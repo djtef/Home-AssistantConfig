@@ -1,0 +1,60 @@
+
+# Loads default set of integrations. Do not remove.
+default_config:
+
+logger:
+  default: error
+  logs:
+    rflink: debug
+    homeassistant.components.rflink: debug
+
+http:
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 192.168.0.10 #Adresse IP du reverse proxy
+  ip_ban_enabled: true
+  login_attempts_threshold: 3
+
+# Text to speech
+tts:
+  - platform: google_translate
+    language: "fr" 
+
+# Example configuration.yaml entry
+rflink:
+  port: /dev/serial/by-id/usb-1a86_USB2.0-Serial-if00-port0
+
+light:
+  - platform: rflink
+    automatic_add: true
+sensor:
+  - platform: rflink
+    automatic_add: true
+   
+device_tracker:    
+  - platform: bluetooth_le_tracker
+    consider_home: 300
+    interval_seconds: 60
+    new_device_defaults:
+      track_new_devices: true
+
+# Example configuration.yaml entry for the Telegram Bot
+telegram_bot:
+  - platform: polling
+    api_key: 453263764:AAHqDhQbTJPp3gIX-Cg2EnBjrXOiTRDDdWQ
+    allowed_chat_ids:
+      - 14419867
+      - -251361296 
+
+# Example configuration.yaml entry for the notifier
+notify:
+  - platform: telegram
+    name: moi
+    chat_id: 14419867
+  - platform: telegram
+    name: maison
+    chat_id: -251361296
+
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml

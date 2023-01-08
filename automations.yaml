@@ -1,0 +1,120 @@
+- id: '1667855934726'
+  alias: 'Fermer volets coucher soleil '
+  description: 'Ferme les volets roulants 15 min après le coucher du soleil '
+  trigger:
+  - platform: sun
+    event: sunset
+    offset: 00:15:00
+  condition: []
+  action:
+  - service: cover.close_cover
+    data: {}
+    target:
+      entity_id: cover.vr_general
+  mode: single
+- id: '1667940962264'
+  alias: Zone Notification
+  description: ''
+  use_blueprint:
+    path: homeassistant/notify_leaving_zone.yaml
+    input:
+      person_entity: person.thomas
+      zone_entity: zone.maison
+      notify_device: 6b2bbffd51050ec702281f101ce90bec
+- id: '1669586212407'
+  alias: Éclairage placard escalier
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - binary_sensor.lumi_lumi_sensor_magnet_aq2_opening
+    from: 'off'
+    to: 'on'
+  condition: []
+  action:
+  - service: light.turn_on
+    data: {}
+    target:
+      entity_id: light.escalier_placard_2
+  mode: single
+- id: '1669586289331'
+  alias: Extinction éclairage placard escalier
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - binary_sensor.lumi_lumi_sensor_magnet_aq2_opening
+    from: 'on'
+    to: 'off'
+  condition: []
+  action:
+  - service: light.turn_off
+    data: {}
+    target:
+      entity_id: light.escalier_placard_2
+  mode: single
+- id: '1669586500452'
+  alias: Éclairage cellier
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - binary_sensor.lumi_lumi_sensor_magnet_aq2_opening_2
+    from: 'off'
+    to: 'on'
+  condition:
+  - condition: state
+    entity_id: cover.vr_cellier
+    state: closed
+  action:
+  - service: light.turn_on
+    data: {}
+    target:
+      entity_id: light.cellier_spots
+  mode: single
+- id: '1669586965200'
+  alias: Éclairage entrée cuisine
+  description: ''
+  trigger:
+  - device_id: 94f10a3d79b25b9d82a903e70bd953ab
+    domain: zha
+    platform: device
+    type: remote_button_short_press
+    subtype: remote_button_short_press
+  condition: []
+  action:
+  - if:
+    - condition: state
+      entity_id: light.cuisine_spots_plan_de_travail
+      state: 'on'
+    then:
+    - service: light.turn_off
+      data: {}
+      target:
+        entity_id: light.cuisine_spots_plan_de_travail
+    else:
+    - service: light.turn_on
+      data: {}
+      target:
+        entity_id: light.cuisine_spots_plan_de_travail
+  mode: single
+- id: '1672266440012'
+  alias: Lampe bureau
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - binary_sensor.bp_bureau
+    from: 'off'
+    to: 'on'
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 0.5
+  condition: []
+  action:
+  - service: light.toggle
+    data: {}
+    target:
+      entity_id: light.yeelight_color_0x458bc59
+  mode: single
