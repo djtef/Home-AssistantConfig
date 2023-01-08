@@ -41,19 +41,19 @@ device_tracker:
 # Example configuration.yaml entry for the Telegram Bot
 telegram_bot:
   - platform: polling
-    api_key: 453263764:AAHqDhQbTJPp3gIX-Cg2EnBjrXOiTRDDdWQ
+    api_key: !secret telegram_bot_api_key
     allowed_chat_ids:
-      - 14419867
-      - -251361296 
+      - !secret telegram_moi_chat_id
+      - !secret telegram_maison_chat_id
 
 # Example configuration.yaml entry for the notifier
 notify:
   - platform: telegram
     name: moi
-    chat_id: 14419867
+    chat_id: !secret telegram_moi_chat_id
   - platform: telegram
     name: maison
-    chat_id: -251361296
+    chat_id: !secret telegram_maison_chat_id
 
 automation: !include automations.yaml
 script: !include scripts.yaml
