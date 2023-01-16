@@ -118,3 +118,57 @@
     target:
       entity_id: light.yeelight_color_0x458bc59
   mode: single
+- id: '1673644248347'
+  alias: Cube
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - binary_sensor.cube_158d0001038dce
+    attribute: last_action
+    to: rotate
+  condition: []
+  action:
+  - service: light.turn_on
+    data:
+      rgb_color:
+      - 255
+      - 60
+      - 0
+    target:
+      entity_id: light.gateway_light_34ce008bede9
+  mode: single
+- id: '1673734933477'
+  alias: Cube 2
+  description: ''
+  trigger:
+  - device_id: 2c446dcafdb0df7cc430ad8f01349807
+    domain: zha
+    platform: device
+    type: device_flipped
+    subtype: face_1
+  condition: []
+  action:
+  - service: notify.moi
+    data:
+      message: Cube face 1
+  mode: single
+- id: '1673905915371'
+  alias: Cycle lave-vaiselle
+  description: Détecte le début et la fin du lave-vaiselle
+  use_blueprint:
+    path: sbyx/notify-or-do-something-when-an-appliance-like-a-dishwasher-or-washing-machine-finishes.yaml
+    input:
+      power_sensor: sensor.prise_lave_vaisselle_active_power
+      starting_threshold: 3
+      starting_hysteresis: 1
+      finishing_threshold: 1900
+      finishing_hysteresis: 60
+      actions:
+      - service: notify.maison
+        data:
+          message: Le lave vaisselle a terminé.
+      pre_actions:
+      - service: notify.maison
+        data:
+          message: Démarrage du lave-vaiselle.
