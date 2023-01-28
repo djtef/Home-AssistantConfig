@@ -168,7 +168,128 @@
       - service: notify.maison
         data:
           message: Le lave vaisselle a terminé.
+      - service: light.toggle
+        data: {}
+        target:
+          entity_id: light.salon_eclairage_central
+      - wait_for_trigger:
+        - platform: numeric_state
+          entity_id: sensor.consommation_lave_vaiselle
+          for:
+            hours: 0
+            minutes: 1
+            seconds: 0
+          above: 1500
+      - service: notify.maison
+        data:
+          message: 'Lave-vaisselle : fin prélavage. Début lavage'
+      - wait_for_trigger:
+        - platform: numeric_state
+          entity_id: sensor.consommation_lave_vaiselle
+          for:
+            hours: 0
+            minutes: 1
+            seconds: 0
+          below: 1500
+      - service: notify.maison
+        data:
+          message: 'Lave vaisselle : fin lavage. Début rinçage. '
+      - wait_for_trigger:
+        - platform: numeric_state
+          entity_id: sensor.consommation_lave_vaiselle
+          for:
+            hours: 0
+            minutes: 1
+            seconds: 0
+          above: 1500
+      - service: notify.maison
+        data:
+          message: 'Lave vaisselle : fin rinçage. Début séchage '
       pre_actions:
       - service: notify.maison
         data:
           message: Démarrage du lave-vaiselle.
+      - service: light.toggle
+        data: {}
+        target:
+          entity_id:
+          - light.salon_eclairage_central
+- id: '1674426498201'
+  alias: Lave-vaisselle
+  description: ''
+  trigger:
+  - platform: numeric_state
+    entity_id: sensor.prise_lave_vaisselle_active_power
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 30
+    above: 8
+  condition: []
+  action:
+  - service: notify.moi
+    data:
+      message: 'Lave-vaisselle : Démarrage prélavage'
+  - wait_for_trigger:
+    - platform: numeric_state
+      entity_id: sensor.prise_lave_vaisselle_active_power
+      for:
+        hours: 0
+        minutes: 0
+        seconds: 30
+      above: 1500
+  - service: notify.moi
+    data:
+      message: 'Lave-vaiselle : début lavage'
+  - wait_for_trigger:
+    - platform: numeric_state
+      entity_id: sensor.prise_lave_vaisselle_active_power
+      for:
+        hours: 0
+        minutes: 0
+        seconds: 30
+      below: 1500
+  - service: notify.moi
+    data:
+      message: 'Lave-vaiselle : début de rinçage'
+  - wait_for_trigger:
+    - platform: numeric_state
+      entity_id: sensor.prise_lave_vaisselle_active_power
+      for:
+        hours: 0
+        minutes: 0
+        seconds: 30
+      above: 1500
+    continue_on_timeout: true
+  - service: notify.moi
+    data:
+      message: 'Lave-vaisselle : début de séchage'
+  - wait_for_trigger:
+    - platform: numeric_state
+      entity_id: sensor.prise_lave_vaisselle_active_power
+      for:
+        hours: 1
+        minutes: 0
+        seconds: 30
+      below: 1500
+  - service: notify.moi
+    data:
+      message: 'Lave-vaisselle : Fin de cycle'
+  mode: single
+- id: '1674428527583'
+  alias: testito
+  description: ''
+  trigger:
+  - platform: numeric_state
+    entity_id: sensor.prise_lave_vaisselle_active_power
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 1
+    above: 5
+  condition: []
+  action:
+  - service: notify.moi
+    data:
+      message: OK !
+  mode: single

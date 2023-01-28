@@ -55,6 +55,81 @@ notify:
     name: maison
     chat_id: !secret telegram_maison_chat_id
 
+
+template:                                                                                                                                                                        
+  - trigger:                                                                                                                                                                     
+      - platform: numeric_state
+        entity_id: sensor.prise_lave_vaisselle_active_power
+        for:
+          hours: 0
+          minutes: 0
+          seconds: 30
+        above: 8  
+      - platform: numeric_state
+        entity_id: sensor.prise_lave_vaisselle_active_power
+        for:
+          hours: 0
+          minutes: 0
+          seconds: 30
+        above: 1500
+      - platform: numeric_state
+        entity_id: sensor.prise_lave_vaisselle_active_power
+        for:
+          hours: 0
+          minutes: 0
+          seconds: 30
+        below: 1500
+      - platform: numeric_state
+        entity_id: sensor.prise_lave_vaisselle_active_power
+        for:
+          hours: 1
+          minutes: 0
+          seconds: 30
+        below: 1500           
+      - platform: homeassistant
+        event: start
+      - platform: event
+        event_type: event_template_reloaded        
+    sensor:                                                                                                                                                                      
+      - name: test_template                                                                                                                                                            
+        state: >-    
+          {% if this.state == 'Libre' %}
+            {% if trigger.idx == '0' %}
+            Prélavage
+            {%- else -%}                                                                                                                                                           
+            Libre 
+            {%- endif -%} 
+          {%- elif this.state == 'Prélavage' -%}
+            {% if trigger.idx == '1' %}
+            Lavage
+            {%- else -%}                                                                                                                                                           
+            Prélavage 
+            {%- endif -%}
+          {%- elif this.state == 'Lavage' -%}
+            {% if trigger.idx == '2' %}
+            Rinçage
+            {%- else -%}                                                                                                                                                           
+            Lavage 
+            {%- endif -%}
+          {%- elif this.state == 'Rinçage' -%}
+            {% if trigger.idx == '1' %}
+            Séchage
+            {%- else -%}                                                                                                                                                           
+            Rinçage 
+            {%- endif -%}
+          {%- elif this.state == 'Séchage' -%}
+            {% if trigger.idx == '3' %}
+            Fin
+            {%- else -%}                                                                                                                                                           
+            Séchage 
+            {%- endif -%}
+          {%- elif this.state == 'Fin' -%}
+          Fin
+          {%- else -%}
+          Libre
+          {%- endif -%}
+
+
 automation: !include automations.yaml
 script: !include scripts.yaml
 scene: !include scenes.yaml
