@@ -276,20 +276,61 @@
     data:
       message: 'Lave-vaisselle : Fin de cycle'
   mode: single
-- id: '1674428527583'
-  alias: testito
-  description: ''
+- id: '1675635231758'
+  alias: Détection sirène
+  description: Avertit si la sirène intérieure est déclenchée
   trigger:
-  - platform: numeric_state
-    entity_id: sensor.prise_lave_vaisselle_active_power
-    for:
-      hours: 0
-      minutes: 0
-      seconds: 1
-    above: 5
+  - platform: state
+    entity_id:
+    - switch.sirene_interieure
+    to: 'on'
   condition: []
   action:
+  - service: notify.maison
+    data:
+      message: 'Déclenchement sirène intérieure ! '
+  - service: notify.mobile_app_galaxy_s20_fe
+    data:
+      message: 'Déclenchement sirène intérieure ! '
   - service: notify.moi
     data:
-      message: OK !
+      message: 'Déclenchement sirène intérieure ! '
+  mode: single
+- id: '1675635547927'
+  alias: Extinction sirène intérieure
+  description: Éteint la sirène intérieure au bout de 3min
+  trigger:
+  - platform: state
+    entity_id:
+    - switch.sirene_interieure
+    to: 'on'
+    for:
+      hours: 0
+      minutes: 3
+      seconds: 0
+  condition: []
+  action:
+  - service: switch.turn_off
+    data: {}
+    target:
+      entity_id: switch.sirene_interieure
+  mode: single
+- id: '1676238242545'
+  alias: Extinction lumière placard escalier
+  description: Extinction lumière placard escalier au bout d'1 min
+  trigger:
+  - platform: state
+    entity_id:
+    - light.escalier_placard_2
+    to: 'on'
+    for:
+      hours: 0
+      minutes: 1
+      seconds: 0
+  condition: []
+  action:
+  - service: light.turn_off
+    data: {}
+    target:
+      entity_id: light.escalier_placard_2
   mode: single

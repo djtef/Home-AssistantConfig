@@ -93,7 +93,7 @@ template:
     sensor:                                                                                                                                                                      
       - name: test_template                                                                                                                                                            
         state: >-    
-          {% if this.state == 'Libre' %}
+          {% if this.state == 'Libre' or this.state == 'Fin' %}
             {% if trigger.idx == '0' %}
             Prélavage
             {%- else -%}                                                                                                                                                           

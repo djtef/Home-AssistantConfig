@@ -1,0 +1,50 @@
+tts_google_home:
+  alias: "TTS Google Home"
+  icon: "mdi:microphone-message"
+  description: "Fait parler Google Home"
+  mode: restart
+  fields:
+    texte:
+      name: Texte
+      description: "Texte à lire"
+    volume:
+      name: Volume
+      description: "Volume du Media player"
+      selector:
+        number:
+          min: 0
+          max: 100
+          step: 5
+          unit_of_measurement: "%"
+          mode: slider
+    media_player_entity:
+        name: Entité Media player
+        description: "Entité du Media player qui va lire le texte"
+      
+  sequence:
+    - service: media_player.turn_on
+      data: 
+        entity_id: "{{ media_player_entity }}"
+    - alias: "Wait for idle"
+      wait_template: "{{ is_state(media_player_entity, 'idle') }}"
+    - service: scene.create
+      data:
+        scene_id: google_home
+        snapshot_entities: "{{ media_player_entity }}"
+    - alias: "Définit le volume"
+      service: media_player.volume_set
+      data: 
+        entity_id: "{{ media_player_entity }}"
+        volume_level: "{{ volume/100 }}"
+    - alias: "TTS Google Home"
+      service: tts.google_translate_say
+      data:
+        entity_id: "{{ media_player_entity }}"
+        message: "{{ texte }}"
+    - alias: "Wait for idle"
+      wait_template: "{{ is_state(media_player_entity, 'idle') }}"
+    - service: scene.turn_on
+      target:
+        entity_id: scene.google_home
+
+
