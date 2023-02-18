@@ -1,7 +1,7 @@
 substitutions:
   slug: tlx800
   name: TLX800
-  description: Home automation board to control lights and covers
+  description: Home automation board to control lights and covers.
   
 packages:
   <<: !include_dir_named common
