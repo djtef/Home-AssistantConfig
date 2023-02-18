@@ -1,0 +1,9 @@
+i2c:
+  - id: bus_a
+    sda: GPIO${i2c_bus_a_sda}
+    scl: GPIO${i2c_bus_a_scl}
+    frequency: 100kHz
+  - id: bus_b
+    sda: GPIO${i2c_bus_b_sda}
+    scl: GPIO${i2c_bus_b_scl}
+    frequency: 100kHz 

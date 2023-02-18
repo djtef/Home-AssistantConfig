@@ -1,0 +1,2990 @@
+mcp23017:
+  - id: 'mcp23017_hub_a1'
+    i2c_id: bus_a
+    address: 0x20
+  - id: 'mcp23017_hub_a2'
+    i2c_id: bus_a
+    address: 0x21
+  - id: 'mcp23017_hub_a3'
+    i2c_id: bus_a
+    address: 0x22
+  - id: 'mcp23017_hub_a4'
+    i2c_id: bus_a
+    address: 0x24
+  - id: 'mcp23017_hub_a5'
+    i2c_id: bus_a
+    address: 0x23
+  - id: 'mcp23017_hub_a6'
+    i2c_id: bus_a
+    address: 0x25
+  - id: 'mcp23017_hub_a7'
+    i2c_id: bus_a
+    address: 0x26
+  - id: 'mcp23017_hub_a8'
+    i2c_id: bus_a
+    address: 0x27
+  - id: 'mcp23017_hub_b1'
+    i2c_id: bus_b
+    address: 0x20
+  - id: 'mcp23017_hub_b2'
+    i2c_id: bus_b
+    address: 0x21
+  - id: 'mcp23017_hub_b3'
+    i2c_id: bus_b
+    address: 0x22
+  - id: 'mcp23017_hub_b4'
+    i2c_id: bus_b
+    address: 0x23
+
+# Individual outputs
+switch:
+  - platform: gpio
+    name: "VR 01 montée"
+    id: out01
+    interlock: [out02]
+    restore_mode: ALWAYS_OFF 
+    pin:
+      mcp23xxx: mcp23017_hub_a1
+      number: 15
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    name: "VR 01 descente"
+    id: out02
+    interlock: [out01]
+    restore_mode: ALWAYS_OFF 
+    pin:
+      mcp23xxx: mcp23017_hub_a1
+      number: 14
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    name: "VR Cuisine montée"
+    id: out03
+    interlock: [out04]
+    restore_mode: ALWAYS_OFF 
+    pin:
+      mcp23xxx: mcp23017_hub_a1
+      number: 13
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    name: "VR Cuisine descente"
+    id: out04
+    interlock: [out03]
+    restore_mode: ALWAYS_OFF 
+    pin:
+      mcp23xxx: mcp23017_hub_a1
+      number: 12
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    name: "VR Palier montée"
+    id: out05
+    interlock: [out06]
+    restore_mode: ALWAYS_OFF 
+    pin:
+      mcp23xxx: mcp23017_hub_a1
+      number: 11
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    name: "VR Palier descente"
+    id: out06
+    interlock: [out05]
+    restore_mode: ALWAYS_OFF 
+    pin:
+      mcp23xxx: mcp23017_hub_a1
+      number: 10
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    name: "VR Escalier montée"
+    id: out07
+    interlock: [out08]
+    restore_mode: ALWAYS_OFF 
+    pin:
+      mcp23xxx: mcp23017_hub_a2
+      number: 13
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    name: "VR Escalier descente"
+    id: out08
+    interlock: [out07]
+    restore_mode: ALWAYS_OFF 
+    pin:
+      mcp23xxx: mcp23017_hub_a2
+      number: 12
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    name: "VR Porte-fenêtre salon montée"
+    id: out09
+    interlock: [out10]
+    restore_mode: ALWAYS_OFF 
+    pin:
+      mcp23xxx: mcp23017_hub_a2
+      number: 11
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    name: "VR Porte-fenêtre salon descente"
+    id: out10
+    interlock: [out09]
+    restore_mode: ALWAYS_OFF 
+    pin:
+      mcp23xxx: mcp23017_hub_a2
+      number: 10
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    name: "VR Chambre 3 montée"
+    id: out11
+    interlock: [out12]
+    restore_mode: ALWAYS_OFF 
+    pin:
+      mcp23xxx: mcp23017_hub_a2
+      number: 9
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    name: "VR Chambre 3 descente"
+    id: out12
+    interlock: [out11]
+    restore_mode: ALWAYS_OFF 
+    pin:
+      mcp23xxx: mcp23017_hub_a2
+      number: 8
+      mode: OUTPUT
+      inverted: False
+ 
+  - platform: gpio
+    name: "VR Bureau montée"
+    id: out13
+    interlock: [out14]
+    restore_mode: ALWAYS_OFF 
+    pin:
+      mcp23xxx: mcp23017_hub_a3
+      number: 15
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    name: "VR Bureau descente"
+    id: out14
+    interlock: [out13]
+    restore_mode: ALWAYS_OFF 
+    pin:
+      mcp23xxx: mcp23017_hub_a3
+      number: 14
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    name: "VR Chambre 1 montée"
+    id: out15
+    interlock: [out16]
+    restore_mode: ALWAYS_OFF 
+    pin:
+      mcp23xxx: mcp23017_hub_a3
+      number: 13
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    name: "VR Chambre 1 descente"
+    id: out16
+    interlock: [out15]
+    restore_mode: ALWAYS_OFF 
+    pin:
+      mcp23xxx: mcp23017_hub_a3
+      number: 12
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    name: "VR Cellier montée"
+    id: out17
+    interlock: [out18]
+    restore_mode: ALWAYS_OFF 
+    pin:
+      mcp23xxx: mcp23017_hub_a3
+      number: 11
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    name: "VR Cellier descente"
+    id: out18
+    interlock: [out17]
+    restore_mode: ALWAYS_OFF 
+    pin:
+      mcp23xxx: mcp23017_hub_a3
+      number: 10
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    name: "VR Salle de jeu montée"
+    id: out19
+    interlock: [out20]
+    restore_mode: ALWAYS_OFF 
+    pin:
+      mcp23xxx: mcp23017_hub_a4
+      number: 15
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    name: "VR Salle de jeu descente"
+    id: out20
+    interlock: [out19]
+    restore_mode: ALWAYS_OFF 
+    pin:
+      mcp23xxx: mcp23017_hub_a4
+      number: 14
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    name: "VR Salon montée"
+    id: out21
+    interlock: [out22]
+    restore_mode: ALWAYS_OFF 
+    pin:
+      mcp23xxx: mcp23017_hub_a4
+      number: 13
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    name: "VR Salon descente"
+    id: out22
+    interlock: [out21]
+    restore_mode: ALWAYS_OFF 
+    pin:
+      mcp23xxx: mcp23017_hub_a4
+      number: 12
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    name: "VR Chambre 2 montée"
+    id: out23
+    interlock: [out24]
+    restore_mode: ALWAYS_OFF 
+    pin:
+      mcp23xxx: mcp23017_hub_a4
+      number: 11
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    name: "VR Chambre 2 descente"
+    id: out24
+    interlock: [out23]
+    restore_mode: ALWAYS_OFF 
+    pin:
+      mcp23xxx: mcp23017_hub_a4
+      number: 10
+      mode: OUTPUT
+      inverted: False
+      
+
+output:
+  - platform: gpio
+    id: out2_01
+    pin:
+      mcp23xxx: mcp23017_hub_a5
+      number: 15
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out2_02
+    pin:
+      mcp23xxx: mcp23017_hub_a5
+      number: 14
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out2_03
+    pin:
+      mcp23xxx: mcp23017_hub_a5
+      number: 13
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out2_04
+    pin:
+      mcp23xxx: mcp23017_hub_a5
+      number: 12
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out2_05
+    pin:
+      mcp23xxx: mcp23017_hub_a5
+      number: 11
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out2_06
+    pin:
+      mcp23xxx: mcp23017_hub_a5
+      number: 10
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out2_07
+    pin:
+      mcp23xxx: mcp23017_hub_a6
+      number: 13
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out2_08
+    pin:
+      mcp23xxx: mcp23017_hub_a6
+      number: 12
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out2_09
+    pin:
+      mcp23xxx: mcp23017_hub_a6
+      number: 11
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out2_10
+    pin:
+      mcp23xxx: mcp23017_hub_a6
+      number: 10
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out2_11
+    pin:
+      mcp23xxx: mcp23017_hub_a6
+      number: 9
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out2_12
+    pin:
+      mcp23xxx: mcp23017_hub_a6
+      number: 8
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out2_13
+    pin:
+      mcp23xxx: mcp23017_hub_a7
+      number: 15
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out2_14
+    pin:
+      mcp23xxx: mcp23017_hub_a7
+      number: 14
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out2_15
+    pin:
+      mcp23xxx: mcp23017_hub_a7
+      number: 13
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out2_16
+    pin:
+      mcp23xxx: mcp23017_hub_a7
+      number: 12
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out2_17
+    pin:
+      mcp23xxx: mcp23017_hub_a7
+      number: 11
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out2_18
+    pin:
+      mcp23xxx: mcp23017_hub_a7
+      number: 10
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out2_19
+    pin:
+      mcp23xxx: mcp23017_hub_a8
+      number: 2
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out2_20
+    pin:
+      mcp23xxx: mcp23017_hub_a8
+      number: 3
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out2_21
+    pin:
+      mcp23xxx: mcp23017_hub_a8
+      number: 4
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out2_22
+    pin:
+      mcp23xxx: mcp23017_hub_a8
+      number: 5
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out2_23
+    pin:
+      mcp23xxx: mcp23017_hub_a8
+      number: 6
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out2_24
+    pin:
+      mcp23xxx: mcp23017_hub_a8
+      number: 7
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out3_01
+    pin:
+      mcp23xxx: mcp23017_hub_b1
+      number: 8
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out3_02
+    pin:
+      mcp23xxx: mcp23017_hub_b1
+      number: 9
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out3_03
+    pin:
+      mcp23xxx: mcp23017_hub_b1
+      number: 10
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out3_04
+    pin:
+      mcp23xxx: mcp23017_hub_b1
+      number: 11
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out3_05
+    pin:
+      mcp23xxx: mcp23017_hub_b1
+      number: 12
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out3_06
+    pin:
+      mcp23xxx: mcp23017_hub_b1
+      number: 13
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out3_07
+    pin:
+      mcp23xxx: mcp23017_hub_b2
+      number: 10
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out3_08
+    pin:
+      mcp23xxx: mcp23017_hub_b2
+      number: 11
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out3_09
+    pin:
+      mcp23xxx: mcp23017_hub_b2
+      number: 12
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out3_10
+    pin:
+      mcp23xxx: mcp23017_hub_b2
+      number: 13
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out3_11
+    pin:
+      mcp23xxx: mcp23017_hub_b2
+      number: 14
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out3_12
+    pin:
+      mcp23xxx: mcp23017_hub_b2
+      number: 15
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out3_13
+    pin:
+      mcp23xxx: mcp23017_hub_b3
+      number: 0
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out3_14
+    pin:
+      mcp23xxx: mcp23017_hub_b3
+      number: 1
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out3_15
+    pin:
+      mcp23xxx: mcp23017_hub_b3
+      number: 2
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out3_16
+    pin:
+      mcp23xxx: mcp23017_hub_b3
+      number: 3
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out3_17
+    pin:
+      mcp23xxx: mcp23017_hub_b3
+      number: 4
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out3_18
+    pin:
+      mcp23xxx: mcp23017_hub_b3
+      number: 5
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out3_19
+    pin:
+      mcp23xxx: mcp23017_hub_b4
+      number: 2
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out3_20
+    pin:
+      mcp23xxx: mcp23017_hub_b4
+      number: 3
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out3_21
+    pin:
+      mcp23xxx: mcp23017_hub_b4
+      number: 4
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out3_22
+    pin:
+      mcp23xxx: mcp23017_hub_b4
+      number: 5
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out3_23
+    pin:
+      mcp23xxx: mcp23017_hub_b4
+      number: 6
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out3_24
+    pin:
+      mcp23xxx: mcp23017_hub_b4
+      number: 7
+      mode: OUTPUT
+      inverted: False
+
+
+
+light:
+  - platform: binary
+    id: CU_LED
+    name: Cuisine LED
+    output: out2_01
+  - platform: binary
+    id: SA_APP_HAUTE
+    name: Salon Applique haute
+    output: out2_02
+  - platform: binary
+    id: SA_APP_PERIPH
+    name: Salon Appliques périphériques
+    output: out2_03
+  - platform: binary
+    id: BB_LED
+    name: SDB RDC LED
+    output: out2_04
+  - platform: binary
+    id: CU_SPT_ILOT
+    name: Cuisine Spots ilot
+    output: out2_05
+  - platform: binary
+    id: BB_DCL
+    name: SDB RDC Spot central
+    output: out2_06
+  - platform: binary
+    id: CE_SPT
+    name: Cellier Spots
+    output: out2_07
+  - platform: binary
+    id: EN_DCL_1
+    name: Escalier placard 1
+    output: out2_08
+  - platform: binary
+    id: EN_DCL_2
+    name: Escalier placard 2
+    output: out2_09
+  - platform: binary
+    id: CU_SPT_TOUR
+    name: Cuisine Spots plan de travail
+    output: out2_10
+  - platform: binary
+    id: BH_SPT
+    name: SDB étage Spots
+    output: out2_11
+  - platform: binary
+    id: PA_DCL
+    name: Palier Eclairage central
+    output: out2_12
+  - platform: binary
+    id: GA_NEON
+    name: Garage Eclairage
+    output: out2_13
+  - platform: binary
+    id: EN_SPT
+    name: Entrée Spots
+    output: out2_14
+  - platform: binary
+    id: RB_SPT
+    name: SAS Spot
+    output: out2_15
+  - platform: binary
+    id: SM_DCL
+    name: Salle à manger Eclairage
+    output: out2_16
+  - platform: binary
+    id: WB_SPT
+    name: WC RDC Eclairage
+    output: out2_17
+  - platform: binary
+    id: BU_DCL
+    name: Bureau Eclairage
+    output: out2_18
+  - platform: binary
+    id: PA_SPT
+    name: Palier Spots
+    output: out2_19
+  - platform: binary
+    id: BH_DCL
+    name: SDB étage Spot central
+    output: out2_20
+  - platform: binary
+    id: SA_DCL
+    name: Salon Eclairage central
+    output: out2_21
+  - platform: binary
+    id: EN_SPT_COULOIR
+    name: Couloir Spots
+    output: out2_22
+  - platform: binary
+    id: SA_DCL_2
+    name: Salon Eclairage central 2
+    output: out2_23
+  - platform: binary
+    id: C1_APP_G
+    name: Chambre 1 Applique gauche
+    output: out2_24
+  - platform: binary
+    id: C1_APP_D
+    name: Chambre 1 Applique droite
+    output: out3_01
+  - platform: binary
+    id: BH_LED
+    name: SDB étage LED
+    output: out3_02
+  - platform: binary
+    id: C2_DCL
+    name: Chambre 2 Eclairage
+    output: out3_03
+  - platform: binary
+    id: WH_SPT
+    name: WC étage Eclairage
+    output: out3_04
+  - platform: binary
+    id: C1_DCL
+    name: Chambre 1 Eclairage central
+    output: out3_05
+  - platform: binary
+    id: BB_SPT
+    name: SDB RDC Spots
+    output: out3_06
+  - platform: binary
+    id: SJ_DCL
+    name: SDJ Eclairage
+    output: out3_07
+  - platform: binary
+    id: CE_APP
+    name: Cellier Applique
+    output: out3_08
+  - platform: binary
+    id: PA_SPT_ESCALIER
+    name: Pallier Spot escalier
+    output: out3_09
+  - platform: binary
+    id: C3_DCL
+    name: Chambre 3 Eclairage
+    output: out3_10
+  - platform: binary
+    id: XT_APP_JM
+    name: Extérieur Appliques côté JM
+    output: out3_11
+  - platform: binary
+    id: XT_APP_GARAGE_PORTAIL
+    name: Extérieur Spot portail garage
+    output: out3_12
+  - platform: binary
+    id: XT_APP_GARAGE_PORTE
+    name: Extérieur Applique porte garage
+    output: out3_13
+  - platform: binary
+    id: XT_APP_TERRASSE
+    name: Extérieur Appliques terrasse
+    output: out3_14
+  - platform: binary
+    id: XT_APP_ENTREE
+    name: Extérieur Applique porche entrée
+    output: out3_15
+  - platform: binary
+    id: EN_APP_ESCALIER
+    name: Escalier Appliques
+    output: out3_16
+  - platform: binary
+    id: out317
+    name: out#3 17
+    output: out3_17
+  - platform: binary
+    id: out318
+    name: out#3 18
+    output: out3_18
+  - platform: binary
+    id: out319
+    name: out#3 19
+    output: out3_19
+  - platform: binary
+    id: out320
+    name: out#3 20
+    output: out3_20
+  - platform: binary
+    id: out321
+    name: out#3 21
+    output: out3_21
+  - platform: binary
+    id: out322
+    name: out#3 22
+    output: out3_22
+  - platform: binary
+    id: out323
+    name: out#3 23
+    output: out3_23
+  - platform: binary
+    id: out324
+    name: out#3 24
+    output: out3_24
+
+# Individual inputs
+binary_sensor:
+  - platform: gpio
+    name: "VR Chambre 2 montée"
+    id: in01
+    pin:
+      mcp23xxx: mcp23017_hub_a1
+      number: 7
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_press:
+      then:
+        - cover.open: vr01
+    on_release:
+      then:
+        - cover.stop: vr01
+  - platform: gpio
+    name: "VR Chambre 2 descente"
+    id: in02
+    pin:
+      mcp23xxx: mcp23017_hub_a1
+      number: 6
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_press:
+      then:
+        - cover.close: vr01
+    on_release:
+      then:
+        - cover.stop: vr01
+  - platform: gpio
+    name: "VR Cuisine montée"
+    id: in03
+    pin:
+      mcp23xxx: mcp23017_hub_a1
+      number: 5
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_press:
+      then:
+        - cover.open: vr02
+    on_release:
+      then:
+        - cover.stop: vr02
+  - platform: gpio
+    name: "VR Cuisine descente"
+    id: in04
+    pin:
+      mcp23xxx: mcp23017_hub_a1
+      number: 4
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_press:
+      then:
+        - cover.close: vr02
+    on_release:
+      then:
+        - cover.stop: vr02
+  - platform: gpio
+    name: "VR Palier montée"
+    id: in05
+    pin:
+      mcp23xxx: mcp23017_hub_a1
+      number: 3
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_press:
+      then:
+        - cover.open: vr03
+        - cover.open: vr04
+    on_release:
+      then:
+        - cover.stop: vr03
+        - cover.stop: vr04
+  - platform: gpio
+    name: "VR Palier descente"
+    id: in06
+    pin:
+      mcp23xxx: mcp23017_hub_a1
+      number: 2
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_press:
+      then:
+        - cover.close: vr03
+        - cover.close: vr04
+    on_release:
+      then:
+        - cover.stop: vr03
+        - cover.stop: vr04
+  # - platform: gpio
+    # name: "in#1 07"
+    # id: in07
+    # pin:
+      # mcp23xxx: mcp23017_hub_a1
+      # number: 1
+      # mode: INPUT_PULLUP
+      # inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    # on_press:
+      # then:
+        # - cover.open: vr04
+  # - platform: gpio
+    # name: "in#1 08"
+    # id: in08
+    # pin:
+      # mcp23xxx: mcp23017_hub_a1
+      # number: 0
+      # mode: INPUT_PULLUP
+      # inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    # on_press:
+      # then:
+        # - cover.close: vr04
+  - platform: gpio
+    name: "VR Porte-fenêtre salon montée"
+    id: in09
+    pin:
+      mcp23xxx: mcp23017_hub_a1
+      number: 9
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - lambda: |-
+            if (id(vr05).current_operation == CoverOperation::COVER_OPERATION_IDLE) 
+              {
+                 auto call = id(vr05).make_call();
+                 call.set_command_open();
+                 call.perform();
+              } 
+            else 
+              {
+                 auto call = id(vr05).make_call();
+                 call.set_command_stop();
+                 call.perform();
+              }
+  - platform: gpio
+    name: "VR Porte-fenêtre salon descente"
+    id: in10
+    pin:
+      mcp23xxx: mcp23017_hub_a1
+      number: 8
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - lambda: |-
+            if (id(vr05).current_operation == CoverOperation::COVER_OPERATION_IDLE)   
+            {
+                 auto call = id(vr05).make_call();
+                 call.set_command_close();
+                 call.perform();
+            } 
+            else 
+            {
+                 auto call = id(vr05).make_call();
+                 call.set_command_stop();
+                 call.perform();
+            }
+  - platform: gpio
+    name: "VR Chambre 3 montée"
+    id: in11
+    pin:
+      mcp23xxx: mcp23017_hub_a2
+      number: 15
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_press:
+      then:
+        - cover.open: vr06
+    on_release:
+      then:
+        - cover.stop: vr06
+  - platform: gpio
+    name: "VR Chambre 3 descente"
+    id: in12
+    pin:
+      mcp23xxx: mcp23017_hub_a2
+      number: 14
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_press:
+      then:
+        - cover.close: vr06
+    on_release:
+      then:
+        - cover.stop: vr06
+  - platform: gpio
+    name: "VR Bureau montée"
+    id: in13
+    pin:
+      mcp23xxx: mcp23017_hub_a2
+      number: 7
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_press:
+      then:
+        - cover.open: vr07
+    on_release:
+      then:
+        - cover.stop: vr07
+  - platform: gpio
+    name: "VR Bureau descente"
+    id: in14
+    pin:
+      mcp23xxx: mcp23017_hub_a2
+      number: 6
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_press:
+      then:
+        - cover.close: vr07
+    on_release:
+      then:
+        - cover.stop: vr07
+  - platform: gpio
+    name: "VR Chambre 1 montée"
+    id: in15
+    pin:
+      mcp23xxx: mcp23017_hub_a2
+      number: 5
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_press:
+      then:
+        - cover.open: vr08
+    on_release:
+      then:
+        - cover.stop: vr08
+  - platform: gpio
+    name: "VR Chambre 1 descente"
+    id: in16
+    pin:
+      mcp23xxx: mcp23017_hub_a2
+      number: 4
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_press:
+      then:
+        - cover.close: vr08
+    on_release:
+      then:
+        - cover.stop: vr08
+  - platform: gpio
+    name: "VR Cellier montée"
+    id: in17
+    pin:
+      mcp23xxx: mcp23017_hub_a2
+      number: 3
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_press:
+      then:
+        - cover.open: vr09
+    on_release:
+      then:
+        - cover.stop: vr09
+  - platform: gpio
+    name: "VR Cellier descente"
+    id: in18
+    pin:
+      mcp23xxx: mcp23017_hub_a2
+      number: 2
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_press:
+      then:
+        - cover.close: vr09
+    on_release:
+      then:
+        - cover.stop: vr09
+  - platform: gpio
+    name: "VR Salle de jeu montée"
+    id: in19
+    pin:
+      mcp23xxx: mcp23017_hub_a2
+      number: 1
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_press:
+      then:
+        - cover.open: vr10
+    on_release:
+      then:
+        - cover.stop: vr10
+  - platform: gpio
+    name: "VR Salle de jeu descente"
+    id: in20
+    pin:
+      mcp23xxx: mcp23017_hub_a2
+      number: 0
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_press:
+      then:
+        - cover.close: vr10              
+    on_release:
+      then:
+        - cover.stop: vr10
+  - platform: gpio
+    name: "VR Salon montée"
+    id: in21
+    pin:
+      mcp23xxx: mcp23017_hub_a3
+      number: 7
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - lambda: |-
+            if (id(vr11).current_operation == CoverOperation::COVER_OPERATION_IDLE) 
+            {
+                 auto call = id(vr11).make_call();
+                 call.set_command_open();
+                 call.perform();
+            } 
+            else 
+            {
+                 auto call = id(vr11).make_call();
+                 call.set_command_stop();
+                 call.perform();
+            }
+  - platform: gpio
+    name: "VR Salon descente"
+    id: in22
+    pin:
+      mcp23xxx: mcp23017_hub_a3
+      number: 6
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - lambda: |-
+            if (id(vr11).current_operation == CoverOperation::COVER_OPERATION_IDLE) 
+            {
+                 auto call = id(vr11).make_call();
+                 call.set_command_close();
+                 call.perform();
+            } 
+            else 
+            {
+                 auto call = id(vr11).make_call();
+                 call.set_command_stop();
+                 call.perform();
+            }
+  - platform: gpio #in1 23
+    name: "BP Salon Angle SM-Haut"
+    id: BP_SA_ANGLE_SM_1
+    pin:
+      mcp23xxx: mcp23017_hub_a3
+      number: 5
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_press:
+      then:
+        - light.toggle: SA_DCL
+  - platform: gpio #in1 24
+    name: "BP Salon Angle SM-Bas Gauche"
+    id: BP_SA_ANGLE_SM_3
+    pin:
+      mcp23xxx: mcp23017_hub_a3
+      number: 4
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: SA_APP_PERIPH
+  - platform: gpio #in1 25
+    name: "BP Salon Angle SM-Bas Droite"
+    id: BP_SA_ANGLE_SM_4
+    pin:
+      mcp23xxx: mcp23017_hub_a3
+      number: 3
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: SA_APP_HAUTE
+  - platform: gpio #in1 26
+    name: "BP Salle à manger Baie-Haut Gauche"
+    id: BP_SM_BAIE_1
+    pin:
+      mcp23xxx: mcp23017_hub_a3
+      number: 2
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 500ms
+      then:
+        - light.toggle: XT_APP_TERRASSE
+  - platform: gpio #in1 27
+    name: "BP Salle à manger Baie-Haut Droite"
+    id: BP_SM_BAIE_2
+    pin:
+      mcp23xxx: mcp23017_hub_a3
+      number: 1
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 500ms
+      then:
+        - light.toggle: XT_APP_TERRASSE
+  - platform: gpio #in1 28
+    name: "BP SDJ"
+    id: BP_SDJ
+    pin:
+      mcp23xxx: mcp23017_hub_a3
+      number: 0
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: SJ_DCL
+  - platform: gpio #in1 29
+    name: "BP Chambre 1 Lit gauche-Gauche"
+    id: BP_C1_LIT_G_1
+    pin:
+      mcp23xxx: mcp23017_hub_a3
+      number: 9
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: C1_DCL
+  - platform: gpio #in1 30
+    name: "BP Chambre 1 Lit gauche-Droit"
+    id: BP_C1_LIT_G_2
+    pin:
+      mcp23xxx: mcp23017_hub_a3
+      number: 8
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: C1_APP_G        
+  - platform: gpio #in1 31
+    name: "BP Chambre 1 Lit droite-Gauche"
+    id: BP_C1_LIT_D_1
+    pin:
+      mcp23xxx: mcp23017_hub_a4
+      number: 9
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: C1_DCL
+  - platform: gpio #in1 32
+    name: "BP Chambre 1 Lit droite-Droite"
+    id: BP_C1_LIT_D_2
+    pin:
+      mcp23xxx: mcp23017_hub_a4
+      number: 8
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: C1_APP_D
+  - platform: gpio #in1 33
+    name: "BP Entrée Angle salon"
+    id: BP_EN_SALON
+    pin:
+      mcp23xxx: mcp23017_hub_a4
+      number: 7
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: EN_SPT
+  - platform: gpio #in1 34
+    name: "BP Salon Angle entrée-Haut"
+    id: BP_SA_ENTREE_1
+    pin:
+      mcp23xxx: mcp23017_hub_a4
+      number: 6
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: SA_DCL
+  - platform: gpio #in1 35
+    name: "BP Salon Angle entrée-Bas Gauche"
+    id: BP_SA_ENTREE_3
+    pin:
+      mcp23xxx: mcp23017_hub_a4
+      number: 5
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: SA_APP_PERIPH
+  - platform: gpio #in1 36
+    name: "BP Salon Angle entrée-Bas Droite"
+    id: BP_SA_ENTREE_4
+    pin:
+      mcp23xxx: mcp23017_hub_a4
+      number: 4
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: SA_APP_HAUTE
+  - platform: gpio #in1 37
+    name: "BP Salon Baie-Haut Gauche"
+    id: BP_SA_BAIE_3
+    pin:
+      mcp23xxx: mcp23017_hub_a4
+      number: 3
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 500ms
+      then:
+        - light.toggle: XT_APP_TERRASSE
+  - platform: gpio #in1 38
+    name: "BP Salon Baie-Haut Droite"
+    id: BP_SA_BAIE_4
+    pin:
+      mcp23xxx: mcp23017_hub_a4
+      number: 2
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 500ms
+      then:
+        - light.toggle: XT_APP_TERRASSE
+  - platform: gpio #in1 39
+    name: "BP Salon Porte-fenêtre 1-Haut Gauche"
+    id: BP_SA_PF_1_1
+    pin:
+      mcp23xxx: mcp23017_hub_a4
+      number: 1
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 500ms
+      then:
+        - light.toggle: XT_APP_JM
+  - platform: gpio #in1 40
+    name: "BP Salon Porte-fenêtre 1-Haut Droite"
+    id: BP_SA_PF_1_2
+    pin:
+      mcp23xxx: mcp23017_hub_a4
+      number: 0
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    # on_press:
+      # then:
+        # - light.toggle: ???  
+  - platform: gpio #in2 01
+    name: "BP Salle à manger Angle salon - Bas gauche"
+    id: BP_SM_SA_3
+    pin:
+      mcp23xxx: mcp23017_hub_a5
+      number: 7
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: CU_LED
+  - platform: gpio #in2 02
+    name: "BP Salon Porte-fenêtre 2-Bas Gauche"
+    id: BP_SA_PF_2_3
+    pin:
+      mcp23xxx: mcp23017_hub_a5
+      number: 6
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: SA_APP_PERIPH
+  - platform: gpio #in2 03
+    name: "BP Salon Porte-fenêtre 2-Bas Droite"
+    id: BP_SA_PF_2_4
+    pin:
+      mcp23xxx: mcp23017_hub_a5
+      number: 5
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: SA_APP_HAUTE
+  - platform: gpio #in2 04
+    name: "in#2 04"
+    id: in204
+    pin:
+      mcp23xxx: mcp23017_hub_a5
+      number: 4
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    # on_click:
+      # then:
+        # - light.toggle: out204
+  - platform: gpio #in2 05
+    name: "BP SDB RDC-Gauche"
+    id: BP_BB_1
+    pin:
+      mcp23xxx: mcp23017_hub_a5
+      number: 3
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: BB_LED
+  - platform: gpio #in2 06
+    name: "BP SDB RDC-Droite"
+    id: BP_BB_2
+    pin:
+      mcp23xxx: mcp23017_hub_a5
+      number: 2
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 250ms
+      then:
+        - light.toggle: BB_DCL
+    - min_length: 250ms
+      max_length: 3000ms
+      then:
+        - light.toggle: BB_SPT
+  - platform: gpio #in2 07
+    name: "BP Garage Cellier-Droite"
+    id: BP_GA_CELLIER_2
+    pin:
+      mcp23xxx: mcp23017_hub_a5
+      number: 1
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: CE_SPT
+  - platform: gpio #in2 08
+    name: "in#2 08"
+    id: in208
+    pin:
+      mcp23xxx: mcp23017_hub_a5
+      number: 0
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    # on_click:
+      # then:
+        # - light.toggle: out208
+  - platform: gpio #in2 09
+    name: "BP Placard Escalier RDC"
+    id: BP_EN_PLACARD_ESCALIER_RDC
+    pin:
+      mcp23xxx: mcp23017_hub_a5
+      number: 9
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: EN_DCL_2
+  - platform: gpio #in2 10
+    name: "BP Salle à manger Angle salon - Bas Droite"
+    id: BP_SM_SA_4
+    pin:
+      mcp23xxx: mcp23017_hub_a5
+      number: 8
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: CU_SPT_TOUR        
+  - platform: gpio #in2 11
+    name: "in#2 11"
+    id: in211
+    pin:
+      mcp23xxx: mcp23017_hub_a6
+      number: 15
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    # on_click:
+      # then:
+        # - light.toggle: out211
+  - platform: gpio #in2 12
+    name: "BP Palier Chambre 2-Gauche"
+    id: BP_PA_C2_1
+    pin:
+      mcp23xxx: mcp23017_hub_a6
+      number: 14
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: PA_SPT_ESCALIER
+  - platform: gpio #in2 13
+    name: "BP Garage Cellier-Gauche"
+    id: BP_GA_CELLIER_1
+    pin:
+      mcp23xxx: mcp23017_hub_a6
+      number: 7
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: GA_NEON
+  - platform: gpio #in2 14
+    name: "BP Entrée SAS"
+    id: BP_EN_SAS
+    pin:
+      mcp23xxx: mcp23017_hub_a6
+      number: 6
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: RB_SPT
+  - platform: gpio #in2 15
+    name: "BP SAS"
+    id: BP_RB
+    pin:
+      mcp23xxx: mcp23017_hub_a6
+      number: 5
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: RB_SPT
+  - platform: gpio #in2 16
+    name: "BP Salle à manger Angle salon-Haut"
+    id: BP_SM_SA_1
+    pin:
+      mcp23xxx: mcp23017_hub_a6
+      number: 4
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: SM_DCL
+  - platform: gpio #in2 17
+    name: "BP WC RDC"
+    id: BP_WB
+    pin:
+      mcp23xxx: mcp23017_hub_a6
+      number: 3
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: WB_SPT
+  - platform: gpio #in2 18
+    name: "BP Bureau"
+    id: BU_BP
+    pin:
+      mcp23xxx: mcp23017_hub_a6
+      number: 2
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: BU_DCL
+  - platform: gpio #in2 19
+    name: "in#2 19"
+    id: in219
+    pin:
+      mcp23xxx: mcp23017_hub_a6
+      number: 1
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    # on_click:
+      # then:
+        # - light.toggle: out219
+  - platform: gpio #in2 20
+    name: "BP SDB étage-Gauche"
+    id: BP_BH_1
+    pin:
+      mcp23xxx: mcp23017_hub_a6
+      number: 0
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: BH_LED              
+  - platform: gpio #in2 21
+    name: "BP Salon Porte-fenêtre 2-Haut"
+    id: BP_SA_PF_2_1
+    pin:
+      mcp23xxx: mcp23017_hub_a7
+      number: 7
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+      then:
+        - light.toggle: SA_DCL
+  - platform: gpio #in2 22
+    name: "BP Couloir WC"
+    id: BP_EN_WC
+    pin:
+      mcp23xxx: mcp23017_hub_a7
+      number: 6
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: EN_SPT_COULOIR
+  - platform: gpio #in2 23
+    name: "in#2 23"
+    id: in223
+    pin:
+      mcp23xxx: mcp23017_hub_a7
+      number: 5
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    # on_click:
+      # then:
+        # - light.toggle: out223
+  - platform: gpio #in2 24
+    name: "in#2 24"
+    id: in224
+    pin:
+      mcp23xxx: mcp23017_hub_a7
+      number: 4
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    # on_click:
+      # then:
+        # - light.toggle: out224
+  - platform: gpio #in2 25
+    name: "BP Palier Chambre 2-Droite"
+    id: BP_PA_C2_2
+    pin:
+      mcp23xxx: mcp23017_hub_a7
+      number: 3
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: PA_DCL
+    - min_length: 300ms
+      max_length: 2000ms
+      then:
+        - light.toggle: PA_SPT
+  - platform: gpio #in2 26
+    name: "BP Chambre 1-Gauche"
+    id: BP_C1_ENTREE_1
+    pin:
+      mcp23xxx: mcp23017_hub_a7
+      number: 2
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: C1_DCL
+  - platform: gpio #in2 27
+    name: "BP Chambre 1-Droite"
+    id: BP_C1_ENTREE_2
+    pin:
+      mcp23xxx: mcp23017_hub_a7
+      number: 1
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: C1_APP_D
+  - platform: gpio #in2 28
+    name: "BP Chambre 2"
+    id: BP_C2_ENTREE
+    pin:
+      mcp23xxx: mcp23017_hub_a7
+      number: 0
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: C2_DCL
+  - platform: gpio #in2 29
+    name: "BP Cuisine Verrière-Gauche"
+    id: BP_CU_VERRIERE_1
+    pin:
+      mcp23xxx: mcp23017_hub_a7
+      number: 9
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: CU_LED
+  - platform: gpio #in2 30
+    name: "BP Cuisine Verrière-Droite"
+    id: BP_CU_VERRIERE_2
+    pin:
+      mcp23xxx: mcp23017_hub_a7
+      number: 8
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: CU_SPT_TOUR        
+  - platform: gpio #in2 31
+    name: "BP Salle à manger Colonne-Haut"
+    id: BP_SM_COLONNE_1
+    pin:
+      mcp23xxx: mcp23017_hub_a8
+      number: 0
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: SM_DCL
+  - platform: gpio #in2 32
+    name: "BP Salle à manger Colonne-Bas Gauche"
+    id: BP_SM_COLONNE_3
+    pin:
+      mcp23xxx: mcp23017_hub_a8
+      number: 1
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: CU_LED
+  - platform: gpio #in2 33
+    name: "BP Salle à manger Colonne-Bas Droite"
+    id: BP_SM_COLONNE_4
+    pin:
+      mcp23xxx: mcp23017_hub_a8
+      number: 15
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: CU_SPT_TOUR
+  - platform: gpio #in2 34
+    name: "BP Entrée Porte-Haut Gauche"
+    id: BP_EN_PORTE_1
+    pin:
+      mcp23xxx: mcp23017_hub_a8
+      number: 14
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    # on_click:
+      # then:
+        # - light.toggle: out234
+  - platform: gpio #in2 35
+    name: "BP Entrée Porte-Haut Droite"
+    id: BP_EN_PORTE_2
+    pin:
+      mcp23xxx: mcp23017_hub_a8
+      number: 13
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: XT_APP_ENTREE
+  - platform: gpio #in2 36
+    name: "BP Entrée Porte-Bas"
+    id: BP_EN_PORTE_3
+    pin:
+      mcp23xxx: mcp23017_hub_a8
+      number: 12
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: EN_SPT
+  - platform: gpio #in2 37
+    name: "BP SDB étage-Droite"
+    id: BP_BH_2
+    pin:
+      mcp23xxx: mcp23017_hub_a8
+      number: 11
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 250ms
+      then:
+        - light.toggle: BH_DCL
+    - min_length: 250ms
+      max_length: 3000ms
+      then:
+        - light.toggle: BH_SPT
+  - platform: gpio #in2 38
+    name: "in#2 38"
+    id: in238
+    pin:
+      mcp23xxx: mcp23017_hub_a8
+      number: 10
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    # on_click:
+      # then:
+        # - light.toggle: out238
+  - platform: gpio #in2 39
+    name: "in#2 39"
+    id: in239
+    pin:
+      mcp23xxx: mcp23017_hub_a8
+      number: 9
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    # on_click:
+      # then:
+        # - light.toggle: out239
+  - platform: gpio #in2 40
+    name: "in#2 40"
+    id: in240
+    pin:
+      mcp23xxx: mcp23017_hub_a8
+      number: 8
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    # on_click:
+      # then:
+        # - light.toggle: out240        
+  - platform: gpio #in3 01
+    name: "in#3 01"
+    id: in301
+    pin:
+      mcp23xxx: mcp23017_hub_b1
+      number: 0
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    # # on_click:
+      # # then:
+        # # - light.toggle: out301
+  - platform: gpio #in3 02
+    name: "in#3 02"
+    id: in302
+    pin:
+      mcp23xxx: mcp23017_hub_b1
+      number: 1
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    # # on_click:
+      # # then:
+        # # - light.toggle: out302
+  - platform: gpio #in3 03
+    name: "BP Chambre 2 lit gauche"
+    id: C2_BP_LIT_G
+    pin:
+      mcp23xxx: mcp23017_hub_b1
+      number: 2
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: C2_DCL
+  - platform: gpio #in3 04
+    name: "BP WC étage"
+    id: WH_BP
+    pin:
+      mcp23xxx: mcp23017_hub_b1
+      number: 3
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: WH_SPT
+  - platform: gpio #in3 05
+    name: "in#3 05"
+    id: in305
+    pin:
+      mcp23xxx: mcp23017_hub_b1
+      number: 4
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    # # on_click:
+      # # then:
+        # # - light.toggle: out305
+  - platform: gpio #in3 06
+    name: "in#3 06"
+    id: in306
+    pin:
+      mcp23xxx: mcp23017_hub_b1
+      number: 5
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    # # on_click:
+      # # then:
+        # # - light.toggle: out306
+  - platform: gpio #in3 07
+    name: "in#3 07"
+    id: in307
+    pin:
+      mcp23xxx: mcp23017_hub_b1
+      number: 6
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    # # on_click:
+      # # then:
+        # # - light.toggle: out307
+  - platform: gpio #in3 08
+    name: "BP Cellier côté cuisine-Gauche "
+    id: CE_BP_CUISINE_2
+    pin:
+      mcp23xxx: mcp23017_hub_b1
+      number: 7
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: CE_APP
+  - platform: gpio #in3 09
+    name: "BP Escalier bas-Gauche"
+    id: EN_BP_ESCALIER_BAS_1
+    pin:
+      mcp23xxx: mcp23017_hub_b1
+      number: 14
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: PA_SPT_ESCALIER
+  - platform: gpio #in3 10
+    name: "BP Chambre 3 Entrée"
+    id: C3_BP
+    pin:
+      mcp23xxx: mcp23017_hub_b1
+      number: 15
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: C3_DCL        
+  - platform: gpio #in3 11
+    name: "in#3 11"
+    id: in311
+    pin:
+      mcp23xxx: mcp23017_hub_b2
+      number: 8
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    # # on_click:
+      # # then:
+        # # - light.toggle: out311
+  - platform: gpio #in3 12
+    name: "BP Garage portail"
+    id: GA_BP_PORTAIL
+    pin:
+      mcp23xxx: mcp23017_hub_b2
+      number: 9
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: XT_APP_GARAGE_PORTAIL
+  - platform: gpio #in3 13
+    name: "BP Garage porte"
+    id: GA_BP_PORTE
+    pin:
+      mcp23xxx: mcp23017_hub_b2
+      number: 0
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+      then:
+        - light.toggle: XT_APP_GARAGE_PORTE
+  - platform: gpio #in3 14
+    name: "in#3 14"
+    id: in314
+    pin:
+      mcp23xxx: mcp23017_hub_b2
+      number: 1
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    # # on_click:
+      # # then:
+        # # - light.toggle: out314
+  - platform: gpio #in3 15
+    name: "in#3 15"
+    id: in315
+    pin:
+      mcp23xxx: mcp23017_hub_b2
+      number: 2
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    # # on_click:
+      # # then:
+        # # - light.toggle: out315
+  - platform: gpio #in3 16
+    name: "BP Escalier bas-Droite"
+    id: EN_BP_ESCALIER_BAS_2
+    pin:
+      mcp23xxx: mcp23017_hub_b2
+      number: 3
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: EN_APP_ESCALIER
+  - platform: gpio #in3 17
+    name: "in#3 17"
+    id: in317
+    pin:
+      mcp23xxx: mcp23017_hub_b2
+      number: 4
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    # on_click:
+      # then:
+        # - light.toggle: out317
+  - platform: gpio #in3 18
+    name: "in#3 18"
+    id: in318
+    pin:
+      mcp23xxx: mcp23017_hub_b2
+      number: 5
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    # on_click:
+      # then:
+        # - light.toggle: out318
+  - platform: gpio #in3 19
+    name: "in#3 19"
+    id: in319
+    pin:
+      mcp23xxx: mcp23017_hub_b2
+      number: 6
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    # on_click:
+      # then:
+        # - light.toggle: out319
+  - platform: gpio #in3 20
+    name: "in#3 20"
+    id: in320
+    pin:
+      mcp23xxx: mcp23017_hub_b2
+      number: 7
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    # on_click:
+      # then:
+        # - light.toggle: out320              
+
+  - platform: gpio #in3 21
+    name: "in#3 21"
+    id: in321
+    pin:
+      mcp23xxx: mcp23017_hub_b3
+      number: 15
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    # on_click:
+      # then:
+        # - light.toggle: out321
+  - platform: gpio #in3 22
+    name: "in#3 22"
+    id: in322
+    pin:
+      mcp23xxx: mcp23017_hub_b3
+      number: 14
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    # on_click:
+      # then:
+        # - light.toggle: out322
+  - platform: gpio #in3 23
+    name: "in#3 23"
+    id: in323
+    pin:
+      mcp23xxx: mcp23017_hub_b3
+      number: 13
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    # on_click:
+      # then:
+        # - light.toggle: out323
+  - platform: gpio #in3 24
+    name: "in#3 24"
+    id: in324
+    pin:
+      mcp23xxx: mcp23017_hub_b3
+      number: 12
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    # on_click:
+      # then:
+        # - light.toggle: out324
+  - platform: gpio #in3 25
+    name: "BP Chambre 2 lit droite"
+    id: in325
+    pin:
+      mcp23xxx: mcp23017_hub_b3
+      number: 11
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: C2_DCL
+  - platform: gpio #in3 26
+    name: "BP Palier Chambre 3-Gauche"
+    id: in326
+    pin:
+      mcp23xxx: mcp23017_hub_b3
+      number: 10
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: PA_SPT_ESCALIER
+  - platform: gpio #in3 27
+    name: "BP Palier Chambre 3-Droite"
+    id: in327
+    pin:
+      mcp23xxx: mcp23017_hub_b3
+      number: 9
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: PA_DCL
+    - min_length: 300ms
+      max_length: 2000ms
+      then:
+        - light.toggle: PA_SPT
+  - platform: gpio #in3 28
+    name: "BP Chambre 3 lit droite"
+    id: C3_BP_LIT_D
+    pin:
+      mcp23xxx: mcp23017_hub_b3
+      number: 8
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: C3_DCL
+  - platform: gpio #in3 29
+    name: "BP Chambre 3 lit gauche"
+    id: C3_BP_LIT_G
+    pin:
+      mcp23xxx: mcp23017_hub_b3
+      number: 6
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: C3_DCL
+  - platform: gpio #in3 30
+    name: "BP Entrée angle couloir-Gauche"
+    id: EN_BP_COULOIR_1
+    pin:
+      mcp23xxx: mcp23017_hub_b3
+      number: 7
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: EN_SPT
+  - platform: gpio #in3 31
+    name: "BP Entrée angle couloir-Droite"
+    id: EN_BP_COULOIR_2
+    pin:
+      mcp23xxx: mcp23017_hub_b4
+      number: 0
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: EN_SPT_COULOIR
+  - platform: gpio #in3 32
+    name: "VR Entrée Haut montée"
+    id: in332
+    pin:
+      mcp23xxx: mcp23017_hub_b4
+      number: 1
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_press:
+      then:
+        - cover.open: vr01
+        - cover.open: vr03
+        - cover.open: vr04
+        - cover.open: vr06
+    on_release:
+      then:
+        - cover.stop: vr01 
+        - cover.stop: vr03
+        - cover.stop: vr04
+        - cover.stop: vr06
+  - platform: gpio #in3 33
+    name: "VR Entrée Haut descente"
+    id: in333
+    pin:
+      mcp23xxx: mcp23017_hub_b4
+      number: 15
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_press:
+      then:
+        - cover.close: vr01
+        - cover.close: vr03
+        - cover.close: vr04
+        - cover.close: vr06
+    on_release:
+      then:
+        - cover.stop: vr01 
+        - cover.stop: vr03
+        - cover.stop: vr04
+        - cover.stop: vr06
+  - platform: gpio #in3 34
+    name: "VR Entrée Bas descente"
+    id: in334
+    pin:
+      mcp23xxx: mcp23017_hub_b4
+      number: 14
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_press:
+      then:
+        - cover.close: vr02
+        - cover.close: vr05
+        - cover.close: vr07
+        - cover.close: vr08
+        - cover.close: vr09
+        - cover.close: vr10
+        - cover.close: vr11
+    on_release:
+      then:
+        - cover.stop: vr02
+        - cover.stop: vr05
+        - cover.stop: vr07
+        - cover.stop: vr08
+        - cover.stop: vr09
+        - cover.stop: vr10
+        - cover.stop: vr11
+  - platform: gpio #in3 35
+    name: "VR Entrée Bas montée"
+    id: in335
+    pin:
+      mcp23xxx: mcp23017_hub_b4
+      number: 13
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_press:
+      then:
+        - cover.open: vr02
+        - cover.open: vr05
+        - cover.open: vr07
+        - cover.open: vr08
+        - cover.open: vr09
+        - cover.open: vr10
+        - cover.open: vr11
+    on_release:
+      then:
+        - cover.stop: vr02
+        - cover.stop: vr05
+        - cover.stop: vr07
+        - cover.stop: vr08
+        - cover.stop: vr09
+        - cover.stop: vr10
+        - cover.stop: vr11
+  - platform: gpio #in3 36
+    name: "in#3 36"
+    id: in336
+    pin:
+      mcp23xxx: mcp23017_hub_b4
+      number: 12
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    # # on_click:
+      # # then:
+        # # - light.toggle: out31
+  - platform: gpio #in3 37
+    name: "in#3 37"
+    id: in337
+    pin:
+      mcp23xxx: mcp23017_hub_b4
+      number: 11
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    # # on_click:
+      # # then:
+        # # - light.toggle: out31
+  - platform: gpio #in3 38
+    name: "BP Escalier haut-Gauche"
+    id: PA_BP_ESCALIER_HAUT_1
+    pin:
+      mcp23xxx: mcp23017_hub_b4
+      number: 10
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - cover.open: vr01
+        - cover.open: vr03
+        - cover.open: vr04
+        - cover.open: vr06
+  - platform: gpio #in3 39
+    name: "BP Escalier haut-Droite"
+    id: PA_BP_ESCALIER_HAUT_2
+    pin:
+      mcp23xxx: mcp23017_hub_b4
+      number: 9
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - cover.close: vr01
+        - cover.close: vr03
+        - cover.close: vr04
+        - cover.close: vr06
+  - platform: gpio #in3 40
+    name: "BP Cellier Côté Cuisine-Gauche"
+    id: CE_BP_CUISINE_1
+    pin:
+      mcp23xxx: mcp23017_hub_b4
+      number: 8
+      mode: INPUT_PULLUP
+      inverted: True
+    # filters:
+      # - delayed_on: 3ms
+      # - delayed_off: 3ms
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
+      then:
+        - light.toggle: CE_SPT        
+
+cover:
+  - platform: time_based
+    name: "VR Chambre 2"
+    id: vr01
+    open_action:
+      - switch.turn_on: out23
+    open_duration: 15s
+    close_action:
+      - switch.turn_on: out24
+    close_duration: 15s
+    stop_action:
+      - switch.turn_off: out23
+      - switch.turn_off: out24
+  - platform: time_based
+    name: "VR Cuisine"
+    id: vr02
+    open_action:
+      - switch.turn_on: out03
+    open_duration: 20s
+    close_action:
+      - switch.turn_on: out04
+    close_duration: 20s
+    stop_action:
+      - switch.turn_off: out03
+      - switch.turn_off: out04
+  - platform: time_based
+    name: "VR Palier"
+    id: vr03
+    open_action:
+      - switch.turn_on: out05
+    open_duration: 15s
+    close_action:
+      - switch.turn_on: out06
+    close_duration: 15s
+    stop_action:
+      - switch.turn_off: out05
+      - switch.turn_off: out06
+  - platform: time_based
+    name: "VR Escalier"
+    id: vr04
+    open_action:
+      - switch.turn_on: out07
+    open_duration: 15.5s
+    close_action:
+      - switch.turn_on: out08
+    close_duration: 15.5s
+    stop_action:
+      - switch.turn_off: out07
+      - switch.turn_off: out08
+  - platform: time_based
+    name: "VR Porte-fenêtre salon"
+    id: vr05
+    open_action:
+      - switch.turn_on: out09
+    open_duration: 27s
+    close_action:
+      - switch.turn_on: out10
+    close_duration: 27s
+    stop_action:
+      - switch.turn_off: out09
+      - switch.turn_off: out10
+  - platform: time_based
+    name: "VR Chambre 3"
+    id: vr06
+    open_action:
+      - switch.turn_on: out11
+    open_duration: 15s
+    close_action:
+      - switch.turn_on: out12
+    close_duration: 15s
+    stop_action:
+      - switch.turn_off: out11
+      - switch.turn_off: out12
+  - platform: time_based
+    name: "VR Bureau"
+    id: vr07
+    open_action:
+      - switch.turn_on: out13
+    open_duration: 17s
+    close_action:
+      - switch.turn_on: out14
+    close_duration: 17s
+    stop_action:
+      - switch.turn_off: out13
+      - switch.turn_off: out14
+  - platform: time_based
+    name: "VR Chambre 1"
+    id: vr08
+    open_action:
+      - switch.turn_on: out15
+    open_duration: 16s
+    close_action:
+      - switch.turn_on: out16
+    close_duration: 16s
+    stop_action:
+      - switch.turn_off: out15
+      - switch.turn_off: out16
+  - platform: time_based
+    name: "VR Cellier"
+    id: vr09
+    open_action:
+      - switch.turn_on: out17
+    open_duration: 17s
+    close_action:
+      - switch.turn_on: out18
+    close_duration: 17s
+    stop_action:
+      - switch.turn_off: out17
+      - switch.turn_off: out18
+  - platform: time_based
+    name: "VR Salle de jeu"
+    id: vr10
+    open_action:
+      - switch.turn_on: out19
+    open_duration: 16s
+    close_action:
+      - switch.turn_on: out20
+    close_duration: 16s
+    stop_action:
+      - switch.turn_off: out19
+      - switch.turn_off: out20
+  - platform: time_based
+    name: "VR Salon"
+    id: vr11
+    open_action:
+      - switch.turn_on: out21
+    open_duration: 20s
+    close_action:
+      - switch.turn_on: out22
+    close_duration: 20s
+    stop_action:
+      - switch.turn_off: out21
+      - switch.turn_off: out22
+  # - platform: time_based
+    # name: "VR Chambre 2"
+    # id: vr12
+    # open_action:
+      # - switch.turn_on: out23
+    # open_duration: 14.5s
+    # close_action:
+      # - switch.turn_on: out24
+    # close_duration: 14.5s
+    # stop_action:
+      # - switch.turn_off: out23
+      # - switch.turn_off: out24
+  - platform: template
+    name: "VR  GENERAL"
+    open_action:
+      - cover.open: vr01
+      - cover.open: vr02
+      - cover.open: vr03
+      - cover.open: vr04
+      - cover.open: vr05
+      - cover.open: vr06
+      - cover.open: vr07
+      - cover.open: vr08
+      - cover.open: vr09
+      - cover.open: vr10
+      - cover.open: vr11
+      # - cover.open: vr12
+    close_action:
+      - cover.close: vr01
+      - cover.close: vr02
+      - cover.close: vr03
+      - cover.close: vr04
+      - cover.close: vr05
+      - cover.close: vr06
+      - cover.close: vr07
+      - cover.close: vr08
+      - cover.close: vr09
+      - cover.close: vr10
+      - cover.close: vr11
+      # - cover.close: vr12
+    stop_action:
+      - cover.stop: vr01
+      - cover.stop: vr02
+      - cover.stop: vr03
+      - cover.stop: vr04
+      - cover.stop: vr05
+      - cover.stop: vr06
+      - cover.stop: vr07
+      - cover.stop: vr08
+      - cover.stop: vr09
+      - cover.stop: vr10
+      - cover.stop: vr11
+      # - cover.stop: vr12
+    optimistic: true

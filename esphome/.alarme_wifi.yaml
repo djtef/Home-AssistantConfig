@@ -1,0 +1,11 @@
+substitutions:
+  slug: alarme
+  name: Alarme
+  description: Alarm board with 72 inputs and 8 12V outputs
+  
+packages:
+  <<: !include_dir_named common
+  board: !include boards/esp32dev.yaml
+  device: !include devices/alarme.yaml
+  i2c: !include components/i2c_bus_b.yaml
+  

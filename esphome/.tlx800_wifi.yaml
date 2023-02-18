@@ -1,0 +1,11 @@
+substitutions:
+  slug: tlx800
+  name: TLX800
+  description: Home automation board to control lights and covers
+  
+packages:
+  <<: !include_dir_named common
+  board: !include boards/esp32dev.yaml
+  device: !include devices/tlx800.yaml
+  i2c: !include components/i2c_2.yaml
+  

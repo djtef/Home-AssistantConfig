@@ -1,0 +1,928 @@
+substitutions:
+  RTTTL_MARIO: >-
+        "mario:d=4,o=5,b=100:16e6,16e6,32p,8e6,16c6,8e6,8g6,8p,8g,8p,8c6,16p,8g,16p,8e,16p,8a,8b,16a#,8a,16g.,16e6,16g6,8a6,16f6,8g6,8e6,16c6,16d6,8b,16p,8c6,16p,8g,16p,8e,16p,
+        8a,8b,16a#,8a,16g.,16e6,16g6,8a6,16f6,8g6,8e6,16c6,16d6,8b,8p,16g6,16f#6,16f6,16d#6,16p,16e6,16p,16g#,16a,16c6,16p,16a,16c6,16d6,8p,16g6,16f#6,16f6,16d#6,16p,16e6,16p,
+        16c7,16p,16c7,16c7,p,16g6,16f#6,16f6,16d#6,16p,16e6,16p,16g#,16a,16c6,16p,16a,16c6,16d6,8p,16d#6,8p,16d6,8p,16c6"
+
+# Enable Home Assistant API
+api:
+  services:
+    - service: play_rtttl
+      variables:
+        song_str: string
+      then:
+        - rtttl.play:
+            rtttl: !lambda 'return song_str;'
+
+mcp23017:
+  - id: 'mcp23017_hub_b1'
+    i2c_id: bus_b
+    address: 0x20
+  - id: 'mcp23017_hub_b2'
+    i2c_id: bus_b
+    address: 0x21
+  - id: 'mcp23017_hub_b3'
+    i2c_id: bus_b
+    address: 0x22
+  - id: 'mcp23017_hub_b4'
+    i2c_id: bus_b
+    address: 0x23
+  - id: 'mcp23017_hub_b5'
+    i2c_id: bus_b
+    address: 0x24
+
+# Individual inputs
+binary_sensor:
+  # - platform: gpio #GPIO35
+    # name: "GPIO35"
+    # id: gpio35
+    # pin: 35
+  # - platform: gpio #GPIO36
+    # name: "Autoprotection capteur présence Bureau"
+    # id: BU_AP_PIR
+    # pin: 36
+  # - platform: gpio #GPIO39
+    # name: "Alarme clavier Entrée"
+    # id: EN_ALARM_CLAVIER
+    # pin: 39
+  - platform: gpio #in01
+    name: "Porte Entrée verrouillée"
+    id: EN_P_VERR
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b1
+      number: 8
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in02
+    name: "Porte Entrée fermée"
+    id: EN_P_FERME
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b1
+      number: 9
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in03
+    name: "Porte Garage verrouillée Droite"
+    id: GA_P_VERR_D
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b1
+      number: 10
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in04
+    name: "Porte Garage verrouillée Gauche"
+    id: GA_P_VERR_G
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b1
+      number: 11
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in05
+    name: "Porte Garage fermée Gauche"
+    id: GA_P_FERME_G
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b1
+      number: 12
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in06
+    name: "Fenêtre Garage fermée"
+    id: GA_F_FERME
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b1
+      number: 13
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in07
+    name: "Portail Garage fermé"
+    id: GA_PORTAIL_FERME
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b1
+      number: 14
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in08
+    name: "Fenêtre Palier verrouillée Gauche"
+    id: PA_F_VERR_G
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b1
+      number: 15
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in09
+    name: "VR Palier fermés"
+    id: PA_VR_FERME
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b1
+      number: 7
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in10
+    name: "Fenêtre Palier fermée Gauche"
+    id: PA_F_FERME_G
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b1
+      number: 6
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in11
+    name: "Fenêtre Palier verrouillée Droite"
+    id: PA_F_VERR_D
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b1
+      number: 5
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in12
+    name: "Fenêtre Palier fermée Droite"
+    id: PA_F_FERME_D
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b1
+      number: 4
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in13
+    name: "Fenêtre Bureau verrouillée Gauche"
+    id: BU_F_VERR_G
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b1
+      number: 3
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in14
+    name: "VR Bureau fermés"
+    id: BU_VR_FERME
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b1
+      number: 2
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in15
+    name: "Fenêtre Bureau fermée Gauche"
+    id: BU_F_FERME_G
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b1
+      number: 1
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in16
+    name: "Fenêtre Bureau verrouillée Droite"
+    id: BU_F_VERR_D
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b1
+      number: 0
+      mode: INPUT_PULLUP
+      inverted: True      
+  - platform: gpio #in17
+    name: "Fenêtre Bureau fermée Droite"
+    id: BU_F_FERME_D
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b3
+      number: 8
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in18
+    name: "VR Porte-fenêtre Salon fermés"
+    id: SA_VR_PF_FERME
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b3
+      number: 9
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in19
+    name: "Porte-fenêtre Salon verrouillée"
+    id: SA_PF_VERR
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b3
+      number: 10
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in20
+    name: "Porte-fenêtre Salon fermée"
+    id: SA_PF_FERME
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b3
+      number: 11
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in21
+    name: "Fenêtre Chambre 1 verrouillée Gauche"
+    id: C1_F_VERR_G
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b3
+      number: 12
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in22
+    name: "VR Chambre 1 fermés"
+    id: C1_VR_FERME
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b3
+      number: 13
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in23
+    name: "Fenêtre Chambre 1 fermée Gauche"
+    id: C1_F_FERME_G
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b3
+      number: 14
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in24
+    name: "Fenêtre Chambre 1 verrouillée Droite"
+    id: C1_F_VERR_D
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b3
+      number: 15
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in25
+    name: "Fenêtre Chambre 1 fermée Droite"
+    id: C1_F_FERME_D
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b3
+      number: 7
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in26
+    name: "Baie Salon verrouillée Gauche"
+    id: SA_B_VERR_G
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b3
+      number: 6
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in27
+    name: "VR Baie Salon fermés Gauche"
+    id: SA_VR_B_FERME_G
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b3
+      number: 5
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in28
+    name: "Baie Salon Fermée Gauche"
+    id: SA_B_FERME_G
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b3
+      number: 4
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in29
+    name: "Baie Salon verrouillée Droite"
+    id: SA_B_VERR_D
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b3
+      number: 3
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in30
+    name: "VR Baie Salon fermés Droite"
+    id: SA_VR_B_FERME_D
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b3
+      number: 2
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in31
+    name: "Baie Salon fermée Droite"
+    id: SA_B_FERME_D
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b3
+      number: 1
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in32
+    name: "Fenêtre SDB RDC fermée"
+    id: BB_F_FERME
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b3
+      number: 0
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in33
+    name: "Fenêtre SDB RDC verrouillée"
+    id: BB_F_VERR
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b5
+      number: 8
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in34
+    name: "Baie Cuisine verrouillée Gauche"
+    id: CU_B_VERR_G
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b5
+      number: 9
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in35
+    name: "VR Cuisine fermés Gauche"
+    id: CU_VR_FERME_G
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b5
+      number: 10
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in36
+    name: "Baie Cuisine fermée Gauche"
+    id: CU_B_FERME_G
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b5
+      number: 11
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in37
+    name: "Baie Cuisine verrouillée Droite"
+    id: CU_B_VERR_D
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b5
+      number: 12
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in38
+    name: "VR Cuisine fermés Droite"
+    id: CU_VR_FERME_D
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b5
+      number: 13
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in39
+    name: "Baie Cuisine fermée Droite"
+    id: CU_B_FERME_D
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b5
+      number: 14
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in40
+    name: "Fenêtre SDJ verrouillée Gauche"
+    id: SJ_F_VERR_G
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b5
+      number: 15
+      mode: INPUT_PULLUP
+      inverted: True      
+  #--------------BAS-------------------    
+  - platform: gpio #in41
+    name: "VR SDJ fermés"
+    id: SJ_VR_FERME
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b2
+      number: 8
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in42
+    name: "Fenêtre SDJ fermée Gauche"
+    id: SJ_F_FERME_G
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b2
+      number: 9
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in43
+    name: "Fenêtre SDJ verrouillée Droite"
+    id: SJ_F_VERR_D
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b2
+      number: 10
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in44
+    name: "Fenêtre SDJ fermée Droite"
+    id: SJ_F_FERME_D
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b2
+      number: 11
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in45
+    name: "Fenêtre Chambre 3 verrouillée Gauche"
+    id: C3_F_VERR_G
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b2
+      number: 12
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in46
+    name: "Fenêtre Chambre 3 fermée Gauche"
+    id: C3_F_FERME_G
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b2
+      number: 13
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in47
+    name: "Fenêtre Chambre 3 verrouillée Droite"
+    id: C3_F_VERR_D
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b2
+      number: 14
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in48
+    name: "VR Chambre 3 fermés"
+    id: C3_VR_FERME
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b2
+      number: 15
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in49
+    name: "Fenêtre Chambre 3 fermée Droite"
+    id: C3_F_FERME_D
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b2
+      number: 7
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in50
+    name: "Fenêtre Chambre 2 verrouillée Gauche"
+    id: C2_F_VERR_G
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b2
+      number: 6
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in51
+    name: "Fenêtre Chambre 2 fermée Gauche"
+    id: C2_F_FERME_G
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b2
+      number: 5
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in52
+    name: "Fenêtre Chambre 2 verrouillée Droite"
+    id: C2_F_VERR_D
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b2
+      number: 4
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in53
+    name: "VR Chambre 2 fermés"
+    id: C2_VR_FERME
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b2
+      number: 3
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in54
+    name: "Fenêtre Chambre 2 fermée Droite"
+    id: C2_F_FERME_D
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b2
+      number: 2
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in55
+    name: "Fenêtre WC Etage fermée"
+    id: WH_F_FERME
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b2
+      number: 1
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in56
+    name: "Fenêtre WC Etage verrouillée"
+    id: WH_F_VERR
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b2
+      number: 0
+      mode: INPUT_PULLUP
+      inverted: True      
+  - platform: gpio #in57
+    name: "VR Escalier fermés"
+    id: PA_VR_ESC_FERME
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b4
+      number: 8
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in58
+    name: "Fenêtre Escalier fermée"
+    id: PA_F_ESC_FERME
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b4
+      number: 9
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in59
+    name: "Fenêtre Escalier verrouillée"
+    id: PA_F_ESC_VERR
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b4
+      number: 10
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in60
+    name: "Fenêtre WC RDC fermée"
+    id: WB_F_FERME
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b4
+      number: 11
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in61
+    name: "Fenêtre WC RDC verrouillée"
+    id: WB_F_VERR
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b4
+      number: 12
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in62
+    name: "Fenêtre SDB Etage fermée"
+    id: BH_F_FERME
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b4
+      number: 13
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in63
+    name: "Fenêtre SDB Etage verrouillée"
+    id: BH_F_VERR
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b4
+      number: 14
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in64
+    name: "VR Cellier fermés"
+    id: CE_VR_FERME
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b4
+      number: 15
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in65
+    name: "Fenêtre Cellier verrouillée"
+    id: CE_F_VERR
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b4
+      number: 7
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in66
+    name: "Fenêtre Cellier fermée"
+    id: CE_F_FERME
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b4
+      number: 6
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in67
+    name: "Autoprotection sirène intérieure"
+    id: AP_SIR_INT
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b4
+      number: 5
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in68
+    name: "Activation clavier entrée"
+    id: EN_ACT_CLAVIER
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b4
+      number: 4
+      mode: INPUT_PULLUP
+      inverted: True
+    on_press:
+      if:
+        condition:
+          rtttl.is_playing
+        then:
+          - rtttl.stop
+        else:
+          - rtttl.play: ${RTTTL_MARIO}
+          
+  - platform: gpio #in69
+    name: "Capteur présence bureau"
+    id: BU_PIR
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b4
+      number: 3
+      mode: INPUT_PULLUP
+      inverted: False
+  - platform: gpio #in70
+    name: "in70"
+    id: in70
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b4
+      number: 2
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in71
+    name: "in71"
+    id: in71
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b4
+      number: 1
+      mode: INPUT_PULLUP
+      inverted: True
+  - platform: gpio #in72
+    name: "in72"
+    id: in72
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    pin:
+      mcp23xxx: mcp23017_hub_b4
+      number: 0
+      mode: INPUT_PULLUP
+      inverted: True   
+
+# Individual outputs
+switch:
+  - platform: gpio
+    id: out73
+    name: "out73"
+    pin:
+      mcp23xxx: mcp23017_hub_b5
+      number: 0
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out74
+    name: "out74"
+    pin:
+      mcp23xxx: mcp23017_hub_b5
+      number: 1
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out75
+    name: "out75"
+    pin:
+      mcp23xxx: mcp23017_hub_b5
+      number: 2
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out76
+    name: "out76"
+    pin:
+      mcp23xxx: mcp23017_hub_b5
+      number: 3
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out77
+    name: "out77"
+    pin:
+      mcp23xxx: mcp23017_hub_b5
+      number: 4
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out78
+    name: "out78"
+    pin:
+      mcp23xxx: mcp23017_hub_b5
+      number: 5
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: out79
+    name: "out79"
+    pin:
+      mcp23xxx: mcp23017_hub_b5
+      number: 6
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    id: SA_SIRENE
+    name: "Sirène salon"
+    pin:
+      mcp23xxx: mcp23017_hub_b5
+      number: 7
+      mode: OUTPUT
+      inverted: False
+    restore_mode:  ALWAYS_OFF
+    
+output:
+  - platform: ledc
+    pin: GPIO12
+    id: rtttl_out
+    
+rtttl:
+  output: rtttl_out
+  on_finished_playback:
+    - logger.log: 'Song ended!'
+    
