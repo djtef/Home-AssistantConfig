@@ -3,6 +3,45 @@ substitutions:
         "mario:d=4,o=5,b=100:16e6,16e6,32p,8e6,16c6,8e6,8g6,8p,8g,8p,8c6,16p,8g,16p,8e,16p,8a,8b,16a#,8a,16g.,16e6,16g6,8a6,16f6,8g6,8e6,16c6,16d6,8b,16p,8c6,16p,8g,16p,8e,16p,
         8a,8b,16a#,8a,16g.,16e6,16g6,8a6,16f6,8g6,8e6,16c6,16d6,8b,8p,16g6,16f#6,16f6,16d#6,16p,16e6,16p,16g#,16a,16c6,16p,16a,16c6,16d6,8p,16g6,16f#6,16f6,16d#6,16p,16e6,16p,
         16c7,16p,16c7,16c7,p,16g6,16f#6,16f6,16d#6,16p,16e6,16p,16g#,16a,16c6,16p,16a,16c6,16d6,8p,16d#6,8p,16d6,8p,16c6"
+  RTTTL_MISSION: >-
+        "MissionImp:d=16,o=6,b=95:32d,32d#,32d,32d#,32d,32d#,32d,32d#,32d,32d,32d#,32e,32f,32f#,32g,g,8p,g,8p,a#,p,c7,p,g,8p,g,8p,f,p,f#,p,g,8p,g,8p,a#,p,c7,p,g,8p,g,8p,f,p,f#,
+        p,a#,g,2d,32p,a#,g,2c#,32p,a#,g,2c,a#5,8c,2p,32p,a#5,g5,2f#,32p,a#5,g5,2f,32p,a#5,g5,2e,d#,8d"
+  RTTTL_HIGH: >-
+        "Ring High:d=2,o=6,b=10,b=100:b5,d,b5,d,b5,d,b5,d,d,f,d,f,d,f,d,f,f,a,f,a,f,a,f,a."
+  RTTTL_TONES: >-
+        "Tones:d=8,o=5,b=500,b=500:b,16p,b,2p,g,16p,g,2p,d6,16p,d6,2p,d,16p,d."
+  RTTTL_FAIL: >-   
+        "siren:d=8,o=5,b=100:d,e,d,e,d,e,d,e"
+  RTTTL_SUCCESS: >-         
+        "success:d=32,o=5,b=100:c,c#,d#,e,f#,g#,a#,b"
+  RTTTL_SIREN: >-      
+        "siren:d=16,o=5,b=100:d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,
+        e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,
+        e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,
+        e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d"
+  alarm_code: !secret alarm_code
+  delai_armement: '3'
+
+esphome:
+  on_boot:
+      then:
+        - lambda: |-
+            id(statut_alarme).publish_state("désarmé");
+          
+# if (id(state_int) == ${disarmed_id}) {
+# id(alarm_condition).publish_state("disarmed");
+# } else if (id(state_int) == ${pending_id}){
+# id(alarm_condition).publish_state("armed_home");
+# id(state_int) = ${armed_home_id};
+# } else if (id(state_int) == ${triggered_id}){
+# id(alarm_condition).publish_state("armed_home");
+# id(state_int) = ${armed_home_id};
+# } else if (id(state_int) == ${armed_home_id}){
+# id(alarm_condition).publish_state("armed_home");
+# } else{
+# id(alarm_condition).publish_state("disarmed");
+# id(state_int) = ${disarmed_id};
+# }
 
 # Enable Home Assistant API
 api:
@@ -12,7 +51,209 @@ api:
         song_str: string
       then:
         - rtttl.play:
-            rtttl: !lambda 'return song_str;'
+            rtttl: !lambda 'return song_str;'          
+    - service: arm_home
+      variables:
+         code: string
+      then:
+        - if:
+            condition:
+              lambda: "return code == \"${alarm_code}\";"
+            then:
+              - script.execute: alarm_arm
+    - service: disarm
+      variables:
+         code: string
+      then:
+        - if:
+            condition:
+              lambda: "return code == \"${alarm_code}\";"
+            then:
+              - script.execute: alarm_disarm
+
+
+script:
+  - id: attente_armement
+    mode: restart 
+    then:
+      - rtttl.play: ${RTTTL_MARIO}
+      - wait_until:
+         condition:
+           not:
+             - rtttl.is_playing
+         timeout: ${delai_armement}min
+      - rtttl.play: ${RTTTL_HIGH}
+      - wait_until:
+         condition:
+           not:
+             - rtttl.is_playing
+         timeout: ${delai_armement}min
+  - id: attente_desarmement
+    mode: restart 
+    then:
+      - rtttl.play: ${RTTTL_MISSION}
+      - wait_until:
+         condition:
+           - lambda: |-
+               return id(statut_alarme).state != "désarmement";
+  - id: commande_clavier
+    then:
+      - if:
+          condition:
+            or:
+              - lambda: |-
+                  return id(statut_alarme).state == "désarmé";
+              - lambda: |-
+                  return id(statut_alarme).state == "timeout";
+          then:
+            - script.execute: alarm_arm
+          else:
+            - script.execute: alarm_disarm
+  - id: trigger_alarm_delayed
+    mode: single 
+    parameters:
+      delay_s: int
+    then:
+      - logger.log: "Init déclenchement..."
+      - if:
+          condition:
+            and:
+              - not:
+                  script.is_running: trigger_alarm_execute
+              - lambda: |-
+                  return id(statut_alarme).state == "armé";
+          then:
+            - lambda: |-
+               id(statut_alarme).publish_state("désarmement");
+            - script.execute: attente_desarmement
+            - delay: !lambda return delay_s;
+            - script.execute: trigger_alarm_execute
+  # when arming and disarming, turn off all sirens and buzzers
+  # also, cancel any trigger sequence
+  - id: alarm_arm
+    then:
+        - lambda: |-
+              id(statut_alarme).publish_state("armement");
+        - logger.log: "Armement..."
+        - script.execute: attente_armement
+        - wait_until:
+            condition:
+              or:
+                - binary_sensor.is_off: EN_P_FERME
+                - binary_sensor.is_off: GA_PORTAIL_FERME
+                - not: 
+                    script.is_running: attente_armement
+        - if:
+            condition:
+              - binary_sensor.is_off: EN_P_FERME
+            then:
+              - logger.log: "Porte ouverte"
+              - wait_until:
+                  condition:
+                    or:
+                      - binary_sensor.is_on: EN_P_FERME
+                      - not: 
+                          script.is_running: attente_armement
+              - logger.log: "Porte fermée ou délai dépassé"
+            else:
+              - if:
+                  condition:
+                    - binary_sensor.is_off: GA_PORTAIL_FERME
+                  then:
+                    - logger.log: "Portail ouvert"
+                    - wait_until:
+                        condition:
+                          or:
+                            - binary_sensor.is_on: GA_PORTAIL_FERME
+                            - not: 
+                                script.is_running: attente_armement
+                    - logger.log: "Portail fermé ou délai dépassé"
+                  else:
+                    - logger.log: "Dépassement délai ! "
+        - if:
+            condition:
+              - script.is_running: attente_armement
+            then:
+              - logger.log: "Armé !"
+              - script.stop: attente_armement
+              - rtttl.stop
+              - rtttl.play: ${RTTTL_TONES}
+              - lambda: |-
+                    id(statut_alarme).publish_state("armé");
+            else:
+              - logger.log: "Timeout armement!"  
+              - rtttl.stop 
+              - rtttl.play: ${RTTTL_FAIL}
+              - lambda: |-
+                    id(statut_alarme).publish_state("timeout");              
+      # - text_sensor.template.publish:
+          # id: alarm_condition
+          # state: "armed_home"
+      # - script.stop: trigger_alarm_execute
+      # - switch.turn_off: buzzer_front_door
+      # - lambda: |-
+          # id(state_int) = ${armed_home_id};
+  - id: alarm_disarm
+    then:
+        - logger.log: "Désarmement..."
+        - script.stop: alarm_arm
+        - script.stop: attente_armement
+        - script.stop: trigger_alarm
+        - script.stop: attente_desarmement
+        - script.stop: trigger_alarm_delayed
+        - script.stop: trigger_alarm_execute
+        - lambda: |-
+              id(statut_alarme).publish_state("désarmé");
+        - rtttl.play: ${RTTTL_SUCCESS}
+      # - text_sensor.template.publish:
+          # id: alarm_condition
+          # state: "disarmed"
+      # - script.stop: trigger_alarm_execute
+      # - switch.turn_off: buzzer_front_door
+      # - lambda: |-
+          # id(state_int) = ${disarmed_id};
+  # triggering sequence
+  - id: trigger_alarm_execute
+    then:
+        - logger.log: "Déclenchement..."
+        - lambda: |-
+            id(statut_alarme).publish_state("déclenché");
+        - rtttl.play: ${RTTTL_SIREN}
+      # - text_sensor.template.publish:
+          # id: alarm_condition
+          # state: "pending"
+      # - switch.turn_on: buzzer_front_door
+      # - lambda: |-
+          # id(state_int) = ${pending_id};
+      # - delay: 30s
+      # - text_sensor.template.publish:
+          # id: alarm_condition
+          # state: "triggered"
+      # - switch.turn_off: buzzer_front_door
+      # - lambda: |-
+          # id(state_int) = ${triggered_id};
+      # - delay: 3600s
+      # TODO: turn on siren
+
+  # only execute triggering if armed and not already running
+  - id: trigger_alarm
+    then:
+      - logger.log: "Init déclenchement..."
+      - if:
+          condition:
+            and:
+              - not:
+                  script.is_running: trigger_alarm_execute
+              - lambda: |-
+                    return id(statut_alarme).state == "armé";
+          then:
+            - script.execute: trigger_alarm_execute
+
+# holds alarm condition for arm/disarm/pending/triggered
+text_sensor:
+  - platform: template
+    name: "Statut alarme"
+    id: "statut_alarme"
 
 mcp23017:
   - id: 'mcp23017_hub_b1'
@@ -56,6 +297,15 @@ binary_sensor:
       number: 8
       mode: INPUT_PULLUP
       inverted: True
+    on_press:
+      then:
+        - if:
+            condition:
+              - binary_sensor.is_off: EN_P_FERME
+            then:
+              - script.execute: 
+                  id: trigger_alarm_delayed
+                  delay_s: 30
   - platform: gpio #in02
     name: "Porte Entrée fermée"
     id: EN_P_FERME
@@ -67,6 +317,15 @@ binary_sensor:
       number: 9
       mode: INPUT_PULLUP
       inverted: True
+    on_press:
+      then:
+        - if:
+            condition:
+              - binary_sensor.is_off: EN_P_VERR
+            then:
+              - script.execute: 
+                  id: trigger_alarm_delayed
+                  delay_s: 30
   - platform: gpio #in03
     name: "Porte Garage verrouillée Droite"
     id: GA_P_VERR_D
@@ -795,14 +1054,8 @@ binary_sensor:
       mode: INPUT_PULLUP
       inverted: True
     on_press:
-      if:
-        condition:
-          rtttl.is_playing
-        then:
-          - rtttl.stop
-        else:
-          - rtttl.play: ${RTTTL_MARIO}
-          
+      then:
+        - script.execute: commande_clavier
   - platform: gpio #in69
     name: "Capteur présence bureau"
     id: BU_PIR
