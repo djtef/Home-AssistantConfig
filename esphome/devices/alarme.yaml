@@ -6,6 +6,9 @@ substitutions:
   RTTTL_MISSION: >-
         "MissionImp:d=16,o=6,b=95:32d,32d#,32d,32d#,32d,32d#,32d,32d#,32d,32d,32d#,32e,32f,32f#,32g,g,8p,g,8p,a#,p,c7,p,g,8p,g,8p,f,p,f#,p,g,8p,g,8p,a#,p,c7,p,g,8p,g,8p,f,p,f#,
         p,a#,g,2d,32p,a#,g,2c#,32p,a#,g,2c,a#5,8c,2p,32p,a#5,g5,2f#,32p,a#5,g5,2f,32p,a#5,g5,2e,d#,8d"
+  RTTTL_WARNING: >-
+        "warning:d=4,o=6,b=150:1a,2b,2b,4c,4c,4c,4c,8d,8d,8d,8d,8d,8d,8d,8d,16e,16e,16e,16e,16e,16e,16e,16e,16e,16e,16e,16e,16e,16e,16e,16e,32f,32f,32f,32f,32f,32f,32f,32f,32f,
+        32f,32f,32f,32f,32f,32f,32f,32f,32f,32f,32f,32f,32f,32f,32f,32f,32f,32f,32f,32f,32f,32f"
   RTTTL_HIGH: >-
         "Ring High:d=2,o=6,b=10,b=100:b5,d,b5,d,b5,d,b5,d,d,f,d,f,d,f,d,f,f,a,f,a,f,a,f,a."
   RTTTL_TONES: >-
@@ -94,6 +97,11 @@ script:
       - rtttl.play: ${RTTTL_MISSION}
       - wait_until:
          condition:
+           not:
+             - rtttl.is_playing
+      - rtttl.play: ${RTTTL_WARNING}
+      - wait_until:
+         condition:
            - lambda: |-
                return id(statut_alarme).state != "désarmement";
   - id: commande_clavier
@@ -106,15 +114,15 @@ script:
               - lambda: |-
                   return id(statut_alarme).state == "timeout";
           then:
-            - script.execute: alarm_arm
+            - script.execute: alarm_arm_delayed
           else:
             - script.execute: alarm_disarm
   - id: trigger_alarm_delayed
     mode: single 
     parameters:
-      delay_s: int
+      delay_ms: int
     then:
-      - logger.log: "Init déclenchement..."
+      - logger.log: "Init déclenchement temporisé..."
       - if:
           condition:
             and:
@@ -126,11 +134,19 @@ script:
             - lambda: |-
                id(statut_alarme).publish_state("désarmement");
             - script.execute: attente_desarmement
-            - delay: !lambda return delay_s;
+            - delay: !lambda return delay_ms;
             - script.execute: trigger_alarm_execute
   # when arming and disarming, turn off all sirens and buzzers
   # also, cancel any trigger sequence
   - id: alarm_arm
+    then:
+        - logger.log: "Armé !"
+        - script.stop: attente_armement
+        - rtttl.stop
+        - rtttl.play: ${RTTTL_TONES}
+        - lambda: |-
+            id(statut_alarme).publish_state("armé");
+  - id: alarm_arm_delayed
     then:
         - lambda: |-
               id(statut_alarme).publish_state("armement");
@@ -174,12 +190,7 @@ script:
             condition:
               - script.is_running: attente_armement
             then:
-              - logger.log: "Armé !"
-              - script.stop: attente_armement
-              - rtttl.stop
-              - rtttl.play: ${RTTTL_TONES}
-              - lambda: |-
-                    id(statut_alarme).publish_state("armé");
+              - script.execute: alarm_arm
             else:
               - logger.log: "Timeout armement!"  
               - rtttl.stop 
@@ -196,7 +207,7 @@ script:
   - id: alarm_disarm
     then:
         - logger.log: "Désarmement..."
-        - script.stop: alarm_arm
+        - script.stop: alarm_arm_delayed
         - script.stop: attente_armement
         - script.stop: trigger_alarm
         - script.stop: attente_desarmement
@@ -249,6 +260,31 @@ script:
           then:
             - script.execute: trigger_alarm_execute
 
+number:
+  - platform: template
+    name: "Code"
+    min_value: 0
+    max_value: 9999
+    step: 1
+    mode: "box"
+    set_action :
+      then:
+        - if:
+            condition:
+              lambda: "return x == ${alarm_code};"
+            then:
+              - if:
+                  condition:
+                    or:
+                      - lambda: |-
+                          return id(statut_alarme).state == "désarmé";
+                      - lambda: |-
+                          return id(statut_alarme).state == "timeout";
+                  then:
+                    - script.execute: alarm_arm_delayed
+                  else:
+                    - script.execute: alarm_disarm
+
 # holds alarm condition for arm/disarm/pending/triggered
 text_sensor:
   - platform: template
@@ -297,15 +333,17 @@ binary_sensor:
       number: 8
       mode: INPUT_PULLUP
       inverted: True
-    on_press:
+    on_release :
       then:
+        - logger.log: "Porte déverrouillée"
         - if:
             condition:
               - binary_sensor.is_off: EN_P_FERME
             then:
+              - logger.log: "Déclenchement tempo déverrouillage"
               - script.execute: 
                   id: trigger_alarm_delayed
-                  delay_s: 30
+                  delay_ms: 30000
   - platform: gpio #in02
     name: "Porte Entrée fermée"
     id: EN_P_FERME
@@ -317,15 +355,17 @@ binary_sensor:
       number: 9
       mode: INPUT_PULLUP
       inverted: True
-    on_press:
+    on_release :
       then:
+        - logger.log: "Porte ouverte"
         - if:
             condition:
               - binary_sensor.is_off: EN_P_VERR
             then:
+              - logger.log: "Déclenchement tempo ouverture"
               - script.execute: 
                   id: trigger_alarm_delayed
-                  delay_s: 30
+                  delay_ms: 30000
   - platform: gpio #in03
     name: "Porte Garage verrouillée Droite"
     id: GA_P_VERR_D
@@ -337,6 +377,14 @@ binary_sensor:
       number: 10
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in04
     name: "Porte Garage verrouillée Gauche"
     id: GA_P_VERR_G
@@ -348,6 +396,14 @@ binary_sensor:
       number: 11
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in05
     name: "Porte Garage fermée Gauche"
     id: GA_P_FERME_G
@@ -359,6 +415,14 @@ binary_sensor:
       number: 12
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in06
     name: "Fenêtre Garage fermée"
     id: GA_F_FERME
@@ -370,6 +434,14 @@ binary_sensor:
       number: 13
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in07
     name: "Portail Garage fermé"
     id: GA_PORTAIL_FERME
@@ -381,6 +453,14 @@ binary_sensor:
       number: 14
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in08
     name: "Fenêtre Palier verrouillée Gauche"
     id: PA_F_VERR_G
@@ -392,6 +472,14 @@ binary_sensor:
       number: 15
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in09
     name: "VR Palier fermés"
     id: PA_VR_FERME
@@ -403,6 +491,14 @@ binary_sensor:
       number: 7
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in10
     name: "Fenêtre Palier fermée Gauche"
     id: PA_F_FERME_G
@@ -414,6 +510,14 @@ binary_sensor:
       number: 6
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in11
     name: "Fenêtre Palier verrouillée Droite"
     id: PA_F_VERR_D
@@ -425,6 +529,14 @@ binary_sensor:
       number: 5
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in12
     name: "Fenêtre Palier fermée Droite"
     id: PA_F_FERME_D
@@ -436,6 +548,14 @@ binary_sensor:
       number: 4
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in13
     name: "Fenêtre Bureau verrouillée Gauche"
     id: BU_F_VERR_G
@@ -447,6 +567,14 @@ binary_sensor:
       number: 3
       mode: INPUT_PULLUP
       inverted: True
+    on_release :
+      then:
+        - if:
+            condition:
+              - binary_sensor.is_off: BU_F_FERME_G
+            then:
+              - logger.log: "Fenêtre Bureau déverrouillée Gauche"
+              - script.execute: trigger_alarm
   - platform: gpio #in14
     name: "VR Bureau fermés"
     id: BU_VR_FERME
@@ -458,6 +586,14 @@ binary_sensor:
       number: 2
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in15
     name: "Fenêtre Bureau fermée Gauche"
     id: BU_F_FERME_G
@@ -469,6 +605,14 @@ binary_sensor:
       number: 1
       mode: INPUT_PULLUP
       inverted: True
+    on_release :
+      then:
+        - if:
+            condition:
+              - binary_sensor.is_off: BU_F_VERR_G
+            then:
+              - logger.log: "Fenêtre Bureau ouverte Gauche"
+              - script.execute: trigger_alarm
   - platform: gpio #in16
     name: "Fenêtre Bureau verrouillée Droite"
     id: BU_F_VERR_D
@@ -479,7 +623,15 @@ binary_sensor:
       mcp23xxx: mcp23017_hub_b1
       number: 0
       mode: INPUT_PULLUP
-      inverted: True      
+      inverted: True    
+    on_release :
+      then:
+        - if:
+            condition:
+              - binary_sensor.is_off: BU_F_FERME_D
+            then:
+              - logger.log: "Fenêtre Bureau déverrouillée Droite"
+              - script.execute: trigger_alarm
   - platform: gpio #in17
     name: "Fenêtre Bureau fermée Droite"
     id: BU_F_FERME_D
@@ -491,6 +643,14 @@ binary_sensor:
       number: 8
       mode: INPUT_PULLUP
       inverted: True
+    on_release :
+      then:
+        - if:
+            condition:
+              - binary_sensor.is_off: BU_F_VERR_D
+            then:
+              - logger.log: "Fenêtre Bureau ouverte Droite"
+              - script.execute: trigger_alarm
   - platform: gpio #in18
     name: "VR Porte-fenêtre Salon fermés"
     id: SA_VR_PF_FERME
@@ -502,6 +662,14 @@ binary_sensor:
       number: 9
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in19
     name: "Porte-fenêtre Salon verrouillée"
     id: SA_PF_VERR
@@ -513,6 +681,14 @@ binary_sensor:
       number: 10
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in20
     name: "Porte-fenêtre Salon fermée"
     id: SA_PF_FERME
@@ -524,6 +700,14 @@ binary_sensor:
       number: 11
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in21
     name: "Fenêtre Chambre 1 verrouillée Gauche"
     id: C1_F_VERR_G
@@ -535,6 +719,14 @@ binary_sensor:
       number: 12
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in22
     name: "VR Chambre 1 fermés"
     id: C1_VR_FERME
@@ -546,6 +738,14 @@ binary_sensor:
       number: 13
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in23
     name: "Fenêtre Chambre 1 fermée Gauche"
     id: C1_F_FERME_G
@@ -557,6 +757,14 @@ binary_sensor:
       number: 14
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in24
     name: "Fenêtre Chambre 1 verrouillée Droite"
     id: C1_F_VERR_D
@@ -568,6 +776,14 @@ binary_sensor:
       number: 15
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in25
     name: "Fenêtre Chambre 1 fermée Droite"
     id: C1_F_FERME_D
@@ -579,6 +795,14 @@ binary_sensor:
       number: 7
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in26
     name: "Baie Salon verrouillée Gauche"
     id: SA_B_VERR_G
@@ -590,6 +814,14 @@ binary_sensor:
       number: 6
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in27
     name: "VR Baie Salon fermés Gauche"
     id: SA_VR_B_FERME_G
@@ -601,6 +833,14 @@ binary_sensor:
       number: 5
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in28
     name: "Baie Salon Fermée Gauche"
     id: SA_B_FERME_G
@@ -612,6 +852,14 @@ binary_sensor:
       number: 4
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in29
     name: "Baie Salon verrouillée Droite"
     id: SA_B_VERR_D
@@ -623,6 +871,14 @@ binary_sensor:
       number: 3
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in30
     name: "VR Baie Salon fermés Droite"
     id: SA_VR_B_FERME_D
@@ -634,6 +890,14 @@ binary_sensor:
       number: 2
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in31
     name: "Baie Salon fermée Droite"
     id: SA_B_FERME_D
@@ -645,6 +909,14 @@ binary_sensor:
       number: 1
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in32
     name: "Fenêtre SDB RDC fermée"
     id: BB_F_FERME
@@ -656,6 +928,14 @@ binary_sensor:
       number: 0
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in33
     name: "Fenêtre SDB RDC verrouillée"
     id: BB_F_VERR
@@ -667,6 +947,14 @@ binary_sensor:
       number: 8
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in34
     name: "Baie Cuisine verrouillée Gauche"
     id: CU_B_VERR_G
@@ -678,6 +966,14 @@ binary_sensor:
       number: 9
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in35
     name: "VR Cuisine fermés Gauche"
     id: CU_VR_FERME_G
@@ -689,6 +985,14 @@ binary_sensor:
       number: 10
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in36
     name: "Baie Cuisine fermée Gauche"
     id: CU_B_FERME_G
@@ -700,6 +1004,14 @@ binary_sensor:
       number: 11
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in37
     name: "Baie Cuisine verrouillée Droite"
     id: CU_B_VERR_D
@@ -711,6 +1023,14 @@ binary_sensor:
       number: 12
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in38
     name: "VR Cuisine fermés Droite"
     id: CU_VR_FERME_D
@@ -722,6 +1042,14 @@ binary_sensor:
       number: 13
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in39
     name: "Baie Cuisine fermée Droite"
     id: CU_B_FERME_D
@@ -733,6 +1061,14 @@ binary_sensor:
       number: 14
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in40
     name: "Fenêtre SDJ verrouillée Gauche"
     id: SJ_F_VERR_G
@@ -756,6 +1092,14 @@ binary_sensor:
       number: 8
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in42
     name: "Fenêtre SDJ fermée Gauche"
     id: SJ_F_FERME_G
@@ -767,6 +1111,14 @@ binary_sensor:
       number: 9
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in43
     name: "Fenêtre SDJ verrouillée Droite"
     id: SJ_F_VERR_D
@@ -778,6 +1130,14 @@ binary_sensor:
       number: 10
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in44
     name: "Fenêtre SDJ fermée Droite"
     id: SJ_F_FERME_D
@@ -789,6 +1149,14 @@ binary_sensor:
       number: 11
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in45
     name: "Fenêtre Chambre 3 verrouillée Gauche"
     id: C3_F_VERR_G
@@ -800,6 +1168,14 @@ binary_sensor:
       number: 12
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in46
     name: "Fenêtre Chambre 3 fermée Gauche"
     id: C3_F_FERME_G
@@ -811,6 +1187,14 @@ binary_sensor:
       number: 13
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in47
     name: "Fenêtre Chambre 3 verrouillée Droite"
     id: C3_F_VERR_D
@@ -822,6 +1206,14 @@ binary_sensor:
       number: 14
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in48
     name: "VR Chambre 3 fermés"
     id: C3_VR_FERME
@@ -833,6 +1225,14 @@ binary_sensor:
       number: 15
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in49
     name: "Fenêtre Chambre 3 fermée Droite"
     id: C3_F_FERME_D
@@ -844,6 +1244,14 @@ binary_sensor:
       number: 7
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in50
     name: "Fenêtre Chambre 2 verrouillée Gauche"
     id: C2_F_VERR_G
@@ -855,6 +1263,14 @@ binary_sensor:
       number: 6
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in51
     name: "Fenêtre Chambre 2 fermée Gauche"
     id: C2_F_FERME_G
@@ -866,6 +1282,14 @@ binary_sensor:
       number: 5
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in52
     name: "Fenêtre Chambre 2 verrouillée Droite"
     id: C2_F_VERR_D
@@ -877,6 +1301,14 @@ binary_sensor:
       number: 4
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in53
     name: "VR Chambre 2 fermés"
     id: C2_VR_FERME
@@ -888,6 +1320,14 @@ binary_sensor:
       number: 3
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in54
     name: "Fenêtre Chambre 2 fermée Droite"
     id: C2_F_FERME_D
@@ -899,6 +1339,14 @@ binary_sensor:
       number: 2
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in55
     name: "Fenêtre WC Etage fermée"
     id: WH_F_FERME
@@ -910,6 +1358,14 @@ binary_sensor:
       number: 1
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in56
     name: "Fenêtre WC Etage verrouillée"
     id: WH_F_VERR
@@ -932,6 +1388,14 @@ binary_sensor:
       number: 8
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in58
     name: "Fenêtre Escalier fermée"
     id: PA_F_ESC_FERME
@@ -943,6 +1407,14 @@ binary_sensor:
       number: 9
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in59
     name: "Fenêtre Escalier verrouillée"
     id: PA_F_ESC_VERR
@@ -954,6 +1426,14 @@ binary_sensor:
       number: 10
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in60
     name: "Fenêtre WC RDC fermée"
     id: WB_F_FERME
@@ -965,6 +1445,14 @@ binary_sensor:
       number: 11
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in61
     name: "Fenêtre WC RDC verrouillée"
     id: WB_F_VERR
@@ -976,6 +1464,14 @@ binary_sensor:
       number: 12
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in62
     name: "Fenêtre SDB Etage fermée"
     id: BH_F_FERME
@@ -987,6 +1483,14 @@ binary_sensor:
       number: 13
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in63
     name: "Fenêtre SDB Etage verrouillée"
     id: BH_F_VERR
@@ -998,6 +1502,14 @@ binary_sensor:
       number: 14
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in64
     name: "VR Cellier fermés"
     id: CE_VR_FERME
@@ -1009,6 +1521,14 @@ binary_sensor:
       number: 15
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in65
     name: "Fenêtre Cellier verrouillée"
     id: CE_F_VERR
@@ -1020,6 +1540,14 @@ binary_sensor:
       number: 7
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in66
     name: "Fenêtre Cellier fermée"
     id: CE_F_FERME
@@ -1031,6 +1559,14 @@ binary_sensor:
       number: 6
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in67
     name: "Autoprotection sirène intérieure"
     id: AP_SIR_INT
@@ -1042,6 +1578,14 @@ binary_sensor:
       number: 5
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in68
     name: "Activation clavier entrée"
     id: EN_ACT_CLAVIER
@@ -1078,6 +1622,14 @@ binary_sensor:
       number: 2
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in71
     name: "in71"
     id: in71
@@ -1089,6 +1641,14 @@ binary_sensor:
       number: 1
       mode: INPUT_PULLUP
       inverted: True
+    # on_release :
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: <GARDE_FOU>
+            # then:
+              # - logger.log: "<enter log>"
+              # - script.execute: trigger_alarm
   - platform: gpio #in72
     name: "in72"
     id: in72
