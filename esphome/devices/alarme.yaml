@@ -28,8 +28,12 @@ substitutions:
 esphome:
   on_boot:
       then:
+        - logger.log:
+            format: "Au boot statut_alarme=%s"
+            args: [ 'id(statut_alarme).state']
         - lambda: |-
             id(statut_alarme).publish_state("désarmé");
+            id(state_alarm_panel).publish_state("disarmed");
           
 # if (id(state_int) == ${disarmed_id}) {
 # id(alarm_condition).publish_state("disarmed");
@@ -290,6 +294,36 @@ text_sensor:
   - platform: template
     name: "Statut alarme"
     id: "statut_alarme"
+    on_value:
+      then:
+        - lambda: |-
+            if (x == "armé")
+            {
+             id(state_alarm_panel).publish_state("armed_away");
+            }
+            else if ((x == "désarmé") || (x == "timeout") )
+            {
+             id(state_alarm_panel).publish_state("disarmed");
+            }
+            else if (x == "armement")
+            {
+             id(state_alarm_panel).publish_state("arming");
+            }
+            else if (x == "désarmement")
+            {
+             id(state_alarm_panel).publish_state("pending");
+            }
+            else if (x == "déclenché")
+            {
+             id(state_alarm_panel).publish_state("triggered");
+            }
+            else
+            {
+             id(state_alarm_panel).publish_state("unavailable ");
+            }
+  - platform: template
+    name: "State Alarm Panel"
+    id: "state_alarm_panel"
 
 mcp23017:
   - id: 'mcp23017_hub_b1'
@@ -343,7 +377,7 @@ binary_sensor:
               - logger.log: "Déclenchement tempo déverrouillage"
               - script.execute: 
                   id: trigger_alarm_delayed
-                  delay_ms: 30000
+                  delay_ms: 20000
   - platform: gpio #in02
     name: "Porte Entrée fermée"
     id: EN_P_FERME
