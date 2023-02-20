@@ -55,6 +55,22 @@ notify:
     name: maison
     chat_id: !secret telegram_maison_chat_id
 
+# secrets inside templates not allowed
+# must use hard coded 'code' on home assistant panel
+# esphome code does not need to match HA code
+alarm_control_panel:
+  - platform: template
+    panels:
+      alarme_maison:
+        value_template: "{{ states('sensor.state_alarm_panel') }}"
+        arm_away:
+          - service: esphome.alarme_arm_home
+            data:
+              code: "{{ code }}"
+        disarm:
+          - service: esphome.alarme_disarm
+            data:
+              code: "{{ code }}"
 
 template:                                                                                                                                                                        
   - trigger:                                                                                                                                                                     
