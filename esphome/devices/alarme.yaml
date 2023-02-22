@@ -311,6 +311,10 @@ text_sensor:
             {
               id(state_int) = ${ARMED_AWAY};
             }
+            else if (x == "arming")
+            {
+              id(state_int) = ${ARMING};
+            }
             else if (x == "triggered")
             {
               id(state_int) = ${TRIGGERED};
