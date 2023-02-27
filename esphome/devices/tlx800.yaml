@@ -2120,8 +2120,8 @@ binary_sensor:
       # then:
         # - light.toggle: out238
   - platform: gpio #in2 39
-    name: "in#2 39"
-    id: in239
+    name: "Présence 220V"
+    id: AC_OK
     pin:
       mcp23xxx: mcp23017_hub_a8
       number: 9
@@ -2134,8 +2134,8 @@ binary_sensor:
       # then:
         # - light.toggle: out239
   - platform: gpio #in2 40
-    name: "in#2 40"
-    id: in240
+    name: "Batterie 12V faible"
+    id: LOW_BAT
     pin:
       mcp23xxx: mcp23017_hub_a8
       number: 8
