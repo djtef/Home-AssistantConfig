@@ -55,6 +55,18 @@ notify:
     name: maison
     chat_id: !secret telegram_maison_chat_id
 
+yeelight:
+  custom_effects:
+    - name: 'Call'
+      flow_params:
+        count: 0
+        transitions:
+          - RGBTransition: [90, 255, 36, 50, 20]
+          - RGBTransition: [90, 255, 36, 50, 100]
+          - RGBTransition: [90, 255, 36, 50, 20]
+          - RGBTransition: [90, 255, 36, 50, 100]
+          - SleepTransition:       [500]
+          
 # secrets inside templates not allowed
 # must use hard coded 'code' on home assistant panel
 # esphome code does not need to match HA code
@@ -145,7 +157,62 @@ template:
           Libre
           {%- endif -%}
 
-
+binary_sensor:
+  - platform: group
+    name: "Capteurs ouvertures"
+    device_class: opening
+    entities:
+      - binary_sensor.porte_entree_fermee
+      - binary_sensor.porte_entree_verrouillee
+      - binary_sensor.baie_cuisine_fermee_droite
+      - binary_sensor.baie_cuisine_verrouillee_droite
+      - binary_sensor.baie_cuisine_fermee_gauche
+      - binary_sensor.baie_cuisine_verrouillee_gauche
+      - binary_sensor.baie_salon_fermee_droite
+      - binary_sensor.baie_salon_fermee_gauche
+      - binary_sensor.baie_salon_verrouillee_droite
+      - binary_sensor.baie_salon_verrouillee_gauche
+      - binary_sensor.fenetre_chambre_1_fermee_droite
+      - binary_sensor.fenetre_chambre_1_verrouillee_droite
+      - binary_sensor.fenetre_chambre_1_fermee_gauche
+      - binary_sensor.fenetre_chambre_1_verrouillee_gauche
+      - binary_sensor.fenetre_sdj_fermee_droite
+      - binary_sensor.fenetre_sdj_verrouillee_droite
+      - binary_sensor.fenetre_sdj_fermee_gauche
+      - binary_sensor.fenetre_bureau_fermee_droite
+      - binary_sensor.fenetre_bureau_verrouillee_droite
+      - binary_sensor.fenetre_bureau_fermee_gauche
+      - binary_sensor.fenetre_bureau_verrouillee_gauche
+      - binary_sensor.fenetre_cellier_fermee
+      - binary_sensor.fenetre_cellier_verrouillee
+      - binary_sensor.porte_fenetre_salon_fermee
+      - binary_sensor.porte_fenetre_salon_verrouillee
+      - binary_sensor.fenetre_sdb_rdc_fermee
+      - binary_sensor.fenetre_sdb_rdc_verrouillee
+      - binary_sensor.fenetre_wc_rdc_fermee
+      - binary_sensor.fenetre_wc_rdc_verrouillee
+      - binary_sensor.fenetre_chambre_2_fermee_droite
+      - binary_sensor.fenetre_chambre_2_verrouillee_droite
+      - binary_sensor.fenetre_chambre_2_fermee_gauche
+      - binary_sensor.fenetre_chambre_2_verrouillee_gauche
+      - binary_sensor.fenetre_chambre_3_fermee_droite
+      - binary_sensor.fenetre_chambre_3_verrouillee_droite
+      - binary_sensor.fenetre_chambre_3_verrouillee_gauche
+      - binary_sensor.fenetre_sdb_etage_fermee
+      - binary_sensor.fenetre_sdb_etage_verrouillee
+      - binary_sensor.fenetre_wc_etage_fermee
+      - binary_sensor.fenetre_wc_etage_verrouillee
+      - binary_sensor.fenetre_palier_fermee_droite
+      - binary_sensor.fenetre_palier_verrouillee_droite
+      - binary_sensor.fenetre_palier_fermee_gauche
+      - binary_sensor.fenetre_palier_verrouillee_gauche
+      - binary_sensor.fenetre_escalier_fermee
+      - binary_sensor.fenetre_escalier_verrouillee
+      - binary_sensor.porte_garage_fermee_gauche
+      - binary_sensor.porte_garage_verrouillee_gauche
+      - binary_sensor.porte_garage_verrouillee_droite
+      - binary_sensor.fenetre_garage_fermee
+  
 automation: !include automations.yaml
 script: !include scripts.yaml
 scene: !include scenes.yaml

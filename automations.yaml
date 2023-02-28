@@ -8,9 +8,54 @@
   condition: []
   action:
   - service: cover.close_cover
-    data: {}
     target:
-      entity_id: cover.vr_general
+      entity_id:
+      - cover.vr_bureau
+      - cover.vr_cellier
+      - cover.vr_chambre_1
+      - cover.vr_chambre_2
+      - cover.vr_chambre_3
+      - cover.vr_escalier
+      - cover.vr_palier
+      - cover.vr_salle_de_jeu
+    data: {}
+  - if:
+    - condition: state
+      entity_id: binary_sensor.porte_fenetre_salon_verrouillee
+      state: 'on'
+    then:
+    - service: cover.close_cover
+      target:
+        entity_id: cover.vr_porte_fenetre_salon
+      data: {}
+  - if:
+    - condition: and
+      conditions:
+      - condition: state
+        entity_id: binary_sensor.baie_cuisine_verrouillee_droite
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.baie_cuisine_verrouillee_gauche
+        state: 'on'
+    then:
+    - service: cover.close_cover
+      data: {}
+      target:
+        entity_id: cover.vr_cuisine
+  - if:
+    - condition: and
+      conditions:
+      - condition: state
+        entity_id: binary_sensor.baie_salon_verrouillee_droite
+        state: 'on'
+      - condition: state
+        entity_id: binary_sensor.baie_salon_verrouillee_gauche
+        state: 'on'
+    then:
+    - service: cover.close_cover
+      data: {}
+      target:
+        entity_id: cover.vr_salon
   mode: single
 - id: '1667940962264'
   alias: Zone Notification
@@ -334,3 +379,101 @@
     target:
       entity_id: light.escalier_placard_2
   mode: single
+- id: '1677092658855'
+  alias: Alarme
+  description: Gère les état de l'alarme
+  trigger:
+  - platform: state
+    entity_id:
+    - alarm_control_panel.alarme_maison
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: alarm_control_panel.alarme_maison
+        state: arming
+      sequence:
+      - service: script.tts_ouvertures
+        data:
+          volume: 80
+      - service: script.tts_google_home
+        data:
+          texte: L'alarme sera activée dès que la porte sera fermée
+          volume: 80
+          media_player_entity: media_player.sejour
+    - conditions:
+      - condition: state
+        entity_id: alarm_control_panel.alarme_maison
+        state: armed_away
+      sequence:
+      - service: script.tts_google_home
+        data:
+          texte: Alarme activée !
+          volume: 80
+          media_player_entity: media_player.sejour
+    - conditions:
+      - condition: state
+        entity_id: alarm_control_panel.alarme_maison
+        state: disarmed
+      - condition: template
+        value_template: '{{trigger.from_state.state != ''unavailable''}}'
+      sequence:
+      - service: script.tts_google_home
+        data:
+          texte: Alarme désactivée
+          volume: 80
+          media_player_entity: media_player.sejour
+      - if:
+        - condition: template
+          value_template: '{{trigger.from_state.state == ''triggered''}}'
+        then:
+        - service: scene.turn_on
+          target:
+            entity_id: scene.lumieres_vr
+          data: {}
+    - conditions:
+      - condition: state
+        entity_id: alarm_control_panel.alarme_maison
+        state: pending
+      sequence:
+      - service: script.tts_google_home
+        data:
+          texte: Il reste 20 secondes pour désactiver l'alarme, 17, 16, 15, 14, 13,
+            12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
+          volume: 80
+          media_player_entity: media_player.sejour
+    - conditions:
+      - condition: state
+        entity_id: alarm_control_panel.alarme_maison
+        state: triggered
+      sequence:
+      - service: scene.create
+        data:
+          scene_id: lumieres_vr
+          snapshot_entities: '{{ expand(states)|selectattr(''domain'', ''in'', (''light'',
+            ''cover''))|selectattr(''state'', ''ne'', ''unavailable'')| map(attribute=''entity_id'')|
+            list }}
+
+            '
+      - repeat:
+          while:
+          - condition: state
+            entity_id: alarm_control_panel.alarme_maison
+            state: triggered
+          sequence:
+          - service: cover.open_cover
+            data: {}
+            target:
+              entity_id: cover.vr_general
+          - service: script.turn_on
+            data:
+              variables:
+                texte: Alarme déclenchée, appel police en cours !
+                volume: 100
+                media_player_entity: media_player.sejour
+            target:
+              entity_id: script.tts_google_home
+          - service: script.allume_lumieres
+            data: {}
+  mode: restart
