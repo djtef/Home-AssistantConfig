@@ -22,6 +22,11 @@ substitutions:
         e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,
         e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,
         e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d"
+  RTTTL_TUBULAR: >-
+        "Tubular Bells:d=4,o=5,b=250,b=250:c6,f6,c6,g6,c6,d#6,f6,c6,g#6,c6,a#6,c6,g6,g#6,c6,g6,c6,f6,c6,g6,c6,d#6,f6,c6,g#6,c6,a#6,c6,g6,g#6,c6,g6,c6,f6,c6,g6,c6,d#6,f6,c6,g#6,
+        c6,a#6,c6,g6,g#6,c6,g6,c6,f6,c6,g6,c6,d#6,f6,c6,g#6,c6,a#6,c6,g6,g#6"
+  RTTL_HALLOWEN: >-
+        "Halloween:d=8,o=5,b=180,b=180:d6,g,g,d6,g,g,d6,g,d#6,g,d6,g,g,d6,g,g,d6,g,d#6,g,c#6,f#,f#,c#6,f#,f#,c#6,f#,d6,f#,c#6,f#,f#,c#6,f#,f#,c#6,f#,d6,f#"
   alarm_code: !secret alarm_code
   delai_armement: '3'
   DISARMED: "0"
@@ -94,7 +99,65 @@ script:
   - id: attente_armement
     mode: restart 
     then:
-      - rtttl.play: ${RTTTL_MARIO}
+      - if:
+          condition:
+            or:
+               - binary_sensor.is_off: CE_F_FERME
+               - binary_sensor.is_off: CE_F_VERR
+               - binary_sensor.is_off: CU_B_FERME_D
+               - binary_sensor.is_off: CU_B_FERME_G
+               - binary_sensor.is_off: CU_B_VERR_D
+               - binary_sensor.is_off: CU_B_VERR_G
+               - binary_sensor.is_off: SA_B_FERME_D
+               - binary_sensor.is_off: SA_B_FERME_G
+               - binary_sensor.is_off: SA_B_VERR_D
+               - binary_sensor.is_off: SA_B_VERR_G
+               - binary_sensor.is_off: SA_PF_FERME
+               - binary_sensor.is_off: SA_PF_VERR
+               - binary_sensor.is_off: SJ_F_FERME_D
+               - binary_sensor.is_off: SJ_F_FERME_G
+               - binary_sensor.is_off: SJ_F_VERR_D
+               # - binary_sensor.is_off: SJ_F_VERR_G
+               - binary_sensor.is_off: BB_F_FERME
+               - binary_sensor.is_off: BB_F_VERR
+               - binary_sensor.is_off: C1_F_FERME_D
+               - binary_sensor.is_off: C1_F_FERME_G
+               - binary_sensor.is_off: C1_F_VERR_D
+               - binary_sensor.is_off: C1_F_VERR_G
+               - binary_sensor.is_off: EN_P_FERME
+               - binary_sensor.is_off: EN_P_VERR
+               - binary_sensor.is_off: WB_F_FERME
+               - binary_sensor.is_off: WB_F_VERR
+               - binary_sensor.is_off: BU_F_FERME_D
+               - binary_sensor.is_off: BU_F_FERME_G
+               - binary_sensor.is_off: BU_F_VERR_D
+               - binary_sensor.is_off: BU_F_VERR_G
+               - binary_sensor.is_off: PA_F_ESC_FERME
+               - binary_sensor.is_off: PA_F_ESC_VERR
+               - binary_sensor.is_off: PA_F_FERME_D
+               - binary_sensor.is_off: PA_F_FERME_G
+               - binary_sensor.is_off: PA_F_VERR_D
+               - binary_sensor.is_off: PA_F_VERR_G
+               - binary_sensor.is_off: BH_F_FERME
+               - binary_sensor.is_off: BH_F_VERR
+               - binary_sensor.is_off: WH_F_FERME
+               - binary_sensor.is_off: WH_F_VERR
+               - binary_sensor.is_off: C2_F_FERME_D
+               - binary_sensor.is_off: C2_F_FERME_G
+               - binary_sensor.is_off: C2_F_VERR_D
+               - binary_sensor.is_off: C2_F_VERR_G
+               - binary_sensor.is_off: C3_F_FERME_D
+               # - binary_sensor.is_off: C3_F_FERME_G
+               - binary_sensor.is_off: C3_F_VERR_D
+               - binary_sensor.is_off: C3_F_VERR_G
+               - binary_sensor.is_off: GA_F_FERME
+               - binary_sensor.is_off: GA_P_FERME_G
+               - binary_sensor.is_off: GA_P_VERR_D
+               - binary_sensor.is_off: GA_P_VERR_G
+          then:
+            - rtttl.play: ${RTTTL_TUBULAR}
+          else: 
+            - rtttl.play: ${RTTTL_MARIO}
       - wait_until:
          condition:
            not:
@@ -1624,10 +1687,10 @@ binary_sensor:
       number: 5
       mode: INPUT_PULLUP
       inverted: True
-    on_release :
-      then:
-        - logger.log: "Autoprotection sirène intérieure coupée"
-        - script.execute: trigger_alarm
+    # on_release :
+      # then:
+        # - logger.log: "Autoprotection sirène intérieure coupée"
+        # - script.execute: trigger_alarm
   - platform: gpio #in68
     name: "Activation clavier entrée"
     id: EN_ACT_CLAVIER
@@ -1653,6 +1716,10 @@ binary_sensor:
       number: 3
       mode: INPUT_PULLUP
       inverted: False
+    on_press :
+      then:
+        - logger.log: "Détection mouvement Bureau"
+        - script.execute: trigger_alarm
   - platform: gpio #in70
     name: "in70"
     id: in70
