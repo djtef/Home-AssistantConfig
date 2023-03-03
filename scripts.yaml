@@ -122,12 +122,7 @@ tts_ouvertures:
   alias: TTS ouvertures
   icon: mdi:microphone-message
   mode: restart
-  fields:
-    volume:
-      name: Volume
-      description: Volume du Media player
-      example: 50
-  description: Annonce les portes et fenêtres ouvertes
+  description: Notifie par Telegram les portes et fenêtres restées ouvertes
   sequence:
   - condition: template
     value_template: '{{expand(state_attr(''binary_sensor.capteurs_ouvertures'', ''entity_id''))|
@@ -194,3 +189,31 @@ deverrouille_relais_vr:
           milliseconds: 0
   mode: single
   icon: mdi:bug
+notifie_ouvertures:
+  alias: Notifie ouvertures
+  sequence:
+  - condition: template
+    value_template: '{{expand(state_attr(''binary_sensor.capteurs_ouvertures'', ''entity_id''))|
+      selectattr(''state'',''eq'',''off'')|map(attribute=''entity_id'')|list|count
+      > 0}}'
+  - service: notify.maison
+    data:
+      title: 'Attention ! Alarme activée avec :'
+      message: "{% for s in expand(integration_entities(\"alarme\"))|selectattr('domain',
+        'eq', 'binary_sensor')| selectattr('state', 'eq', 'off')|map(attribute='attributes.friendly_name')|
+        list %}\n  {%- if (\"Baie\" in s or \"Fenêtre\" in s or \"Port\" in s) and
+        not \"VR\" in s -%}\n    {{s.lower() \n      | replace(\"fermée\", \"ouverte\")\n
+        \     | replace(\"verrouillée\", \"déverrouillée\")\n      | replace(\"droite\",
+        \"à droite\")\n      | replace(\"gauche\", \"à gauche\")\n      | replace(\"sdb\",
+        \"salle de bain\")\n      | replace(\"sdj\", \"salle de jeu\")\n      | replace(\"rdc\",
+        \"rez de chaussée\")\n      | replace(\"wc\", \"WC\")\n      | replace(\"1\",
+        \"parentale\")\n      | replace(\"2\", \"Athénaïs\")}}\n    {{- '\\n' -}}\n
+        \ {%- endif -%}\n{% endfor %}\n"
+  icon: mdi:message-alert
+  mode: restart
+  fields:
+    volume:
+      name: Volume
+      description: Volume du Media player
+      example: 50
+  description: Annonce les portes et fenêtres ouvertes

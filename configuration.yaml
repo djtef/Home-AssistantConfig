@@ -157,6 +157,12 @@ template:
           Libre
           {%- endif -%}
 
+  - sensor:
+      - name: Changement capteurs
+        state: >
+          {% set x = expand(integration_entities("alarme"))|selectattr('domain', 'eq', 'binary_sensor') | sort(attribute='last_changed', reverse=true) | list %}
+          {{ (x[0].entity_id if now() - x[0].last_changed < timedelta(seconds=3) else '') if x | count > 0 else '' }}
+
 binary_sensor:
   - platform: group
     name: "Capteurs ouvertures"

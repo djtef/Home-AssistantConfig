@@ -407,6 +407,8 @@
         entity_id: alarm_control_panel.alarme_maison
         state: armed_away
       sequence:
+      - service: script.notifie_ouvertures
+        data: {}
       - service: script.tts_google_home
         data:
           texte: Alarme activée !
@@ -419,61 +421,142 @@
       - condition: template
         value_template: '{{trigger.from_state.state != ''unavailable''}}'
       sequence:
-      - service: script.tts_google_home
-        data:
-          texte: Alarme désactivée
-          volume: 80
-          media_player_entity: media_player.sejour
-      - if:
-        - condition: template
-          value_template: '{{trigger.from_state.state == ''triggered''}}'
-        then:
-        - service: scene.turn_on
+      - service: siren.turn_off
+        target:
+          entity_id:
+          - siren.pse03_v1_1_0_siren_2
+          - siren.pse03_v1_1_0_siren
+        data: {}
+      - parallel:
+        - service: siren.turn_on
+          data:
+            tone: '5'
+            duration: '5'
           target:
-            entity_id: scene.lumieres_vr
-          data: {}
+            entity_id:
+            - siren.pse03_v1_1_0_siren_2
+            - siren.pse03_v1_1_0_siren
+        - service: script.tts_google_home
+          data:
+            texte: Alarme désactivée
+            volume: 80
+            media_player_entity: media_player.sejour
+        - if:
+          - condition: template
+            value_template: '{{trigger.from_state.state == ''triggered''}}'
+          then:
+          - service: scene.turn_on
+            target:
+              entity_id: scene.lumieres_vr
+            data: {}
+      - service: siren.turn_off
+        data: {}
+        target:
+          entity_id:
+          - siren.pse03_v1_1_0_siren_2
+          - siren.pse03_v1_1_0_siren
     - conditions:
       - condition: state
         entity_id: alarm_control_panel.alarme_maison
         state: pending
       sequence:
-      - service: script.tts_google_home
+      - service: script.turn_on
         data:
-          texte: Il reste 20 secondes pour désactiver l'alarme, 17, 16, 15, 14, 13,
-            12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
-          volume: 80
-          media_player_entity: media_player.sejour
+          variables:
+            texte: Il reste 20 secondes pour désactiver l'alarme, 17, 16, 15, 14,
+              13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
+            volume: 80
+            media_player_entity: media_player.sejour
+        target:
+          entity_id: script.tts_google_home
+      - service: siren.turn_on
+        data:
+          tone: '6'
+        target:
+          entity_id:
+          - siren.pse03_v1_1_0_siren_2
+          - siren.pse03_v1_1_0_siren
+      - delay:
+          seconds: 4
+      - service: siren.turn_on
+        data:
+          tone: '6'
+        target:
+          entity_id:
+          - siren.pse03_v1_1_0_siren_2
+          - siren.pse03_v1_1_0_siren
+      - delay:
+          seconds: 3
+      - repeat:
+          while:
+          - condition: state
+            entity_id: alarm_control_panel.alarme_maison
+            state: pending
+          sequence:
+          - service: siren.turn_on
+            data:
+              tone: '6'
+            target:
+              entity_id:
+              - siren.pse03_v1_1_0_siren_2
+              - siren.pse03_v1_1_0_siren
+          - delay:
+              seconds: 1
     - conditions:
       - condition: state
         entity_id: alarm_control_panel.alarme_maison
         state: triggered
       sequence:
-      - service: scene.create
-        data:
-          scene_id: lumieres_vr
-          snapshot_entities: '{{ expand(states)|selectattr(''domain'', ''in'', (''light'',
-            ''cover''))|selectattr(''state'', ''ne'', ''unavailable'')| map(attribute=''entity_id'')|
-            list }}
+      - parallel:
+        - service: siren.turn_on
+          data:
+            tone: '1'
+            duration: '600'
+          target:
+            entity_id:
+            - siren.pse03_v1_1_0_siren_2
+            - siren.pse03_v1_1_0_siren
+        - service: scene.create
+          data:
+            scene_id: lumieres_vr
+            snapshot_entities: '{{ expand(states)|selectattr(''domain'', ''in'', (''light'',
+              ''cover''))|selectattr(''state'', ''ne'', ''unavailable'')| map(attribute=''entity_id'')|
+              list }}
 
-            '
+              '
       - repeat:
           while:
           - condition: state
             entity_id: alarm_control_panel.alarme_maison
             state: triggered
           sequence:
-          - service: cover.open_cover
-            data: {}
-            target:
-              entity_id: cover.vr_general
-          - service: script.turn_on
-            data:
-              variables:
-                texte: Alarme déclenchée, appel police en cours !
-                volume: 100
-                media_player_entity: media_player.sejour
-            target:
-              entity_id: script.tts_google_home
-          - service: script.allume_lumieres
-            data: {}
+          - parallel:
+            - sequence:
+              - service: cover.open_cover
+                data: {}
+                target:
+                  entity_id: cover.vr_general
+              - service: script.turn_on
+                data:
+                  variables:
+                    texte: Alarme déclenchée, appel police en cours !
+                    volume: 100
+                    media_player_entity: media_player.sejour
+                target:
+                  entity_id: script.tts_google_home
+              - service: script.allume_lumieres
+                data: {}
   mode: restart
+- id: '1677626292376'
+  alias: Notify if door opens
+  trigger:
+  - platform: state
+    entity_id: sensor.changement_capteurs
+  condition:
+  - condition: template
+    value_template: '{{ trigger.to_state.state != '''' }}'
+  action:
+  - service: notify.moi
+    data:
+      message: '{{ state_attr(trigger.to_state.state, ''friendly_name'') }} {{ states(trigger.to_state.state)
+        }}'
