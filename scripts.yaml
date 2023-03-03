@@ -1,50 +1,219 @@
 tts_google_home:
-  alias: "TTS Google Home"
-  icon: "mdi:microphone-message"
-  description: "Fait parler Google Home"
+  alias: TTS Google Home
+  icon: mdi:microphone-message
+  description: Fait parler Google Home
   mode: restart
   fields:
     texte:
       name: Texte
-      description: "Texte à lire"
+      description: Texte à lire
+      example: Ceci est un test
     volume:
       name: Volume
-      description: "Volume du Media player"
+      description: Volume du Media player
+      example: 50
       selector:
         number:
           min: 0
           max: 100
           step: 5
-          unit_of_measurement: "%"
+          unit_of_measurement: '%'
           mode: slider
     media_player_entity:
-        name: Entité Media player
-        description: "Entité du Media player qui va lire le texte"
-      
+      name: Entité Media player
+      description: Entité du Media player qui va lire le texte
+      example: media_player.sejour
   sequence:
-    - service: media_player.turn_on
-      data: 
-        entity_id: "{{ media_player_entity }}"
-    - alias: "Wait for idle"
-      wait_template: "{{ is_state(media_player_entity, 'idle') }}"
-    - service: scene.create
-      data:
-        scene_id: google_home
-        snapshot_entities: "{{ media_player_entity }}"
-    - alias: "Définit le volume"
-      service: media_player.volume_set
-      data: 
-        entity_id: "{{ media_player_entity }}"
-        volume_level: "{{ volume/100 }}"
-    - alias: "TTS Google Home"
-      service: tts.google_translate_say
-      data:
-        entity_id: "{{ media_player_entity }}"
-        message: "{{ texte }}"
-    - alias: "Wait for idle"
-      wait_template: "{{ is_state(media_player_entity, 'idle') }}"
-    - service: scene.turn_on
-      target:
-        entity_id: scene.google_home
+  - service: media_player.media_stop
+    data:
+      entity_id: '{{ media_player_entity }}'
+  - service: media_player.turn_on
+    data:
+      entity_id: '{{ media_player_entity }}'
+  - alias: Wait for idle
+    wait_template: '{{ is_state(media_player_entity, ''idle'') }}'
+  - service: scene.create
+    data:
+      scene_id: google_home
+      snapshot_entities: '{{ media_player_entity }}'
+  - alias: Définit le volume
+    service: media_player.volume_set
+    data:
+      entity_id: '{{ media_player_entity }}'
+      volume_level: '{{ volume/100 }}'
+  - alias: TTS Google Home
+    service: tts.google_translate_say
+    data:
+      entity_id: '{{ media_player_entity }}'
+      message: '{{ texte }}'
+  - alias: Wait for idle
+    wait_template: '{{ is_state(media_player_entity, ''idle'') }}'
+  - service: scene.turn_on
+    target:
+      entity_id: scene.google_home
+    data: {}
+test_sirene_interieure:
+  alias: Test sirène intérieure
+  sequence:
+  - service: switch.turn_on
+    data: {}
+    target:
+      entity_id: switch.sirene_salon
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 230
+  - service: switch.turn_off
+    data: {}
+    target:
+      entity_id: switch.sirene_salon
+  mode: single
+allume_lumieres:
+  alias: Allume lumières
+  sequence:
+  - repeat:
+      for_each: '{{ expand(states)|selectattr(''domain'', ''eq'', ''light'')|selectattr(''state'',
+        ''ne'', ''unavailable'')| map(attribute=''entity_id'')| list }}
 
+        '
+      sequence:
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 0
+          milliseconds: 100
+      - service: light.turn_on
+        target:
+          entity_id: '{{ repeat.item }}'
+  mode: restart
+eteint_lumieres:
+  alias: Eteint lumières
+  sequence:
+  - repeat:
+      for_each: '{{ expand(states)|selectattr(''domain'', ''eq'', ''light'')|selectattr(''state'',
+        ''ne'', ''unavailable'')| map(attribute=''entity_id'')| list }}
 
+        '
+      sequence:
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 0
+          milliseconds: 100
+      - service: light.turn_off
+        target:
+          entity_id: '{{ repeat.item }}'
+  mode: restart
+bascule_lumieres:
+  alias: Bascule lumières
+  sequence:
+  - service: script.test
+    data: {}
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 5
+      milliseconds: 0
+  - service: script.eteint_lumieres
+    data: {}
+  mode: single
+tts_ouvertures:
+  alias: TTS ouvertures
+  icon: mdi:microphone-message
+  mode: restart
+  description: Notifie par Telegram les portes et fenêtres restées ouvertes
+  sequence:
+  - condition: template
+    value_template: '{{expand(state_attr(''binary_sensor.capteurs_ouvertures'', ''entity_id''))|
+      selectattr(''state'',''eq'',''off'')|map(attribute=''entity_id'')|list|count
+      > 0}}'
+  - service: script.tts_google_home
+    data:
+      texte: "Attention ! {% for s in expand(integration_entities(\"alarme\"))|selectattr('domain',
+        'eq', 'binary_sensor')| selectattr('state', 'eq', 'off')|map(attribute='attributes.friendly_name')|
+        list %}\n  {%- if (\"Baie\" in s or \"Fenêtre\" in s or \"Porte\" in s) and
+        not \"VR\" in s -%}\n    {{s.lower() \n      | replace(\"fermée\", \"ouverte\")\n
+        \     | replace(\"verrouillée\", \"déverrouillée\")\n      | replace(\"droite\",
+        \"à droite\")\n      | replace(\"gauche\", \"à gauche\")\n      | replace(\"sdb\",
+        \"salle de bain\")\n      | replace(\"sdj\", \"salle de jeu\")\n      | replace(\"rdc\",
+        \"rez de chaussée\")\n      | replace(\"wc\", \"WC\")\n      | replace(\"1\",
+        \"parentale\")\n      | replace(\"2\", \"Athénaïs\")}}\n    {{- '\\n' -}}\n
+        \ {%- endif -%}\n{% endfor %}\n"
+      volume: '{{ volume }}'
+      media_player_entity: media_player.sejour
+flash_rouge_xiaomi:
+  alias: 'Flash rouge Xiaomi '
+  sequence:
+  - service: light.turn_on
+    entity_id:
+    - light.yeelight_color_0x458bc59
+    data:
+      effect: Call
+  - repeat:
+      until:
+      - condition: state
+        entity_id: light.gateway_light_34ce008bede9
+        state: unknown
+      sequence:
+      - service: light.toggle
+        data:
+          brightness_pct: 100
+          color_name: red
+        target:
+          entity_id:
+          - light.yeelight_color_0x458bc59
+        enabled: false
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 0
+          milliseconds: 200
+    enabled: true
+  mode: restart
+deverrouille_relais_vr:
+  alias: Déverrouille relais VR
+  sequence:
+  - repeat:
+      count: '1000'
+      sequence:
+      - service: switch.toggle
+        data: {}
+        target:
+          entity_id:
+          - switch.vr_chambre_1_montee
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 1
+          milliseconds: 0
+  mode: single
+  icon: mdi:bug
+notifie_ouvertures:
+  alias: Notifie ouvertures
+  sequence:
+  - condition: template
+    value_template: '{{expand(state_attr(''binary_sensor.capteurs_ouvertures'', ''entity_id''))|
+      selectattr(''state'',''eq'',''off'')|map(attribute=''entity_id'')|list|count
+      > 0}}'
+  - service: notify.maison
+    data:
+      title: 'Attention ! Alarme activée avec :'
+      message: "{% for s in expand(integration_entities(\"alarme\"))|selectattr('domain',
+        'eq', 'binary_sensor')| selectattr('state', 'eq', 'off')|map(attribute='attributes.friendly_name')|
+        list %}\n  {%- if (\"Baie\" in s or \"Fenêtre\" in s or \"Port\" in s) and
+        not \"VR\" in s -%}\n    {{s.lower() \n      | replace(\"fermée\", \"ouverte\")\n
+        \     | replace(\"verrouillée\", \"déverrouillée\")\n      | replace(\"droite\",
+        \"à droite\")\n      | replace(\"gauche\", \"à gauche\")\n      | replace(\"sdb\",
+        \"salle de bain\")\n      | replace(\"sdj\", \"salle de jeu\")\n      | replace(\"rdc\",
+        \"rez de chaussée\")\n      | replace(\"wc\", \"WC\")\n      | replace(\"1\",
+        \"parentale\")\n      | replace(\"2\", \"Athénaïs\")}}\n    {{- '\\n' -}}\n
+        \ {%- endif -%}\n{% endfor %}\n"
+  icon: mdi:message-alert
+  mode: restart
+  fields:
+    volume:
+      name: Volume
+      description: Volume du Media player
+      example: 50
+  description: Annonce les portes et fenêtres ouvertes
