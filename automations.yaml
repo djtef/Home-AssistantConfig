@@ -414,6 +414,10 @@
           texte: Alarme activée !
           volume: 80
           media_player_entity: media_player.sejour
+      - service: automation.turn_on
+        data: {}
+        target:
+          entity_id: automation.telegram_changement_capteur
     - conditions:
       - condition: state
         entity_id: alarm_control_panel.alarme_maison
@@ -436,6 +440,11 @@
             entity_id:
             - siren.pse03_v1_1_0_siren_2
             - siren.pse03_v1_1_0_siren
+        - service: automation.turn_off
+          data:
+            stop_actions: true
+          target:
+            entity_id: automation.telegram_changement_capteur
         - service: script.tts_google_home
           data:
             texte: Alarme désactivée
@@ -516,6 +525,7 @@
             entity_id:
             - siren.pse03_v1_1_0_siren_2
             - siren.pse03_v1_1_0_siren
+          enabled: true
         - service: scene.create
           data:
             scene_id: lumieres_vr
@@ -524,6 +534,25 @@
               list }}
 
               '
+        - service: notify.maison
+          data:
+            message: Alarme maison déclenchée !
+            title: ALARME !
+        - service: notify.mobile_app_galaxy_s20_fe
+          data:
+            message: Alarme maison déclenchée !
+            title: ALARME !
+        - service: notify.mobile_app_m2103k19pg
+          data:
+            message: Alarme maison déclenchée !
+            title: ALARME !
+        - if:
+          - condition: template
+            value_template: '{{trigger.from_state.state == ''pending''}}'
+          then:
+          - service: notify.maison
+            data:
+              message: Délai désactivation alarme dépassé !
       - repeat:
           while:
           - condition: state
@@ -546,6 +575,7 @@
                   entity_id: script.tts_google_home
               - service: script.allume_lumieres
                 data: {}
+        enabled: true
   mode: restart
 - id: '1677626292376'
   alias: Notify if door opens
@@ -560,3 +590,67 @@
     data:
       message: '{{ state_attr(trigger.to_state.state, ''friendly_name'') }} {{ states(trigger.to_state.state)
         }}'
+- id: '1677878113159'
+  alias: Telegram changement capteur
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - binary_sensor.baie_cuisine_fermee_droite
+    - binary_sensor.baie_cuisine_verrouillee_droite
+    - binary_sensor.baie_cuisine_fermee_gauche
+    - binary_sensor.baie_cuisine_verrouillee_gauche
+    - binary_sensor.baie_salon_fermee_droite
+    - binary_sensor.baie_salon_fermee_gauche
+    - binary_sensor.baie_salon_verrouillee_droite
+    - binary_sensor.baie_salon_verrouillee_gauche
+    - binary_sensor.fenetre_chambre_1_fermee_droite
+    - binary_sensor.fenetre_chambre_1_verrouillee_droite
+    - binary_sensor.fenetre_chambre_1_fermee_gauche
+    - binary_sensor.fenetre_chambre_1_verrouillee_gauche
+    - binary_sensor.fenetre_sdj_fermee_droite
+    - binary_sensor.fenetre_sdj_verrouillee_droite
+    - binary_sensor.fenetre_sdj_fermee_gauche
+    - binary_sensor.fenetre_bureau_fermee_droite
+    - binary_sensor.fenetre_bureau_verrouillee_droite
+    - binary_sensor.fenetre_bureau_fermee_gauche
+    - binary_sensor.fenetre_bureau_verrouillee_gauche
+    - binary_sensor.fenetre_cellier_fermee
+    - binary_sensor.fenetre_cellier_verrouillee
+    - binary_sensor.porte_fenetre_salon_fermee
+    - binary_sensor.porte_fenetre_salon_verrouillee
+    - binary_sensor.fenetre_sdb_rdc_fermee
+    - binary_sensor.fenetre_sdb_rdc_verrouillee
+    - binary_sensor.fenetre_wc_rdc_fermee
+    - binary_sensor.fenetre_wc_rdc_verrouillee
+    - binary_sensor.fenetre_chambre_2_fermee_droite
+    - binary_sensor.fenetre_chambre_2_verrouillee_droite
+    - binary_sensor.fenetre_chambre_2_fermee_gauche
+    - binary_sensor.fenetre_chambre_2_verrouillee_gauche
+    - binary_sensor.fenetre_chambre_3_fermee_droite
+    - binary_sensor.fenetre_chambre_3_verrouillee_droite
+    - binary_sensor.fenetre_chambre_3_verrouillee_gauche
+    - binary_sensor.fenetre_sdb_etage_fermee
+    - binary_sensor.fenetre_sdb_etage_verrouillee
+    - binary_sensor.fenetre_wc_etage_fermee
+    - binary_sensor.fenetre_wc_etage_verrouillee
+    - binary_sensor.fenetre_palier_fermee_droite
+    - binary_sensor.fenetre_palier_verrouillee_droite
+    - binary_sensor.fenetre_palier_fermee_gauche
+    - binary_sensor.fenetre_palier_verrouillee_gauche
+    - binary_sensor.fenetre_escalier_fermee
+    - binary_sensor.fenetre_escalier_verrouillee
+    - binary_sensor.porte_garage_fermee_gauche
+    - binary_sensor.porte_garage_verrouillee_gauche
+    - binary_sensor.porte_garage_verrouillee_droite
+    - binary_sensor.fenetre_garage_fermee
+    - binary_sensor.capteur_presence_bureau
+  condition: []
+  action:
+  - service: notify.maison
+    data:
+      message: '{{ state_attr(trigger.entity_id, ''friendly_name'') }} {{ trigger.to_state.state
+        }}
+
+        '
+  mode: single
