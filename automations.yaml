@@ -423,7 +423,8 @@
         entity_id: alarm_control_panel.alarme_maison
         state: disarmed
       - condition: template
-        value_template: '{{trigger.from_state.state != ''unavailable''}}'
+        value_template: '{{ (trigger.from_state.state != ''unavailable'') and (trigger.from_state
+          is not none) }} '
       sequence:
       - service: siren.turn_off
         target:

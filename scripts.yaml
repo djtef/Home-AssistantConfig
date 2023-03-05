@@ -180,8 +180,7 @@ deverrouille_relais_vr:
       - service: switch.toggle
         data: {}
         target:
-          entity_id:
-          - switch.vr_chambre_1_montee
+          entity_id: switch.vr_salon_montee
       - delay:
           hours: 0
           minutes: 0
