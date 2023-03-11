@@ -394,14 +394,19 @@
         entity_id: alarm_control_panel.alarme_maison
         state: arming
       sequence:
-      - service: script.tts_ouvertures
-        data:
-          volume: 80
-      - service: script.tts_google_home
-        data:
-          texte: L'alarme sera activée dès que la porte sera fermée
-          volume: 80
-          media_player_entity: media_player.sejour
+      - if:
+        - condition: state
+          entity_id: input_boolean.alarme_silencieuse
+          state: 'off'
+        then:
+        - service: script.tts_ouvertures
+          data:
+            volume: 80
+        - service: script.tts_google_home
+          data:
+            texte: L'alarme sera activée dès que la porte sera fermée
+            volume: 80
+            media_player_entity: media_player.sejour
     - conditions:
       - condition: state
         entity_id: alarm_control_panel.alarme_maison
@@ -409,11 +414,16 @@
       sequence:
       - service: script.notifie_ouvertures
         data: {}
-      - service: script.tts_google_home
-        data:
-          texte: Alarme activée !
-          volume: 80
-          media_player_entity: media_player.sejour
+      - if:
+        - condition: state
+          entity_id: input_boolean.alarme_silencieuse
+          state: 'off'
+        then:
+        - service: script.tts_google_home
+          data:
+            texte: Alarme activée !
+            volume: 80
+            media_player_entity: media_player.sejour
       - service: automation.turn_on
         data: {}
         target:
@@ -433,24 +443,34 @@
           - siren.pse03_v1_1_0_siren
         data: {}
       - parallel:
-        - service: siren.turn_on
-          data:
-            tone: '5'
-            duration: '5'
-          target:
-            entity_id:
-            - siren.pse03_v1_1_0_siren_2
-            - siren.pse03_v1_1_0_siren
+        - if:
+          - condition: state
+            entity_id: input_boolean.alarme_silencieuse
+            state: 'off'
+          then:
+          - service: siren.turn_on
+            data:
+              tone: '5'
+              duration: '5'
+            target:
+              entity_id:
+              - siren.pse03_v1_1_0_siren_2
+              - siren.pse03_v1_1_0_siren
         - service: automation.turn_off
           data:
             stop_actions: true
           target:
             entity_id: automation.telegram_changement_capteur
-        - service: script.tts_google_home
-          data:
-            texte: Alarme désactivée
-            volume: 80
-            media_player_entity: media_player.sejour
+        - if:
+          - condition: state
+            entity_id: input_boolean.alarme_silencieuse
+            state: 'off'
+          then:
+          - service: script.tts_google_home
+            data:
+              texte: Alarme désactivée
+              volume: 80
+              media_player_entity: media_player.sejour
         - if:
           - condition: template
             value_template: '{{trigger.from_state.state == ''triggered''}}'
@@ -469,6 +489,9 @@
       - condition: state
         entity_id: alarm_control_panel.alarme_maison
         state: pending
+      - condition: state
+        entity_id: input_boolean.alarme_silencieuse
+        state: 'off'
       sequence:
       - service: script.turn_on
         data:
@@ -518,15 +541,19 @@
         state: triggered
       sequence:
       - parallel:
-        - service: siren.turn_on
-          data:
-            tone: '1'
-            duration: '600'
-          target:
-            entity_id:
-            - siren.pse03_v1_1_0_siren_2
-            - siren.pse03_v1_1_0_siren
-          enabled: true
+        - if:
+          - condition: state
+            entity_id: input_boolean.alarme_silencieuse
+            state: 'off'
+          then:
+          - service: siren.turn_on
+            data:
+              tone: '1'
+              duration: '600'
+            target:
+              entity_id:
+              - siren.pse03_v1_1_0_siren_2
+              - siren.pse03_v1_1_0_siren
         - service: scene.create
           data:
             scene_id: lumieres_vr
@@ -560,23 +587,25 @@
             entity_id: alarm_control_panel.alarme_maison
             state: triggered
           sequence:
-          - parallel:
-            - sequence:
-              - service: cover.open_cover
-                data: {}
-                target:
-                  entity_id: cover.vr_general
-              - service: script.turn_on
-                data:
-                  variables:
-                    texte: Alarme déclenchée, appel police en cours !
-                    volume: 100
-                    media_player_entity: media_player.sejour
-                target:
-                  entity_id: script.tts_google_home
-              - service: script.allume_lumieres
-                data: {}
-        enabled: true
+          - service: cover.open_cover
+            data: {}
+            target:
+              entity_id: cover.vr_general
+          - if:
+            - condition: state
+              entity_id: input_boolean.alarme_silencieuse
+              state: 'off'
+            then:
+            - service: script.turn_on
+              data:
+                variables:
+                  texte: Alarme déclenchée, appel police en cours !
+                  volume: 100
+                  media_player_entity: media_player.sejour
+              target:
+                entity_id: script.tts_google_home
+          - service: script.allume_lumieres
+            data: {}
   mode: restart
 - id: '1677626292376'
   alias: Notify if door opens

@@ -180,7 +180,8 @@ deverrouille_relais_vr:
       - service: switch.toggle
         data: {}
         target:
-          entity_id: switch.vr_salon_montee
+          entity_id:
+          - switch.vr_cuisine_montee
       - delay:
           hours: 0
           minutes: 0
@@ -195,6 +196,10 @@ notifie_ouvertures:
     value_template: '{{expand(state_attr(''binary_sensor.capteurs_ouvertures'', ''entity_id''))|
       selectattr(''state'',''eq'',''off'')|map(attribute=''entity_id'')|list|count
       > 0}}'
+  - condition: template
+    value_template: '{{ expand(state_attr(''binary_sensor.capteurs_ouvertures'', ''entity_id''))|
+      selectattr(''state'',''eq'',''off'')|map(attribute=''entity_id'')|list|count
+      != 1 or is_state(''binary_sensor.porte_entree_verrouillee'', ''on'') }}'
   - service: notify.maison
     data:
       title: 'Attention ! Alarme activée avec :'
