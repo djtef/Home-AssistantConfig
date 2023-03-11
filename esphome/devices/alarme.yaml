@@ -28,6 +28,7 @@ substitutions:
   RTTL_HALLOWEN: >-
         "Halloween:d=8,o=5,b=180,b=180:d6,g,g,d6,g,g,d6,g,d#6,g,d6,g,g,d6,g,g,d6,g,d#6,g,c#6,f#,f#,c#6,f#,f#,c#6,f#,d6,f#,c#6,f#,f#,c#6,f#,f#,c#6,f#,d6,f#"
   alarm_code: !secret alarm_code
+  alarm_code_silence: !secret alarm_code_silence
   delai_armement: '3'
   DISARMED: "0"
   PENDING: "1"
@@ -63,6 +64,9 @@ esphome:
                     return id(state_int) == ${TRIGGERED};
           then:
             - script.execute: trigger_alarm_execute
+      - binary_sensor.template.publish:
+          id: SILENT_ALARM
+          state: OFF
 
           
 
@@ -83,7 +87,16 @@ api:
             condition:
               lambda: "return code == \"${alarm_code}\";"
             then:
-              - script.execute: alarm_arm
+              - script.execute:
+                  id: alarm_arm
+                  silencieux: off
+        - if:
+            condition:
+              lambda: "return code == \"${alarm_code_silence}\";"
+            then:
+              - script.execute:
+                  id: alarm_arm
+                  silencieux: on
     - service: disarm
       variables:
          code: string
@@ -197,6 +210,8 @@ script:
                # return id(state_int) == ${PENDING};
   - id: commande_clavier
     then:
+      - switch.turn_off: SA_SIRENE
+      - switch.turn_off: GA_SIRENE
       - if:
           condition:
             or:
@@ -208,6 +223,44 @@ script:
             - script.execute: alarm_arm_delayed
           else:
             - script.execute: alarm_disarm
+  - id: ouverture_VR
+    parameters:
+      piece: string  
+      sensor_VR : bool
+    then:
+      - if:
+          condition:
+            api.connected:
+          then:
+            - if:
+                condition:
+                  - lambda: |-
+                      return sensor_VR == false;
+                then:
+                  # - logger.log: !lambda |-
+                       # char buf[256];
+                       # sprintf(buf,  "Vendalisme VR %s", piece);
+                       # return ((std::string) buf).c_str();
+                  - lambda: |-
+                        ESP_LOGD("main", "Vendalisme VR %s", piece.c_str());
+                  # - script.execute: trigger_alarm
+                else:
+                  - lambda: |-
+                        ESP_LOGD("main", "Ouverture VR %s", piece.c_str());
+          else:
+            - if:
+                condition:
+                  and:
+                    - not:
+                        script.is_running: trigger_alarm_execute
+                    - or:
+                        - lambda: |-
+                              return id(state_int) == ${ARMED_AWAY};
+                        - lambda: |-
+                              return id(state_int) == ${PENDING};   
+                then:
+                  - lambda: |-
+                        ESP_LOGD("main", "Attention ! Ouverture VR %s avec Home Assistant non connecté !!", piece.c_str());
   - id: trigger_alarm_delayed
     mode: single 
     parameters:
@@ -230,7 +283,21 @@ script:
   # when arming and disarming, turn off all sirens and buzzers
   # also, cancel any trigger sequence
   - id: alarm_arm
+    parameters:
+      silencieux: bool
     then:
+        - if:
+            condition:
+               - lambda: |-
+                   return silencieux == true;
+            then:
+              - binary_sensor.template.publish:
+                  id: SILENT_ALARM
+                  state: ON
+            else:
+              - binary_sensor.template.publish:
+                  id: SILENT_ALARM
+                  state: OFF
         - logger.log: "Armé !"
         - script.stop: attente_armement
         - rtttl.stop
@@ -281,7 +348,9 @@ script:
             condition:
               - script.is_running: attente_armement
             then:
-              - script.execute: alarm_arm
+              - script.execute:
+                  id: alarm_arm
+                  silencieux: off
             else:
               - logger.log: "Timeout armement!"  
               - rtttl.stop 
@@ -291,6 +360,8 @@ script:
   - id: alarm_disarm
     then:
         - logger.log: "Désarmement..."
+        - switch.turn_off: SA_SIRENE
+        - switch.turn_off: GA_SIRENE
         - script.stop: alarm_arm_delayed
         - script.stop: attente_armement
         - script.stop: trigger_alarm
@@ -300,6 +371,9 @@ script:
         - lambda: |-
               id(state_alarm_panel).publish_state("disarmed");
         - rtttl.play: ${RTTTL_SUCCESS}
+        - binary_sensor.template.publish:
+            id: SILENT_ALARM
+            state: OFF
   # triggering sequence
   - id: trigger_alarm_execute
     then:
@@ -307,7 +381,17 @@ script:
         - lambda: |-
             id(state_alarm_panel).publish_state("triggered");
         - rtttl.play: ${RTTTL_SIREN}
-      # TODO: turn on siren
+        - if:
+            condition:
+              - binary_sensor.is_off: SILENT_ALARM
+            then:
+              - logger.log: "Active sirènes"
+              # TODO : déclencher sirène
+              # - switch.turn_on: SA_SIRENE
+              # - switch.turn_on: GA_SIRENE
+        - delay: 10min
+        - switch.turn_off: SA_SIRENE
+        - switch.turn_off: GA_SIRENE
   # only execute triggering if armed and not already running
   - id: trigger_alarm
     then:
@@ -414,6 +498,9 @@ mcp23017:
 
 # Individual inputs
 binary_sensor:
+  - platform: template
+    name: "Alarme silencieuse"
+    id: SILENT_ALARM
   # - platform: gpio #GPIO35
     # name: "GPIO35"
     # id: gpio35
@@ -588,14 +675,9 @@ binary_sensor:
       number: 7
       mode: INPUT_PULLUP
       inverted: True
-    # on_release :
-      # then:
-        # - if:
-            # condition:
-              # - binary_sensor.is_off: <GARDE_FOU>
-            # then:
-              # - logger.log: "<enter log>"
-              # - script.execute: trigger_alarm
+    on_release :
+      then:
+        - lambda: id(ouverture_VR)->execute("Pallier", id(PA_VR_MONTE).state);
   - platform: gpio #in10
     name: "Fenêtre Palier fermée Gauche"
     id: PA_F_FERME_G
@@ -683,14 +765,9 @@ binary_sensor:
       number: 2
       mode: INPUT_PULLUP
       inverted: True
-    # on_release :
-      # then:
-        # - if:
-            # condition:
-              # - binary_sensor.is_off: <GARDE_FOU>
-            # then:
-              # - logger.log: "<enter log>"
-              # - script.execute: trigger_alarm
+    on_release :
+      then:
+        - lambda: id(ouverture_VR)->execute("Bureau", id(BU_VR_MONTE).state);
   - platform: gpio #in15
     name: "Fenêtre Bureau fermée Gauche"
     id: BU_F_FERME_G
@@ -759,14 +836,9 @@ binary_sensor:
       number: 9
       mode: INPUT_PULLUP
       inverted: True
-    # on_release :
-      # then:
-        # - if:
-            # condition:
-              # - binary_sensor.is_off: <GARDE_FOU>
-            # then:
-              # - logger.log: "<enter log>"
-              # - script.execute: trigger_alarm
+    on_release :
+      then:
+        - lambda: id(ouverture_VR)->execute("Porte fenetre", id(SA_PF_VR_MONTE).state);
   - platform: gpio #in19
     name: "Porte-fenêtre Salon verrouillée"
     id: SA_PF_VERR
@@ -835,14 +907,10 @@ binary_sensor:
       number: 13
       mode: INPUT_PULLUP
       inverted: True
+    # TODO : Réparer capteur VR Chambre 1
     # on_release :
       # then:
-        # - if:
-            # condition:
-              # - binary_sensor.is_off: <GARDE_FOU>
-            # then:
-              # - logger.log: "<enter log>"
-              # - script.execute: trigger_alarm
+        # - lambda: id(ouverture_VR)->execute("Chambre 1", id(C1_VR_MONTE).state);
   - platform: gpio #in23
     name: "Fenêtre Chambre 1 fermée Gauche"
     id: C1_F_FERME_G
@@ -930,14 +998,9 @@ binary_sensor:
       number: 5
       mode: INPUT_PULLUP
       inverted: True
-    # on_release :
-      # then:
-        # - if:
-            # condition:
-              # - binary_sensor.is_off: <GARDE_FOU>
-            # then:
-              # - logger.log: "<enter log>"
-              # - script.execute: trigger_alarm
+    on_release :
+      then:
+        - lambda: id(ouverture_VR)->execute("Baie Salon gauche", id(SA_B_VR_MONTE).state);
   - platform: gpio #in28
     name: "Baie Salon Fermée Gauche"
     id: SA_B_FERME_G
@@ -987,14 +1050,9 @@ binary_sensor:
       number: 2
       mode: INPUT_PULLUP
       inverted: True
-    # on_release :
-      # then:
-        # - if:
-            # condition:
-              # - binary_sensor.is_off: <GARDE_FOU>
-            # then:
-              # - logger.log: "<enter log>"
-              # - script.execute: trigger_alarm
+    on_release :
+      then:
+        - lambda: id(ouverture_VR)->execute("Baie Salon droite", id(SA_B_VR_MONTE).state);
   - platform: gpio #in31
     name: "Baie Salon fermée Droite"
     id: SA_B_FERME_D
@@ -1082,14 +1140,9 @@ binary_sensor:
       number: 10
       mode: INPUT_PULLUP
       inverted: True
-    # on_release :
-      # then:
-        # - if:
-            # condition:
-              # - binary_sensor.is_off: <GARDE_FOU>
-            # then:
-              # - logger.log: "<enter log>"
-              # - script.execute: trigger_alarm
+    on_release :
+      then:
+        - lambda: id(ouverture_VR)->execute("Baie cuisine gauche", id(CU_VR_MONTE).state);
   - platform: gpio #in36
     name: "Baie Cuisine fermée Gauche"
     id: CU_B_FERME_G
@@ -1139,14 +1192,9 @@ binary_sensor:
       number: 13
       mode: INPUT_PULLUP
       inverted: True
-    # on_release :
-      # then:
-        # - if:
-            # condition:
-              # - binary_sensor.is_off: <GARDE_FOU>
-            # then:
-              # - logger.log: "<enter log>"
-              # - script.execute: trigger_alarm
+    on_release :
+      then:
+        - lambda: id(ouverture_VR)->execute("Baie cuisine droite", id(CU_VR_MONTE).state);
   - platform: gpio #in39
     name: "Baie Cuisine fermée Droite"
     id: CU_B_FERME_D
@@ -1198,14 +1246,9 @@ binary_sensor:
       number: 8
       mode: INPUT_PULLUP
       inverted: True
-    # on_release :
-      # then:
-        # - if:
-            # condition:
-              # - binary_sensor.is_off: <GARDE_FOU>
-            # then:
-              # - logger.log: "<enter log>"
-              # - script.execute: trigger_alarm
+    on_release :
+      then:
+        - lambda: id(ouverture_VR)->execute("SDJ", id(SJ_VR_MONTE).state);
   - platform: gpio #in42
     name: "Fenêtre SDJ fermée Gauche"
     id: SJ_F_FERME_G
@@ -1334,14 +1377,9 @@ binary_sensor:
       number: 15
       mode: INPUT_PULLUP
       inverted: True
-    # on_release :
-      # then:
-        # - if:
-            # condition:
-              # - binary_sensor.is_off: <GARDE_FOU>
-            # then:
-              # - logger.log: "<enter log>"
-              # - script.execute: trigger_alarm
+    on_release :
+      then:
+        - lambda: id(ouverture_VR)->execute("Chambre 3", id(C3_VR_MONTE).state);
   - platform: gpio #in49
     name: "Fenêtre Chambre 3 fermée Droite"
     id: C3_F_FERME_D
@@ -1429,14 +1467,9 @@ binary_sensor:
       number: 3
       mode: INPUT_PULLUP
       inverted: True
-    # on_release :
-      # then:
-        # - if:
-            # condition:
-              # - binary_sensor.is_off: <GARDE_FOU>
-            # then:
-              # - logger.log: "<enter log>"
-              # - script.execute: trigger_alarm
+    on_release :
+      then:
+        - lambda: id(ouverture_VR)->execute("Chambre 2", id(C2_VR_MONTE).state);
   - platform: gpio #in54
     name: "Fenêtre Chambre 2 fermée Droite"
     id: C2_F_FERME_D
@@ -1497,14 +1530,9 @@ binary_sensor:
       number: 8
       mode: INPUT_PULLUP
       inverted: True
-    # on_release :
-      # then:
-        # - if:
-            # condition:
-              # - binary_sensor.is_off: <GARDE_FOU>
-            # then:
-              # - logger.log: "<enter log>"
-              # - script.execute: trigger_alarm
+    on_release :
+      then:
+        - lambda: id(ouverture_VR)->execute("Escalier", id(PA_ESC_VR_MONTE).state);
   - platform: gpio #in58
     name: "Fenêtre Escalier fermée"
     id: PA_F_ESC_FERME
@@ -1630,14 +1658,10 @@ binary_sensor:
       number: 15
       mode: INPUT_PULLUP
       inverted: True
+    # TODO : Réparer capteurs VR cellier
     # on_release :
       # then:
-        # - if:
-            # condition:
-              # - binary_sensor.is_off: <GARDE_FOU>
-            # then:
-              # - logger.log: "<enter log>"
-              # - script.execute: trigger_alarm
+        # - lambda: id(ouverture_VR)->execute("Cellier", id(CE_VR_MONTE).state);
   - platform: gpio #in65
     name: "Fenêtre Cellier verrouillée"
     id: CE_F_VERR
@@ -1770,6 +1794,52 @@ binary_sensor:
       mode: INPUT_PULLUP
       inverted: True   
 
+  
+  - platform: homeassistant
+    name: "VR Bureau montée"
+    id: BU_VR_MONTE
+    entity_id: switch.vr_bureau_montee
+  - platform: homeassistant
+    name: "VR Cellier montée"
+    id: CE_VR_MONTE    
+    entity_id: switch.vr_cellier_montee
+  - platform: homeassistant
+    name: "VR Chambre 1 montée"
+    id: C1_VR_MONTE 
+    entity_id: switch.vr_chambre_1_montee
+  - platform: homeassistant
+    name: "VR Chambre 2 montée"
+    id: C2_VR_MONTE 
+    entity_id: switch.vr_chambre_2_montee
+  - platform: homeassistant
+    name: "VR Chambre 3 montée"
+    id: C3_VR_MONTE 
+    entity_id: switch.vr_chambre_3_montee
+  - platform: homeassistant
+    name: "VR Cuisine montée"
+    id: CU_VR_MONTE 
+    entity_id: switch.vr_cuisine_montee
+  - platform: homeassistant
+    name: "VR Escalier montée"
+    id: PA_ESC_VR_MONTE 
+    entity_id: switch.vr_escalier_montee
+  - platform: homeassistant
+    name: "VR Palier montée"
+    id: PA_VR_MONTE 
+    entity_id: switch.vr_palier_montee
+  - platform: homeassistant
+    name: "VR Porte fenêtre Salon montée"
+    id: SA_PF_VR_MONTE 
+    entity_id: switch.vr_porte_fenetre_salon_montee
+  - platform: homeassistant
+    name: "VR SDJ montée"
+    id: SJ_VR_MONTE 
+    entity_id: switch.vr_salle_de_jeu_montee
+  - platform: homeassistant
+    name: "VR Baie Salon montée"
+    id: SA_B_VR_MONTE 
+    entity_id: switch.vr_salon_montee
+    
 # Individual outputs
 switch:
   - platform: gpio
@@ -1821,8 +1891,8 @@ switch:
       mode: OUTPUT
       inverted: False
   - platform: gpio
-    id: out79
-    name: "out79"
+    id: GA_SIRENE
+    name: "Sirène Garage"
     pin:
       mcp23xxx: mcp23017_hub_b5
       number: 6
