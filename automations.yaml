@@ -736,3 +736,269 @@
         target:
           entity_id: light.gateway_light_34ce008bede9
   mode: single
+- id: '1679261150516'
+  alias: Alarme absence
+  description: Détection absence sans alarme
+  trigger:
+  - platform: state
+    entity_id:
+    - person.thomas
+    - person.jacinta
+    to: not_home
+    from: home
+    for:
+      hours: 0
+      minutes: 10
+      seconds: 0
+  condition:
+  - condition: state
+    entity_id: person.thomas
+    state: not_home
+  - condition: state
+    entity_id: person.jacinta
+    state: not_home
+  - condition: state
+    entity_id: alarm_control_panel.alarme_maison
+    state: disarmed
+  action:
+  - service: notify.maison
+    data:
+      message: Plus personne n'est à la maison et l'alarme est désactivée, voulez-vous
+        l'activer ?
+      title: '*Attention*'
+  mode: single
+- id: '1679444333816'
+  alias: Telegram callback
+  description: Gère les commandes callback Telegram
+  trigger:
+  - platform: event
+    event_type: telegram_command
+    event_data:
+      command: /alarme
+    id: alarme
+  - platform: event
+    event_type: telegram_callback
+    event_data:
+      data: /activer_alarme
+    id: activer_alarme
+  - platform: event
+    event_type: telegram_callback
+    event_data:
+      data: /desactiver_alarme
+    id: desactiver_alarme
+  - platform: event
+    event_type: telegram_callback
+    event_data:
+      data: /osef
+    id: osef
+  - platform: event
+    event_type: telegram_callback
+    event_data:
+      data: /delete
+    id: delete
+  - platform: event
+    event_type: telegram_callback
+    event_data:
+      data: /0
+    id: code
+  - platform: event
+    event_type: telegram_callback
+    event_data:
+      data: /1
+    id: code
+  - platform: event
+    event_type: telegram_callback
+    event_data:
+      data: /2
+    id: code
+  - platform: event
+    event_type: telegram_callback
+    event_data:
+      data: /3
+    id: code
+  - platform: event
+    event_type: telegram_callback
+    event_data:
+      data: /4
+    id: code
+  - platform: event
+    event_type: telegram_callback
+    event_data:
+      data: /5
+    id: code
+  - platform: event
+    event_type: telegram_callback
+    event_data:
+      data: /6
+    id: code
+  - platform: event
+    event_type: telegram_callback
+    event_data:
+      data: /7
+    id: code
+  - platform: event
+    event_type: telegram_callback
+    event_data:
+      data: /8
+    id: code
+  - platform: event
+    event_type: telegram_callback
+    event_data:
+      data: /9
+    id: code
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: alarme
+      sequence:
+      - if:
+        - condition: state
+          entity_id: alarm_control_panel.alarme_maison
+          state: disarmed
+        then:
+        - service: telegram_bot.send_message
+          data:
+            title: '*Alarme*'
+            target: '{{ trigger.event.data.user_id }}'
+            message: L'alarme est désactivée. Voulez-vous l'activer ?
+            inline_keyboard:
+            - Oui:/activer_alarme, Non:/delete
+        else:
+        - service: telegram_bot.send_message
+          data:
+            title: '*Alarme*'
+            target: '{{ trigger.event.data.user_id }}'
+            message: L'alarme est activée. Voulez-vous la désactiver ?
+            inline_keyboard:
+            - Oui:/desactiver_alarme, Non:/delete
+    - conditions:
+      - condition: trigger
+        id: activer_alarme
+      sequence:
+      - service: esphome.alarme_arm_home
+        data:
+          code: '7757'
+      - service: telegram_bot.answer_callback_query
+        data:
+          callback_query_id: '{{ trigger.event.data.id }}'
+          message: "\U0001F6A8 Alarme activée ! \U0001F6A8"
+      - service: telegram_bot.edit_message
+        data:
+          message_id: last
+          chat_id: '{{ trigger.event.data.user_id }}'
+          title: '*Confirmation*'
+          message: L'alarme a été activée par {{ trigger.event.data.from_first }}
+    - conditions:
+      - condition: trigger
+        id: delete
+      sequence:
+      - service: telegram_bot.delete_message
+        data:
+          message_id: last
+          chat_id: '{{ trigger.event.data.user_id }}'
+    - conditions:
+      - condition: trigger
+        id: osef
+      sequence:
+      - service: telegram_bot.edit_message
+        data:
+          message_id: last
+          chat_id: '{{ trigger.event.data.user_id }}'
+          title: '*Confirmation*'
+          message: L'alarme reste désactivée bien que personne ne soit présent
+    - conditions:
+      - condition: trigger
+        id: desactiver_alarme
+      sequence:
+      - service: telegram_bot.edit_message
+        data:
+          message_id: '{{ trigger.event.data.message.message_id }}'
+          chat_id: '{{ trigger.event.data.chat_id }}'
+          title: '*Désactivation alarme*'
+          inline_keyboard:
+          - 1:/1, 2:/2, 3:/3
+          - 4:/4, 5:/5, 6:/6
+          - 7:/7, 8:/8, 9:/9
+          - 0:/0
+          message: '{{ trigger.event.data.from_first }} entrez le code :
+
+            '
+      - service: input_text.set_value
+        data:
+          value: ''
+        target:
+          entity_id: input_text.code
+    - conditions:
+      - condition: trigger
+        id: code
+      sequence:
+      - service: input_text.set_value
+        data_template:
+          entity_id: input_text.code
+          value: '{{ states(''input_text.code'') }}{{ trigger.event.data.data|replace(''/'',
+            '''') }}'
+      - service: telegram_bot.edit_message
+        data:
+          message_id: '{{ trigger.event.data.message.message_id }}'
+          chat_id: '{{ trigger.event.data.chat_id }}'
+          title: '*Désactivation alarme*'
+          inline_keyboard:
+          - 1:/1, 2:/2, 3:/3
+          - 4:/4, 5:/5, 6:/6
+          - 7:/7, 8:/8, 9:/9
+          - 0:/0
+          message: '{{ trigger.event.data.from_first }} entrez le code : {% for s
+            in states(''input_text.code'')  -%}\*{%- endfor %}
+
+            '
+      - if:
+        - condition: template
+          value_template: '{{ states(''input_text.code'') | count == 4}}'
+        then:
+        - if:
+          - condition: state
+            entity_id: input_text.code
+            state: '7757'
+          then:
+          - service: esphome.alarme_disarm
+            data:
+              code: '7757'
+          - service: telegram_bot.answer_callback_query
+            data:
+              callback_query_id: '{{ trigger.event.data.id }}'
+              message: "\U0001F6A8 Alarme désactivée ! \U0001F6A8"
+          - service: telegram_bot.edit_message
+            data:
+              message_id: '{{ trigger.event.data.message.message_id }}'
+              chat_id: '{{ trigger.event.data.chat_id }}'
+              title: '*Désactivation alarme*'
+              inline_keyboard: []
+              message: 'Alarme désactivée par {{ trigger.event.data.from_first }}
+
+                '
+          else:
+          - service: telegram_bot.answer_callback_query
+            data:
+              callback_query_id: '{{ trigger.event.data.id }}'
+              message: "\U0001F6A8 Code erroné ! \U0001F6A8"
+          - service: telegram_bot.edit_message
+            data:
+              message_id: '{{ trigger.event.data.message.message_id }}'
+              chat_id: '{{ trigger.event.data.chat_id }}'
+              title: '*Désactivation alarme*'
+              inline_keyboard:
+              - 1:/1, 2:/2, 3:/3
+              - 4:/4, 5:/5, 6:/6
+              - 7:/7, 8:/8, 9:/9
+              - 0:/0
+              message: '{{ trigger.event.data.from_first }} entrez le code :
+
+                '
+          - service: input_text.set_value
+            data:
+              value: ''
+            target:
+              entity_id: input_text.code
+  mode: single
