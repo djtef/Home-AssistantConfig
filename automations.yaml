@@ -1,61 +1,80 @@
 - id: '1667855934726'
   alias: 'Fermer volets coucher soleil '
-  description: 'Ferme les volets roulants 15 min après le coucher du soleil '
+  description: 'Ferme les volets roulants après le coucher du soleil '
   trigger:
   - platform: sun
     event: sunset
+    id: pile
+  - platform: sun
+    event: sunset
     offset: 00:15:00
+    id: plus15min
+  - platform: sun
+    event: sunset
+    offset: 00:45:00
+    id: plus45min
   condition: []
   action:
-  - service: cover.close_cover
-    target:
-      entity_id:
-      - cover.vr_bureau
-      - cover.vr_cellier
-      - cover.vr_chambre_1
-      - cover.vr_chambre_2
-      - cover.vr_chambre_3
-      - cover.vr_escalier
-      - cover.vr_palier
-      - cover.vr_salle_de_jeu
-    data: {}
-  - if:
-    - condition: state
-      entity_id: binary_sensor.porte_fenetre_salon_verrouillee
-      state: 'on'
-    then:
-    - service: cover.close_cover
-      target:
-        entity_id: cover.vr_porte_fenetre_salon
-      data: {}
-  - if:
-    - condition: and
-      conditions:
-      - condition: state
-        entity_id: binary_sensor.baie_cuisine_verrouillee_droite
-        state: 'on'
-      - condition: state
-        entity_id: binary_sensor.baie_cuisine_verrouillee_gauche
-        state: 'on'
-    then:
-    - service: cover.close_cover
-      data: {}
-      target:
-        entity_id: cover.vr_cuisine
-  - if:
-    - condition: and
-      conditions:
-      - condition: state
-        entity_id: binary_sensor.baie_salon_verrouillee_droite
-        state: 'on'
-      - condition: state
-        entity_id: binary_sensor.baie_salon_verrouillee_gauche
-        state: 'on'
-    then:
-    - service: cover.close_cover
-      data: {}
-      target:
-        entity_id: cover.vr_salon
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: pile
+      sequence:
+      - if:
+        - condition: state
+          entity_id: binary_sensor.porte_fenetre_salon_verrouillee
+          state: 'on'
+        then:
+        - service: cover.close_cover
+          target:
+            entity_id: cover.vr_porte_fenetre_salon
+    - conditions:
+      - condition: trigger
+        id: plus15min
+      sequence:
+      - service: cover.close_cover
+        target:
+          entity_id:
+          - cover.vr_bureau
+          - cover.vr_cellier
+          - cover.vr_chambre_1
+          - cover.vr_chambre_2
+          - cover.vr_chambre_3
+          - cover.vr_escalier
+          - cover.vr_palier
+          - cover.vr_salle_de_jeu
+    - conditions:
+      - condition: trigger
+        id: plus45min
+      sequence:
+      - if:
+        - condition: and
+          conditions:
+          - condition: state
+            entity_id: binary_sensor.baie_cuisine_verrouillee_droite
+            state: 'on'
+          - condition: state
+            entity_id: binary_sensor.baie_cuisine_verrouillee_gauche
+            state: 'on'
+        then:
+        - service: cover.close_cover
+          data: {}
+          target:
+            entity_id: cover.vr_cuisine
+      - if:
+        - condition: and
+          conditions:
+          - condition: state
+            entity_id: binary_sensor.baie_salon_verrouillee_droite
+            state: 'on'
+          - condition: state
+            entity_id: binary_sensor.baie_salon_verrouillee_gauche
+            state: 'on'
+        then:
+        - service: cover.close_cover
+          data: {}
+          target:
+            entity_id: cover.vr_salon
   mode: single
 - id: '1667940962264'
   alias: Zone Notification
@@ -436,12 +455,26 @@
         value_template: '{{ (trigger.from_state.state != ''unavailable'') and (trigger.from_state
           is not none) }} '
       sequence:
+      - if:
+        - condition: state
+          entity_id: input_boolean.alarme_silencieuse
+          state: 'off'
+        then:
+        - service: script.turn_on
+          data:
+            variables:
+              texte: Alarme désactivée
+              volume: 80
+              media_player_entity: media_player.sejour
+          target:
+            entity_id: script.tts_google_home
       - service: siren.turn_off
         target:
           entity_id:
           - siren.pse03_v1_1_0_siren_2
           - siren.pse03_v1_1_0_siren
         data: {}
+        enabled: false
       - parallel:
         - if:
           - condition: state
@@ -461,16 +494,6 @@
             stop_actions: true
           target:
             entity_id: automation.telegram_changement_capteur
-        - if:
-          - condition: state
-            entity_id: input_boolean.alarme_silencieuse
-            state: 'off'
-          then:
-          - service: script.tts_google_home
-            data:
-              texte: Alarme désactivée
-              volume: 80
-              media_player_entity: media_player.sejour
         - if:
           - condition: template
             value_template: '{{trigger.from_state.state == ''triggered''}}'
@@ -683,4 +706,33 @@
         }}
 
         '
+  mode: single
+- id: '1679160880850'
+  alias: Alerte lumineuse ouverture
+  description: Alerte lumineuse passerelle Xiaomi si une fenêtre ou porte est ouverte
+  trigger:
+  - platform: state
+    entity_id:
+    - binary_sensor.portail_garage_ferme
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - '{{trigger.from_state.state == ''off''}}'
+      - '{{trigger.to_state.state == ''on''}}'
+      sequence:
+      - service: light.turn_off
+        data: {}
+        target:
+          entity_id: light.gateway_light_34ce008bede9
+    - conditions:
+      - '{{trigger.from_state.state == ''on''}}'
+      - '{{trigger.to_state.state == ''off''}}'
+      sequence:
+      - service: light.turn_on
+        data:
+          color_name: blue
+          brightness_pct: 100
+        target:
+          entity_id: light.gateway_light_34ce008bede9
   mode: single
