@@ -386,9 +386,8 @@ script:
               - binary_sensor.is_off: SILENT_ALARM
             then:
               - logger.log: "Active sirènes"
-              # TODO : déclencher sirène
-              # - switch.turn_on: SA_SIRENE
-              # - switch.turn_on: GA_SIRENE
+              - switch.turn_on: SA_SIRENE
+              - switch.turn_on: GA_SIRENE
         - delay: 10min
         - switch.turn_off: SA_SIRENE
         - switch.turn_off: GA_SIRENE
@@ -516,6 +515,7 @@ binary_sensor:
   - platform: gpio #in01
     name: "Porte Entrée verrouillée"
     id: EN_P_VERR
+    # device_class: lock
     filters:
       - delayed_on: 50ms
       - delayed_off: 50ms
@@ -538,6 +538,7 @@ binary_sensor:
   - platform: gpio #in02
     name: "Porte Entrée fermée"
     id: EN_P_FERME
+    # device_class: door
     filters:
       - delayed_on: 50ms
       - delayed_off: 50ms
@@ -560,6 +561,7 @@ binary_sensor:
   - platform: gpio #in03
     name: "Porte Garage verrouillée Droite"
     id: GA_P_VERR_D
+    # device_class: lock
     filters:
       - delayed_on: 50ms
       - delayed_off: 50ms
@@ -579,6 +581,7 @@ binary_sensor:
   - platform: gpio #in04
     name: "Porte Garage verrouillée Gauche"
     id: GA_P_VERR_G
+    # device_class: lock
     filters:
       - delayed_on: 50ms
       - delayed_off: 50ms
@@ -598,6 +601,7 @@ binary_sensor:
   - platform: gpio #in05
     name: "Porte Garage fermée Gauche"
     id: GA_P_FERME_G
+    # device_class: door
     filters:
       - delayed_on: 50ms
       - delayed_off: 50ms
@@ -632,6 +636,7 @@ binary_sensor:
   - platform: gpio #in07
     name: "Portail Garage fermé"
     id: GA_PORTAIL_FERME
+    # device_class: garage_door
     filters:
       - delayed_on: 50ms
       - delayed_off: 50ms
@@ -842,6 +847,7 @@ binary_sensor:
   - platform: gpio #in19
     name: "Porte-fenêtre Salon verrouillée"
     id: SA_PF_VERR
+    # device_class: lock
     filters:
       - delayed_on: 50ms
       - delayed_off: 50ms
@@ -861,6 +867,7 @@ binary_sensor:
   - platform: gpio #in20
     name: "Porte-fenêtre Salon fermée"
     id: SA_PF_FERME
+    # device_class: door
     filters:
       - delayed_on: 50ms
       - delayed_off: 50ms
@@ -907,10 +914,9 @@ binary_sensor:
       number: 13
       mode: INPUT_PULLUP
       inverted: True
-    # TODO : Réparer capteur VR Chambre 1
-    # on_release :
-      # then:
-        # - lambda: id(ouverture_VR)->execute("Chambre 1", id(C1_VR_MONTE).state);
+    on_release :
+      then:
+        - lambda: id(ouverture_VR)->execute("Chambre 1", id(C1_VR_MONTE).state);
   - platform: gpio #in23
     name: "Fenêtre Chambre 1 fermée Gauche"
     id: C1_F_FERME_G
@@ -1320,13 +1326,12 @@ binary_sensor:
       inverted: True
     on_release :
       then:
-        #TODO : réparer capteur fermeture gauche"
-        # - if:
-            # condition:
-              # - binary_sensor.is_off: <GARDE_FOU>
-            # then:
-        - logger.log: "Fenêtre Chambre 3 déverrouillée Gauche"
-        - script.execute: trigger_alarm
+        - if:
+            condition:
+              - binary_sensor.is_off: C3_F_FERME_G
+            then:
+              - logger.log: "Fenêtre Chambre 3 déverrouillée Gauche"
+              - script.execute: trigger_alarm
   - platform: gpio #in46
     name: "Fenêtre Chambre 3 fermée Gauche"
     id: C3_F_FERME_G
@@ -1338,15 +1343,14 @@ binary_sensor:
       number: 13
       mode: INPUT_PULLUP
       inverted: True
-    #TODO : réparer capteur fermeture gauche"
-    # on_release :
-      # then:
-        # - if:
-            # condition:
-              # - binary_sensor.is_off: <GARDE_FOU>
-            # then:
-              # - logger.log: "<enter log>"
-              # - script.execute: trigger_alarm
+    on_release :
+      then:
+        - if:
+            condition:
+              - binary_sensor.is_off: C3_F_VERR_G
+            then:
+              - logger.log: "Fenêtre Chambre 3 ouverte Gauche"
+              - script.execute: trigger_alarm
   - platform: gpio #in47
     name: "Fenêtre Chambre 3 verrouillée Droite"
     id: C3_F_VERR_D
@@ -1658,10 +1662,9 @@ binary_sensor:
       number: 15
       mode: INPUT_PULLUP
       inverted: True
-    # TODO : Réparer capteurs VR cellier
-    # on_release :
-      # then:
-        # - lambda: id(ouverture_VR)->execute("Cellier", id(CE_VR_MONTE).state);
+    on_release :
+      then:
+        - lambda: id(ouverture_VR)->execute("Cellier", id(CE_VR_MONTE).state);
   - platform: gpio #in65
     name: "Fenêtre Cellier verrouillée"
     id: CE_F_VERR
