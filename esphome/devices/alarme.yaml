@@ -67,8 +67,9 @@ esphome:
       - binary_sensor.template.publish:
           id: SILENT_ALARM
           state: OFF
-
-          
+      - number.set:
+          id: sim800l_heartbit
+          value: -1
 
 # Enable Home Assistant API
 api:
@@ -106,7 +107,32 @@ api:
               lambda: "return code == \"${alarm_code}\";"
             then:
               - script.execute: alarm_disarm
-
+    - service: send_sms
+      variables:
+        recipient: string
+        message: string
+      then:
+        - sim800l.send_sms:
+            recipient: !lambda 'return recipient;'
+            message: !lambda 'return message;'
+    - service: dial
+      variables:
+        recipient: string
+      then:
+        - sim800l.dial:
+            recipient: !lambda 'return recipient;'
+    - service: connect
+      then:
+        - sim800l.connect
+    - service: disconnect
+      then:
+        - sim800l.disconnect
+    - service: send_ussd
+      variables:
+        ussdCode: string
+      then:
+        - sim800l.send_ussd:
+            ussd: !lambda 'return ussdCode;'
 
 script:
   - id: attente_armement
@@ -434,6 +460,14 @@ number:
                   else:
                     - script.execute: alarm_disarm
 
+  - platform: template
+    name: "SIM800L Heartbit"
+    id: sim800l_heartbit
+    min_value: -1
+    max_value: 1
+    step: 1
+    optimistic: true
+    
 # global for state restore
 globals:
    - id: state_int
@@ -442,7 +476,18 @@ globals:
      initial_value: '0'
      
 text_sensor:
-# holds alarm condition for arm/disarm/pending/triggered
+  - platform: template
+    id: sms_sender
+    name: "Sms Sender"
+  - platform: template
+    id: sms_message
+    name: "Sms Message"
+  - platform: template
+    id: caller_id_text_sensor
+    name: "Caller ID"
+  - platform: template
+    id: ussd_message
+    name: "Ussd Code"
   - platform: template
     name: "State Alarm Panel"
     id: "state_alarm_panel"
@@ -477,7 +522,12 @@ text_sensor:
             {
               id(state_int) = ${DISARMED};
             }
-            
+
+uart:
+  baud_rate: 9600
+  tx_pin: GPIO17
+  rx_pin: GPIO5
+
 mcp23017:
   - id: 'mcp23017_hub_b1'
     i2c_id: bus_b
@@ -495,8 +545,53 @@ mcp23017:
     i2c_id: bus_b
     address: 0x24
 
+sim800l:
+  on_sms_received:
+    - logger.log:
+        format: "Received '%s' from %s"
+        args: [ 'message.c_str()', 'sender.c_str()' ]
+    - if:
+        condition:
+          - lambda: |-
+              return str_lower_case(message) == "test";
+        then:
+          - sim800l.send_sms:
+              recipient: !lambda 'return sender;'
+              message: "OK"
+        else:
+          - if:
+              condition:
+                - lambda: |-
+                    return str_lower_case(message) == "alarme";
+              then:
+                - sim800l.send_sms:
+                    recipient: !lambda 'return sender;'
+                    message: !lambda |-
+                       return "RSSI : " + to_string(id(rssi).state) + " dB\n" + "Etat : " + to_string(id(registered).state);
+    - lambda: |-
+        id(sms_sender).publish_state(sender);
+        id(sms_message).publish_state(message);
+  on_incoming_call:
+    - lambda: |-
+        id(caller_id_text_sensor).publish_state(caller_id);
+  on_call_connected:
+    - logger.log:
+        format: Call connected
+  on_call_disconnected:
+    - logger.log:
+        format: Call disconnected
+  on_ussd_received:
+    - lambda: |-
+        id(ussd_message).publish_state(ussd);
+
 # Individual inputs
 binary_sensor:
+  - platform: sim800l
+    registered:
+      id: registered
+      name: "Sim800L Registered"
+  - platform: status
+    name: "Alarme Status"
   - platform: template
     name: "Alarme silencieuse"
     id: SILENT_ALARM
@@ -1843,6 +1938,32 @@ binary_sensor:
     id: SA_B_VR_MONTE 
     entity_id: switch.vr_salon_montee
     
+sensor:
+  - platform: sim800l
+    rssi:
+      id: rssi
+      name: "Sim800L RSSI"
+      on_value:
+        then:
+          - lambda: |-
+                auto call = id(sim800l_heartbit).make_call();
+                call.set_value(id(sim800l_heartbit).state*(-1));
+                call.perform();
+
+  # - platform: template
+    # name: "Heartbit"
+    # id: heartbit
+    # update_interval: never
+    
+  # - platform: template
+    # id: sim800l_last_update
+    # name: "SIM800L last update"
+    # device_class: timestamp
+    # entity_category: diagnostic
+    # accuracy_decimals: 0
+    # update_interval: never
+    
+
 # Individual outputs
 switch:
   - platform: gpio

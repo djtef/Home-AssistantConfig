@@ -283,6 +283,13 @@ switch:
 
 output:
   - platform: gpio
+    id: out1_07H #Portail garage 7e pin haut
+    pin:
+      mcp23xxx: mcp23017_hub_a1
+      number: 1
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
     id: out2_01
     pin:
       mcp23xxx: mcp23017_hub_a5
@@ -815,6 +822,11 @@ light:
     name: out#3 24
     output: out3_24
 
+button:
+  - platform: output
+    name: "Portail Garage"
+    output: out1_07H
+    duration: 200ms
 # Individual inputs
 binary_sensor:
   - platform: gpio
@@ -923,20 +935,24 @@ binary_sensor:
       then:
         - cover.stop: vr03
         - cover.stop: vr04
-  # - platform: gpio
-    # name: "in#1 07"
-    # id: in07
-    # pin:
-      # mcp23xxx: mcp23017_hub_a1
-      # number: 1
-      # mode: INPUT_PULLUP
-      # inverted: True
-    # filters:
-      # - delayed_on: 3ms
-      # - delayed_off: 3ms
-    # on_press:
-      # then:
-        # - cover.open: vr04
+ # - platform: gpio
+    #################################
+    # UTILISE EN OUTPUT #############
+    #################################
+    # # name: "in#1 07"
+    # # id: in07
+    # # pin:
+      # # mcp23xxx: mcp23017_hub_a1
+      # # number: 1
+      # # mode: INPUT_PULLUP
+      # # inverted: True
+    # # filters:
+      # # - delayed_on: 3ms
+      # # - delayed_off: 3ms
+    # # on_press:
+      # # then:
+        # # - cover.open: vr04
+    ##################################
   # - platform: gpio
     # name: "in#1 08"
     # id: in08
