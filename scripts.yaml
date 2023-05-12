@@ -177,11 +177,10 @@ deverrouille_relais_vr:
   - repeat:
       count: '1000'
       sequence:
-      - service: switch.toggle
+      - service: light.toggle
         data: {}
         target:
-          entity_id:
-          - switch.vr_cuisine_montee
+          entity_id: light.garage_eclairage
       - delay:
           hours: 0
           minutes: 0
