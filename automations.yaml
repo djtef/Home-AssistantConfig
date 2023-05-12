@@ -1002,3 +1002,136 @@
             target:
               entity_id: input_text.code
   mode: single
+- id: '1680559792912'
+  alias: Heartbit timeout GSM
+  description: Détecte que le GSM ne répond plus
+  trigger:
+  - platform: template
+    value_template: '{{ now() - states.number.sim800l_heartbit.last_updated  > timedelta(seconds=10)
+      }}'
+  condition: []
+  action:
+  - service: persistent_notification.create
+    data:
+      message: Heartbit Sim800l
+  - service: notify.moi
+    data:
+      message: Perte de communication avec le SIM800L
+  - service: esphome.alarme_send_sms
+    data:
+      recipient: 0627278083
+      message: Perte de com avec le SIM800L
+  mode: single
+- id: '1681156778266'
+  alias: Ouverture portail garage
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - binary_sensor.bp_entree_porte_haut_droite
+    - binary_sensor.bp_garage_portail
+    - binary_sensor.bp_garage_cellier_gauche
+    to: 'on'
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 1
+  condition:
+  - condition: state
+    entity_id: alarm_control_panel.alarme_maison
+    state: disarmed
+  action:
+  - service: button.press
+    data: {}
+    target:
+      entity_id: button.portail_garage
+  mode: single
+- id: '1682548031354'
+  alias: Push Camera
+  description: Active les notifications push des caméras
+  trigger:
+  - platform: state
+    entity_id:
+    - alarm_control_panel.alarme_maison
+    to: armed_away
+    for:
+      hours: 0
+      minutes: 1
+      seconds: 0
+    id: activation
+  - platform: state
+    entity_id:
+    - alarm_control_panel.alarme_maison
+    to: disarmed
+    id: desactivation
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: desactivation
+      sequence:
+      - service: switch.turn_off
+        data: {}
+        target:
+          entity_id: switch.nvr_push_notifications
+    - conditions:
+      - condition: trigger
+        id: activation
+      sequence:
+      - service: switch.turn_on
+        data: {}
+        target:
+          entity_id: switch.nvr_push_notifications
+  mode: single
+- id: '1682548945845'
+  alias: Lumière entrée jardin
+  description: Allume la lumière extérieure devant la maison quand la caméra détecte
+    une personne ou un véhicule
+  trigger:
+  - platform: state
+    entity_id:
+    - binary_sensor.entree_vehicle
+    to: 'on'
+    id: vehicule
+  - platform: state
+    entity_id:
+    - binary_sensor.entree_person
+    to: 'on'
+    id: personne
+  condition:
+  - condition: sun
+    before: sunrise
+    after: sunset
+  action:
+  - service: light.turn_on
+    data: {}
+    target:
+      entity_id: light.exterieur_spot_portail_garage
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 30
+      milliseconds: 0
+  - service: light.turn_off
+    data: {}
+    target:
+      entity_id: light.exterieur_spot_portail_garage
+  - if:
+    - condition: trigger
+      id: personne
+    then:
+    - service: light.turn_on
+      data: {}
+      target:
+        entity_id: light.exterieur_applique_porche_entree
+    - delay:
+        hours: 0
+        minutes: 0
+        seconds: 30
+        milliseconds: 0
+    - service: light.turn_off
+      data: {}
+      target:
+        entity_id: light.exterieur_applique_porche_entree
+  mode: single

@@ -2,6 +2,10 @@
 # Loads default set of integrations. Do not remove.
 default_config:
 
+homeassistant:
+  external_url: "https://home-assistant.djtef.synology.me"
+  internal_url: "http://192.168.0.31:8123"
+
 logger:
   default: error
   logs:
@@ -55,18 +59,28 @@ notify:
     name: maison
     chat_id: !secret telegram_maison_chat_id
 
-yeelight:
-  custom_effects:
-    - name: 'Call'
-      flow_params:
-        count: 0
-        transitions:
-          - RGBTransition: [90, 255, 36, 50, 20]
-          - RGBTransition: [90, 255, 36, 50, 100]
-          - RGBTransition: [90, 255, 36, 50, 20]
-          - RGBTransition: [90, 255, 36, 50, 100]
-          - SleepTransition:       [500]
-          
+# yeelight:
+  # custom_effects:
+    # - name: 'Call'
+      # flow_params:
+        # count: 0
+        # transitions:
+          # - RGBTransition: [90, 255, 36, 50, 20]
+          # - RGBTransition: [90, 255, 36, 50, 100]
+          # - RGBTransition: [90, 255, 36, 50, 20]
+          # - RGBTransition: [90, 255, 36, 50, 100]
+          # - SleepTransition:       [500]
+proximity:
+  home:
+    # ignored_zones:
+      # - work
+      # - school
+    devices:
+      - device_tracker.galaxy_s20_fe
+      - device_tracker.m2103k19pg
+    tolerance: 50
+    unit_of_measurement: km
+         
 # secrets inside templates not allowed
 # must use hard coded 'code' on home assistant panel
 # esphome code does not need to match HA code
