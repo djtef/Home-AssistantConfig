@@ -1,3 +1,24 @@
+esphome:
+  on_boot:
+    then:
+        - pulse_meter.set_total_pulses:
+            id: COMPTEUR_EAU_DEBIT
+            value: !lambda 'return id(sauvegarde_compteur_eau);'
+# Set pulse counter total from home assistant using this service call:
+api:
+  services:
+    - service: initialise_compteur_eau
+      variables:
+        total_litres: int
+      then:
+        - pulse_meter.set_total_pulses:
+            id: COMPTEUR_EAU_DEBIT
+            value: !lambda 'return total_litres;'
+globals:
+   - id: sauvegarde_compteur_eau
+     type: int
+     restore_value: yes
+     initial_value: '0'
 mcp23017:
   - id: 'mcp23017_hub_a1'
     i2c_id: bus_a
@@ -829,6 +850,17 @@ button:
     duration: 200ms
 # Individual inputs
 binary_sensor:
+  - platform: gpio
+    name: "Impulsion compteur eau"
+    id: COMPTEUR_EAU_PULSE
+    pin:
+      number: GPIO12
+      mode: INPUT_PULLUP
+    on_state:
+      then:
+        - globals.set:
+            id: sauvegarde_compteur_eau
+            value: !lambda 'return id(COMPTEUR_EAU_TOTAL).state;'
   - platform: gpio
     name: "VR Chambre 2 montée"
     id: in01
@@ -2810,6 +2842,39 @@ binary_sensor:
       then:
         - light.toggle: CE_SPT        
 
+
+sensor:
+    # Debit detecteur compteur d´eau
+  - platform: pulse_meter
+    name: "Debit compteur eau"
+    id: COMPTEUR_EAU_DEBIT
+    icon: mdi:water
+    pin:
+      number: GPIO12
+      mode: INPUT_PULLUP
+    unit_of_measurement: "L/min"
+    timeout: 1min
+    internal_filter: 100ms
+    # Consommation Totale d'Eau
+    total:
+      name: "Compteur eau"
+      id: COMPTEUR_EAU_TOTAL
+      icon: mdi:water
+      device_class: water   
+      unit_of_measurement: 'L'
+      accuracy_decimals: 0
+      filters:
+        - multiply: 1  # (pour resrer en l) 
+    # Consommation eau du jour en m3
+  - platform: template
+    name: "Compteur eau m3"
+    id: COMPTEUR_EAU_TOTAL_M3
+    lambda: |-
+      return id(COMPTEUR_EAU_TOTAL).state * 0.001;
+    device_class: water
+    unit_of_measurement: "m³"
+    accuracy_decimals: 3 
+    state_class: total_increasing
 cover:
   - platform: time_based
     name: "VR Chambre 2"

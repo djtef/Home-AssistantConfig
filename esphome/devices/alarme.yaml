@@ -64,6 +64,14 @@ esphome:
                     return id(state_int) == ${TRIGGERED};
           then:
             - script.execute: trigger_alarm_execute
+      - if:
+          condition:
+              - lambda: |-
+                    return id(state_int) == ${DISARMED};
+          then:
+            - switch.turn_off: CAMERAS
+          else:
+            - switch.turn_on: CAMERAS
       - binary_sensor.template.publish:
           id: SILENT_ALARM
           state: OFF
@@ -328,6 +336,7 @@ script:
         - script.stop: attente_armement
         - rtttl.stop
         - rtttl.play: ${RTTTL_TONES}
+        - switch.turn_on: CAMERAS
         - lambda: |-
             id(state_alarm_panel).publish_state("armed_away");
   - id: alarm_arm_delayed
@@ -388,12 +397,16 @@ script:
         - logger.log: "Désarmement..."
         - switch.turn_off: SA_SIRENE
         - switch.turn_off: GA_SIRENE
+        - switch.turn_off: XT_SIRENE
+        - switch.turn_off: XT_LED
+        - switch.turn_off: XT_STO
         - script.stop: alarm_arm_delayed
         - script.stop: attente_armement
         - script.stop: trigger_alarm
         - script.stop: attente_desarmement
         - script.stop: trigger_alarm_delayed
         - script.stop: trigger_alarm_execute
+        - switch.turn_off: CAMERAS
         - lambda: |-
               id(state_alarm_panel).publish_state("disarmed");
         - rtttl.play: ${RTTTL_SUCCESS}
@@ -414,9 +427,13 @@ script:
               - logger.log: "Active sirènes"
               - switch.turn_on: SA_SIRENE
               - switch.turn_on: GA_SIRENE
+              - switch.turn_on: XT_SIRENE
+              - switch.turn_on: XT_STO
         - delay: 10min
         - switch.turn_off: SA_SIRENE
         - switch.turn_off: GA_SIRENE
+        - switch.turn_off: XT_SIRENE
+        - switch.turn_off: XT_STO
   # only execute triggering if armed and not already running
   - id: trigger_alarm
     then:
@@ -1843,8 +1860,8 @@ binary_sensor:
         - logger.log: "Détection mouvement Bureau"
         - script.execute: trigger_alarm
   - platform: gpio #in70
-    name: "in70"
-    id: in70
+    name: "Autoprotection sirène extérieure"
+    id: AP_SIR_XT
     filters:
       - delayed_on: 50ms
       - delayed_off: 50ms
@@ -1983,40 +2000,42 @@ switch:
       mode: OUTPUT
       inverted: False
   - platform: gpio
-    id: out75
-    name: "out75"
+    id: CAMERAS
+    name: "Switch cameras"
+    icon: "mdi:cctv"
     pin:
       mcp23xxx: mcp23017_hub_b5
       number: 2
       mode: OUTPUT
       inverted: False
   - platform: gpio
-    id: out76
-    name: "out76"
+    id: XT_SIRENE
+    name: "Sirène Extérieure"
     pin:
       mcp23xxx: mcp23017_hub_b5
       number: 3
       mode: OUTPUT
       inverted: False
   - platform: gpio
-    id: out77
-    name: "out77"
+    id: XT_STO
+    name: "Signal Optique Extérieur"
     pin:
       mcp23xxx: mcp23017_hub_b5
       number: 4
       mode: OUTPUT
-      inverted: False
+      inverted: True
   - platform: gpio
-    id: out78
-    name: "out78"
+    id: XT_LED
+    name: "LED Sirène extérieure"
     pin:
       mcp23xxx: mcp23017_hub_b5
       number: 5
       mode: OUTPUT
-      inverted: False
+      inverted: True
   - platform: gpio
     id: GA_SIRENE
     name: "Sirène Garage"
+    icon: "mdi:bullhorn"
     pin:
       mcp23xxx: mcp23017_hub_b5
       number: 6
@@ -2025,6 +2044,7 @@ switch:
   - platform: gpio
     id: SA_SIRENE
     name: "Sirène salon"
+    icon: "mdi:bullhorn"
     pin:
       mcp23xxx: mcp23017_hub_b5
       number: 7
