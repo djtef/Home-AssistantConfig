@@ -146,7 +146,14 @@ template:
           hours: 1
           minutes: 0
           seconds: 30
-        below: 1500           
+        below: 1500          
+      - platform: numeric_state
+        entity_id: sensor.prise_lave_vaisselle_active_power
+        for:
+          hours: 0
+          minutes: 0
+          seconds: 30
+        below: 1   
       - platform: homeassistant
         event: start
       - platform: event
@@ -154,41 +161,46 @@ template:
     sensor:                                                                                                                                                                      
       - name: test_template                                                                                                                                                            
         state: >-    
-          {% if this.state == 'Libre' or this.state == 'Fin' %}
-            {% if trigger.idx == '0' %}
-            Prélavage
-            {%- else -%}                                                                                                                                                           
-            Libre 
-            {%- endif -%} 
-          {%- elif this.state == 'Prélavage' -%}
-            {% if trigger.idx == '1' %}
-            Lavage
-            {%- else -%}                                                                                                                                                           
-            Prélavage 
-            {%- endif -%}
-          {%- elif this.state == 'Lavage' -%}
-            {% if trigger.idx == '2' %}
-            Rinçage
-            {%- else -%}                                                                                                                                                           
-            Lavage 
-            {%- endif -%}
-          {%- elif this.state == 'Rinçage' -%}
-            {% if trigger.idx == '1' %}
-            Séchage
-            {%- else -%}                                                                                                                                                           
-            Rinçage 
-            {%- endif -%}
-          {%- elif this.state == 'Séchage' -%}
-            {% if trigger.idx == '3' %}
-            Fin
-            {%- else -%}                                                                                                                                                           
-            Séchage 
-            {%- endif -%}
-          {%- elif this.state == 'Fin' -%}
+          {% if trigger.idx == '4' %}
           Fin
           {%- else -%}
-          Libre
+              {% if this.state == 'Libre' or this.state == 'Fin' %}
+                {% if trigger.idx == '0' %}
+                Prélavage
+                {%- else -%}                                                                                                                                                           
+                Libre 
+                {%- endif -%} 
+              {%- elif this.state == 'Prélavage' -%}
+                {% if trigger.idx == '1' %}
+                Lavage
+                {%- else -%}                                                                                                                                                           
+                Prélavage 
+                {%- endif -%}
+              {%- elif this.state == 'Lavage' -%}
+                {% if trigger.idx == '2' %}
+                Rinçage
+                {%- else -%}                                                                                                                                                           
+                Lavage 
+                {%- endif -%}
+              {%- elif this.state == 'Rinçage' -%}
+                {% if trigger.idx == '1' %}
+                Séchage
+                {%- else -%}                                                                                                                                                           
+                Rinçage 
+                {%- endif -%}
+              {%- elif this.state == 'Séchage' -%}
+                {% if trigger.idx == '3' %}
+                Fin
+                {%- else -%}                                                                                                                                                           
+                Séchage 
+                {%- endif -%}
+              {%- elif this.state == 'Fin' -%}
+              Fin
+              {%- else -%}
+              Libre
+              {%- endif -%}
           {%- endif -%}
+
 
   - sensor:
       - name: Changement capteurs
@@ -235,6 +247,7 @@ binary_sensor:
       - binary_sensor.fenetre_chambre_2_fermee_gauche
       - binary_sensor.fenetre_chambre_2_verrouillee_gauche
       - binary_sensor.fenetre_chambre_3_fermee_droite
+      - binary_sensor.fenetre_chambre_3_fermee_gauche
       - binary_sensor.fenetre_chambre_3_verrouillee_droite
       - binary_sensor.fenetre_chambre_3_verrouillee_gauche
       - binary_sensor.fenetre_sdb_etage_fermee
@@ -251,7 +264,21 @@ binary_sensor:
       - binary_sensor.porte_garage_verrouillee_gauche
       - binary_sensor.porte_garage_verrouillee_droite
       - binary_sensor.fenetre_garage_fermee
-  
+
+# Roborock
+# 16	8948821	Salon
+# 18	8987278	Placard
+# 19	8948824	Cuisine
+# 20	8948826	Salle à manger
+# 21	8948913	WC RDC
+# 22	8948867	Cellier
+# 23	8987276	Couloir
+# 24	8987258	Salle de jeux
+# 25	8948891	Chambre parents
+# 26	8948843	Salle de bain RDC
+# 27	8948828	Bureau
+
+ 
 automation: !include automations.yaml
 script: !include scripts.yaml
 scene: !include scenes.yaml

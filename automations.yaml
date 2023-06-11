@@ -1168,19 +1168,19 @@
       - condition: template
         value_template: '{{ ''jardin'' in trigger.entity_id }}'
       - condition: state
-        entity_id: binary_sensor.baie_cuisine_fermee_droite
+        entity_id: binary_sensor.baie_cuisine_verrouillee_droite
         state: 'on'
       - condition: state
-        entity_id: binary_sensor.baie_cuisine_fermee_gauche
+        entity_id: binary_sensor.baie_cuisine_verrouillee_gauche
         state: 'on'
       - condition: state
-        entity_id: binary_sensor.baie_salon_fermee_droite
+        entity_id: binary_sensor.baie_salon_verrouillee_droite
         state: 'on'
       - condition: state
-        entity_id: binary_sensor.baie_salon_fermee_gauche
+        entity_id: binary_sensor.baie_salon_verrouillee_gauche
         state: 'on'
       - condition: state
-        entity_id: binary_sensor.porte_garage_fermee_gauche
+        entity_id: binary_sensor.porte_garage_verrouillee_gauche
         state: 'on'
     - condition: and
       conditions:
@@ -1243,4 +1243,131 @@
         - file: /config/camera/{{ trigger.entity_id }}.jpg
           caption: 'Détection caméra : {{ state_attr(trigger.entity_id, ''friendly_name'')
             }}'
+  mode: single
+- id: '1686436079869'
+  alias: Ouverture volets
+  description: Ouverture volets été matin
+  trigger:
+  - platform: time
+    at: 06:00:00
+  condition:
+  - condition: state
+    entity_id: alarm_control_panel.alarme_maison
+    state: disarmed
+  - condition: state
+    entity_id: weather.maison
+    state:
+    - clear-night
+    - cloudy
+    - partlycloudy
+    - sunny
+  action:
+  - if:
+    - condition: or
+      conditions:
+      - condition: state
+        entity_id: binary_sensor.baie_cuisine_fermee_droite
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.baie_cuisine_fermee_gauche
+        state: 'off'
+    then:
+    - service: cover.open_cover
+      data: {}
+      target:
+        entity_id: cover.vr_cuisine
+  - if:
+    - condition: or
+      conditions:
+      - condition: state
+        entity_id: binary_sensor.baie_salon_fermee_droite
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.baie_salon_fermee_gauche
+        state: 'off'
+    then:
+    - service: cover.open_cover
+      data: {}
+      target:
+        entity_id: cover.vr_salon
+  - if:
+    - condition: or
+      conditions:
+      - condition: state
+        entity_id: binary_sensor.fenetre_sdj_fermee_droite
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.fenetre_sdj_fermee_gauche
+        state: 'off'
+    then:
+    - service: cover.open_cover
+      data: {}
+      target:
+        entity_id: cover.vr_salle_de_jeu
+  - if:
+    - condition: or
+      conditions:
+      - condition: state
+        entity_id: binary_sensor.fenetre_palier_fermee_droite
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.fenetre_palier_fermee_gauche
+        state: 'off'
+    then:
+    - service: cover.open_cover
+      data: {}
+      target:
+        entity_id: cover.vr_palier
+  - if:
+    - condition: or
+      conditions:
+      - condition: state
+        entity_id: binary_sensor.fenetre_chambre_3_fermee_droite
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.fenetre_chambre_3_fermee_gauche
+        state: 'off'
+    then:
+    - service: cover.open_cover
+      data: {}
+      target:
+        entity_id: cover.vr_chambre_3
+  - if:
+    - condition: or
+      conditions:
+      - condition: state
+        entity_id: binary_sensor.fenetre_cellier_fermee_droite
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.fenetre_cellier_fermee_gauche
+        state: 'off'
+    then:
+    - service: cover.open_cover
+      data: {}
+      target:
+        entity_id: cover.cellier
+  - if:
+    - condition: state
+      entity_id: binary_sensor.porte_fenetre_fermee
+      state: 'off'
+    then:
+    - service: cover.open_cover
+      data: {}
+      target:
+        entity_id: cover.vr_porte_fenetre_salon
+  mode: single
+- id: '1686512140329'
+  alias: Fin Lave-vaisselle
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.test_template
+    to: Fin
+  condition: []
+  action:
+  - service: notify.maison
+    data:
+      message: Fin de cycle
+      title: Lave-vaisselle
   mode: single
