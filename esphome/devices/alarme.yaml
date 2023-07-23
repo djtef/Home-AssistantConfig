@@ -37,6 +37,10 @@ substitutions:
   ARMED_AWAY: "4"
   UNAVAILABLE: "5"
   TIMEOUT: "6"
+  REPONDEUR: '+33695600012'
+  NUM_TEL:   '+33749273746'
+  NUM_THOMAS:   '+33627278083'
+  NUM_JACE:   '+33627484445'
 
   # restore state
   # if trigger sequence reset to armed for now.
@@ -429,7 +433,22 @@ script:
               - switch.turn_on: GA_SIRENE
               - switch.turn_on: XT_SIRENE
               - switch.turn_on: XT_STO
-        - delay: 10min
+        - repeat:
+            count: 10
+            then:
+                - script.execute:
+                    id: alerte_sms
+                    msg: "ALARME MAISON DECLENCHEE !!"
+                - delay: 30s
+                - sim800l.dial:
+                    recipient: ${NUM_THOMAS}
+                - delay: 10s
+                - sim800l.disconnect
+                - sim800l.dial:
+                    recipient: ${NUM_JACE}
+                - delay: 10s
+                - sim800l.disconnect
+                - delay: 10s
         - switch.turn_off: SA_SIRENE
         - switch.turn_off: GA_SIRENE
         - switch.turn_off: XT_SIRENE
@@ -451,7 +470,30 @@ script:
                         
           then:
             - script.execute: trigger_alarm_execute
-
+  - id: heartbit_gsm
+    mode: restart
+    then:
+      - delay: 10s
+      - sim800l.dial:
+          recipient: ${REPONDEUR}
+      - delay: 10s
+      - sim800l.disconnect
+      - delay: 30s
+      - sim800l.send_sms:
+          recipient: ${NUM_TEL}
+          message: "ping"
+  - id: alerte_sms
+    parameters:
+      msg: string  
+    then:
+      - sim800l.send_sms:
+          recipient: ${NUM_THOMAS}
+          message: !lambda return msg;
+      - sim800l.send_sms:
+          recipient: ${NUM_JACE}
+          message: !lambda return msg;
+  
+ 
 number:
   - platform: template
     name: "Code"
@@ -1966,6 +2008,8 @@ sensor:
                 auto call = id(sim800l_heartbit).make_call();
                 call.set_value(id(sim800l_heartbit).state*(-1));
                 call.perform();
+          - script.execute: heartbit_gsm
+          
 
   # - platform: template
     # name: "Heartbit"
