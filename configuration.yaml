@@ -13,6 +13,7 @@ logger:
   logs:
     rflink: debug
     homeassistant.components.rflink: debug
+    
 
 http:
   use_x_forwarded_for: true
@@ -33,10 +34,18 @@ rflink:
 light:
   - platform: rflink
     automatic_add: true
+    
 sensor:
   - platform: rflink
     automatic_add: true
-   
+    
+cover:
+  - platform: rflink
+    devices:
+      brelmotor_8c48cd_05:
+        name: Store banne
+#        fire_event: true
+  
 device_tracker:    
   - platform: bluetooth_le_tracker
     consider_home: 300
@@ -151,8 +160,8 @@ template:
         entity_id: sensor.prise_lave_vaisselle_active_power
         for:
           hours: 0
-          minutes: 0
-          seconds: 30
+          minutes: 30
+          seconds: 0
         below: 1   
       - platform: homeassistant
         event: start

@@ -180,7 +180,7 @@ deverrouille_relais_vr:
       - service: switch.toggle
         data: {}
         target:
-          entity_id: switch.vr_palier_montee
+          entity_id: switch.vr_salon_montee
       - delay:
           hours: 0
           minutes: 0
@@ -220,3 +220,38 @@ notifie_ouvertures:
       description: Volume du Media player
       example: 50
   description: Annonce les portes et fenêtres ouvertes
+persienne:
+  alias: Persienne
+  fields:
+    cover:
+      name: VR
+      description: Entité volet-roulant
+      example: cover.vr_bureau
+      required: true
+    pourcentage:
+      name: Pourcentage
+      description: Pourcentage ouverture persienne
+      example: '10'
+      selector:
+        number:
+          min: 0
+          max: 100
+          step: 1
+          unit_of_measurement: '%'
+          mode: slider
+  sequence:
+  - if:
+    - '{{ is_state(cover, ''open'') }}'
+    then:
+    - service: cover.close_cover
+      data_template:
+        entity_id: '{{ cover }}'
+    - wait_template: '{{ is_state(cover, ''closed'') }}'
+  - service: cover.set_cover_position
+    data:
+      position: '{{ pourcentage }}'
+    target:
+      entity_id: '{{ cover }}'
+  mode: parallel
+  icon: mdi:blinds-horizontal-closed
+  max: 15

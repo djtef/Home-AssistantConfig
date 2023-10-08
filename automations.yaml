@@ -629,6 +629,7 @@
                 entity_id: script.tts_google_home
           - service: script.allume_lumieres
             data: {}
+        enabled: true
   mode: restart
 - id: '1677626292376'
   alias: Notify if door opens
@@ -1105,17 +1106,10 @@
   - condition: sun
     before: sunrise
     after: sunset
+    after_offset: 00:30:00
+    before_offset: 00:30:00
   action:
   - service: light.turn_on
-    data: {}
-    target:
-      entity_id: light.exterieur_spot_portail_garage
-  - delay:
-      hours: 0
-      minutes: 0
-      seconds: 30
-      milliseconds: 0
-  - service: light.turn_off
     data: {}
     target:
       entity_id: light.exterieur_spot_portail_garage
@@ -1127,16 +1121,18 @@
       data: {}
       target:
         entity_id: light.exterieur_applique_porche_entree
-    - delay:
-        hours: 0
-        minutes: 0
-        seconds: 30
-        milliseconds: 0
-    - service: light.turn_off
-      data: {}
-      target:
-        entity_id: light.exterieur_applique_porche_entree
-  mode: single
+  - delay:
+      hours: 0
+      minutes: 2
+      seconds: 0
+      milliseconds: 0
+  - service: light.turn_off
+    data: {}
+    target:
+      entity_id:
+      - light.exterieur_spot_portail_garage
+      - light.exterieur_applique_porche_entree
+  mode: restart
 - id: '1683928118795'
   alias: Détection caméra
   description: Notification Telegram lors d'une détection personne ou véhicule des
@@ -1348,6 +1344,7 @@
       target:
         entity_id: cover.vr_chambre_2
       data: {}
+    enabled: true
   - if:
     - condition: state
       entity_id: binary_sensor.fenetre_cellier_fermee
@@ -1355,8 +1352,12 @@
     then:
     - service: cover.open_cover
       target:
-        entity_id: cover.cellier
+        entity_id: cover.vr_cellier
       data: {}
+    - service: cover.open_cover
+      data: {}
+      target:
+        entity_id: cover.vr_cellier
   - if:
     - condition: state
       entity_id: binary_sensor.porte_fenetre_salon_fermee
@@ -1365,6 +1366,7 @@
     - service: cover.open_cover
       target:
         entity_id: cover.vr_porte_fenetre_salon
+      data: {}
   - if:
     - condition: state
       entity_id: binary_sensor.fenetre_escalier_fermee
@@ -1389,4 +1391,165 @@
     data:
       message: Fin de cycle
       title: Lave-vaisselle
+  mode: single
+- id: '1690121475147'
+  alias: Commande volets déportée
+  description: Ouvre et ferme les volets sur des BP déportés
+  trigger:
+  - platform: state
+    entity_id:
+    - binary_sensor.bp_chambre_1_lit_droite_droite
+    - binary_sensor.bp_chambre_1_droite
+    to: 'on'
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 1
+    id: descente
+  - platform: state
+    entity_id:
+    - binary_sensor.bp_chambre_1_lit_droite_gauche
+    - binary_sensor.bp_chambre_1_gauche
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 1
+    id: montee
+    to: 'on'
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: descente
+      sequence:
+      - if:
+        - condition: state
+          entity_id: cover.vr_chambre_1
+          state: closing
+        then:
+        - service: cover.stop_cover
+          data: {}
+          target:
+            entity_id: cover.vr_chambre_1
+        else:
+        - service: cover.close_cover
+          data: {}
+          target:
+            entity_id: cover.vr_chambre_1
+    - conditions:
+      - condition: trigger
+        id: montee
+      sequence:
+      - if:
+        - condition: state
+          entity_id: cover.vr_chambre_1
+          state: opening
+        then:
+        - service: cover.stop_cover
+          data: {}
+          target:
+            entity_id: cover.vr_chambre_1
+        else:
+        - service: cover.open_cover
+          data: {}
+          target:
+            entity_id: cover.vr_chambre_1
+  mode: single
+- id: '1690141783683'
+  alias: Persienne VR
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - binary_sensor.bp_salon_angle_entree_bas_droite
+    - binary_sensor.bp_salon_angle_entree_bas_gauche
+    to: 'on'
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 1
+  condition: []
+  action:
+  - parallel:
+    - service: script.persienne
+      data:
+        cover: cover.vr_salon
+        pourcentage: 7
+    - service: script.persienne
+      data:
+        cover: cover.vr_cuisine
+        pourcentage: 7
+    - service: script.persienne
+      data:
+        cover: cover.vr_porte_fenetre_salon
+        pourcentage: 11
+    - service: script.persienne
+      data:
+        cover: cover.vr_cellier
+        pourcentage: 11
+    - service: script.persienne
+      data:
+        cover: cover.vr_bureau
+        pourcentage: 11
+    - service: script.persienne
+      data:
+        cover: cover.vr_salle_de_jeu
+        pourcentage: 11
+    - service: script.persienne
+      data:
+        cover: cover.vr_chambre_1
+        pourcentage: 11
+    - service: script.persienne
+      data:
+        cover: cover.vr_chambre_2
+        pourcentage: 11
+    - service: script.persienne
+      data:
+        cover: cover.vr_chambre_3
+        pourcentage: 11
+    - service: script.persienne
+      data:
+        cover: cover.vr_palier
+        pourcentage: 11
+    - service: script.persienne
+      data:
+        cover: cover.vr_escalier
+        pourcentage: 11
+  mode: single
+- id: '1696441833102'
+  alias: 'Lumière terrasse '
+  description: 'Allume la terrasse le soir '
+  trigger:
+  - platform: sun
+    event: sunset
+    offset: 00:15:00
+    id: plus15min
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: plus15min
+      sequence:
+      - if:
+        - condition: or
+          conditions:
+          - condition: state
+            entity_id: binary_sensor.baie_cuisine_verrouillee_droite
+            state: 'off'
+          - condition: state
+            entity_id: binary_sensor.baie_cuisine_verrouillee_gauche
+            state: 'off'
+        then:
+        - service: light.turn_on
+          data: {}
+          target:
+            entity_id: light.exterieur_appliques_terrasse
+  mode: single
+- id: '1696441887415'
+  description: ''
+  trigger: []
+  condition: []
+  action: []
   mode: single
