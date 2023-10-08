@@ -37,10 +37,10 @@ substitutions:
   ARMED_AWAY: "4"
   UNAVAILABLE: "5"
   TIMEOUT: "6"
-  REPONDEUR: '+33695600012'
-  NUM_TEL:   '+33749273746'
-  NUM_THOMAS: '+33627278083'
-  NUM_JACE:   '+33627484445'
+  REPONDEUR: !secret num_repondeur
+  NUM_TEL:   !secret num_tel
+  NUM_THOMAS: !secret num_thomas
+  NUM_JACE:   !secret num_jace
 
   # restore state
   # if trigger sequence reset to armed for now.
