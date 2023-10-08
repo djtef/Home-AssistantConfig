@@ -19,5 +19,9 @@ ethernet:
   phy_addr: 1
   power_pin: GPIO16
   
+uart:
+  tx_pin: GPIO17
+  rx_pin: GPIO5
+  
 esp32:
   board: esp-wrover-kit

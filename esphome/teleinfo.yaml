@@ -1,0 +1,10 @@
+substitutions:
+  slug: teleinfo
+  name: Teleinfo
+  description: Teleinformation
+  
+packages:
+  <<: !include_dir_named common
+  board: !include boards/nodemcu.yaml
+  device: !include devices/teleinfo.yaml
+  

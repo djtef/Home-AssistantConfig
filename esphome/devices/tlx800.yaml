@@ -19,6 +19,14 @@ globals:
      type: int
      restore_value: yes
      initial_value: '0'
+     
+uart:
+  id: uart_bus
+  baud_rate: 1200
+  parity: EVEN
+  data_bits: 7
+  
+  
 mcp23017:
   - id: 'mcp23017_hub_a1'
     i2c_id: bus_a
@@ -300,7 +308,26 @@ switch:
       number: 10
       mode: OUTPUT
       inverted: False
-      
+  - platform: gpio
+    name: "Electrovanne eau potable ouverture"
+    id: out3_04H
+    interlock: [out3_05H]
+    restore_mode: ALWAYS_OFF 
+    pin:
+      mcp23xxx: mcp23017_hub_b1
+      number: 4
+      mode: OUTPUT
+      inverted: False
+  - platform: gpio
+    name: "Electrovanne eau potable fermeture"
+    id: out3_05H
+    interlock: [out3_04H]
+    restore_mode: ALWAYS_OFF 
+    pin:
+      mcp23xxx: mcp23017_hub_b1
+      number: 5
+      mode: OUTPUT
+      inverted: False
 
 output:
   - platform: gpio
@@ -2196,8 +2223,8 @@ binary_sensor:
       # then:
         # - light.toggle: out240        
   - platform: gpio #in3 01
-    name: "in#3 01"
-    id: in301
+    name: "Electrovanne eau potable fermée"
+    id: EV_EP_FERMEE
     pin:
       mcp23xxx: mcp23017_hub_b1
       number: 0
@@ -2210,8 +2237,8 @@ binary_sensor:
       # # then:
         # # - light.toggle: out301
   - platform: gpio #in3 02
-    name: "in#3 02"
-    id: in302
+    name: "Electrovanne eau potable ouverte"
+    id: EV_EP_OUVERTE
     pin:
       mcp23xxx: mcp23017_hub_b1
       number: 1
@@ -2255,34 +2282,38 @@ binary_sensor:
       max_length: 300ms
       then:
         - light.toggle: WH_SPT
-  - platform: gpio #in3 05
-    name: "in#3 05"
-    id: in305
-    pin:
-      mcp23xxx: mcp23017_hub_b1
-      number: 4
-      mode: INPUT_PULLUP
-      inverted: True
+  #########################################
+  ###### COMMANDE ELECTROVANNE ############
+  # - platform: gpio #in3 05 
+    # name: "in#3 05"
+    # id: in305
+    # pin:
+      # mcp23xxx: mcp23017_hub_b1
+      # number: 4
+      # mode: INPUT_PULLUP
+      # inverted: True
     # filters:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     # # on_click:
       # # then:
         # # - light.toggle: out305
-  - platform: gpio #in3 06
-    name: "in#3 06"
-    id: in306
-    pin:
-      mcp23xxx: mcp23017_hub_b1
-      number: 5
-      mode: INPUT_PULLUP
-      inverted: True
+  ###### COMMANDE ELECTROVANNE ############
+  # - platform: gpio #in3 06
+    # name: "in#3 06"
+    # id: in306
+    # pin:
+      # mcp23xxx: mcp23017_hub_b1
+      # number: 5
+      # mode: INPUT_PULLUP
+      # inverted: True
     # filters:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     # # on_click:
       # # then:
         # # - light.toggle: out306
+ ##############################################
   - platform: gpio #in3 07
     name: "in#3 07"
     id: in307
@@ -2875,6 +2906,54 @@ sensor:
     unit_of_measurement: "m³"
     accuracy_decimals: 3 
     state_class: total_increasing
+  - platform: teleinfo
+    tag_name: "ISOUSC"
+    name: "Intensité souscrite"
+    unit_of_measurement: "A"
+    icon: mdi:flash
+    teleinfo_id: myteleinfo
+  - platform: teleinfo
+    tag_name: "BASE"
+    name: "Index compteur"
+    unit_of_measurement: "Wh"
+    state_class: total_increasing
+    device_class: energy
+    icon: mdi:flash
+    teleinfo_id: myteleinfo
+  - platform: teleinfo
+    tag_name: "PAPP"
+    name: "Puissance apparente"
+    unit_of_measurement: "VA"
+    icon: mdi:flash
+    teleinfo_id: myteleinfo
+  - platform: teleinfo
+    tag_name: "IINST"
+    name: "Intensité instantanée"
+    unit_of_measurement: "A"
+    icon: mdi:flash
+    teleinfo_id: myteleinfo
+  - platform: teleinfo
+    tag_name: "ADPS"
+    name: "Avertissement intensité"
+    unit_of_measurement: "A"
+    icon: mdi:flash
+    teleinfo_id: myteleinfo
+  - platform: teleinfo
+    tag_name: "IMAX"
+    name: "Intensité maximale"
+    unit_of_measurement: "A"
+    icon: mdi:flash
+    teleinfo_id: myteleinfo
+
+text_sensor:
+  - platform: teleinfo
+    tag_name: "ADCO"
+    name: "Identifiant du compteur"
+    teleinfo_id: myteleinfo
+  - platform: teleinfo
+    tag_name: "OPTARIF"
+    name: "Option tarifaire"
+    teleinfo_id: myteleinfo
 cover:
   - platform: time_based
     name: "VR Chambre 2"
@@ -3062,3 +3141,24 @@ cover:
       - cover.stop: vr11
       # - cover.stop: vr12
     optimistic: true
+  - platform: feedback
+    name: "Eau potable"
+    max_duration: 8s
+    direction_change_wait_time : 2s
+    open_action:
+      - switch.turn_on: out3_04H
+    open_duration: 4s
+    open_endstop: EV_EP_OUVERTE
+
+    close_action:
+      - switch.turn_on: out3_05H
+    close_duration: 4s
+    close_endstop: EV_EP_FERMEE
+
+    stop_action:
+      - switch.turn_off: out3_04H
+      - switch.turn_off: out3_05H
+teleinfo:
+  id: myteleinfo
+  update_interval: 5s
+  historical_mode: true

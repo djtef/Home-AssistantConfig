@@ -1,0 +1,101 @@
+wifi:
+  manual_ip:
+    static_ip: 192.168.0.60
+    gateway: 192.168.0.1
+    subnet: 255.255.255.0
+
+# logger:     
+  # # baud_rate: 0   # disable logging via UART, help to avoid numerous crash with ESP_LOGD
+  # level: INFO   # INFO for less log, put DEBUG to view all the linky's "étiquettes" received  in the logs
+  # esp8266_store_log_strings_in_flash: False     # recommanded for ESP8266 https://esphome.io/components/sensor/custom.html 
+
+# Example configuration entry
+uart:
+  id: uart_bus
+  rx_pin: GPIO13
+  # tx_pin: GPIO15
+  baud_rate: 1200
+  parity: EVEN
+  data_bits: 7
+
+
+teleinfo:
+  id: myteleinfo
+  update_interval: 10s
+  historical_mode: true
+    
+sensor:
+  - platform: uptime
+    name: Uptime Sensor
+  - platform: teleinfo
+    tag_name: "ISOUSC"
+    name: "Intensité souscrite"
+    unit_of_measurement: "A"
+    icon: mdi:flash
+    teleinfo_id: myteleinfo
+  - platform: teleinfo
+    tag_name: "BASE"
+    name: "Index compteur"
+    unit_of_measurement: "Wh"
+    icon: mdi:flash
+    teleinfo_id: myteleinfo
+  - platform: teleinfo
+    tag_name: "PAPP"
+    name: "Puissance apparente"
+    unit_of_measurement: "VA"
+    icon: mdi:flash
+    teleinfo_id: myteleinfo
+  - platform: teleinfo
+    tag_name: "IINST"
+    name: "Intensité instantanée"
+    unit_of_measurement: "A"
+    icon: mdi:flash
+    teleinfo_id: myteleinfo
+  - platform: teleinfo
+    tag_name: "ADPS"
+    name: "Avertissement intensité"
+    unit_of_measurement: "A"
+    icon: mdi:flash
+    teleinfo_id: myteleinfo
+  - platform: teleinfo
+    tag_name: "IMAX"
+    name: "Intensité maximale"
+    unit_of_measurement: "A"
+    icon: mdi:flash
+    teleinfo_id: myteleinfo
+
+text_sensor:
+  - platform: teleinfo
+    tag_name: "ADCO"
+    name: "Identifiant du compteur"
+    teleinfo_id: myteleinfo
+  - platform: teleinfo
+    tag_name: "OPTARIF"
+    name: "Option tarifaire"
+    teleinfo_id: myteleinfo
+    
+
+    # ADCO : Identifiant du compteur
+    # OPTARIF : Option tarifaire (type d’abonnement)
+    # ISOUSC : Intensité souscrite
+    # BASE : Index si option = base (en Wh)
+    # HCHC : Index heures creuses si option = heures creuses (en Wh)
+    # HCHP : Index heures pleines si option = heures creuses (en Wh)
+    # EJP HN : Index heures normales si option = EJP (en Wh)
+    # EJP HPM : Index heures de pointe mobile si option = EJP (en Wh)
+    # BBR HC JB : Index heures creuses jours bleus si option = tempo (en Wh)
+    # BBR HP JB : Index heures pleines jours bleus si option = tempo (en Wh)
+    # BBR HC JW : Index heures creuses jours blancs si option = tempo (en Wh)
+    # BBR HC JW : Index heures pleines jours blancs si option = tempo (en Wh)
+    # BBR HC JR : Index heures creuses jours rouges si option = tempo  (en Wh)
+    # BBR HP JR : Index heures pleines jours rouges si option = tempo (en Wh)
+    # PEJP : Préavis EJP si option = EJP 30mn avant période EJP
+    # PTEC : Période tarifaire en cours
+    # DEMAIN : Couleur du lendemain si option = tempo
+    # IINST : Intensité instantanée (en ampères)
+    # ADPS : Avertissement de dépassement de puissance souscrite (en ampères)
+    # IMAX : Intensité maximale (en ampères)
+    # PAPP : Puissance apparente (en Volt.ampères)
+    # HHPHC : Groupe horaire si option = heures creuses ou tempo
+    # MOTDETAT : Mot d’état (autocontrôle)
+

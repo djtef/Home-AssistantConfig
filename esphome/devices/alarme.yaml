@@ -39,7 +39,7 @@ substitutions:
   TIMEOUT: "6"
   REPONDEUR: '+33695600012'
   NUM_TEL:   '+33749273746'
-  NUM_THOMAS:   '+33627278083'
+  NUM_THOMAS: '+33627278083'
   NUM_JACE:   '+33627484445'
 
   # restore state
@@ -439,16 +439,31 @@ script:
                 - script.execute:
                     id: alerte_sms
                     msg: "ALARME MAISON DECLENCHEE !!"
-                - delay: 30s
+                - delay: 5s
+                - script.execute:
+                    id: alerte_sms
+                    msg: "ALARME MAISON DECLENCHEE !!"
+                - delay: 5s
+                - script.execute:
+                    id: alerte_sms
+                    msg: "ALARME MAISON DECLENCHEE !!"
+                - delay: 5s
+                - script.execute:
+                    id: alerte_sms
+                    msg: "ALARME MAISON DECLENCHEE !!"
+                - delay: 15s
                 - sim800l.dial:
                     recipient: ${NUM_THOMAS}
-                - delay: 10s
+                - script.execute:
+                    id: alerte_sms
+                    msg: "ALARME MAISON DECLENCHEE !!"
+                - delay: 5s
                 - sim800l.disconnect
                 - sim800l.dial:
                     recipient: ${NUM_JACE}
-                - delay: 10s
+                - delay: 5s
                 - sim800l.disconnect
-                - delay: 10s
+                - delay: 5s
         - switch.turn_off: SA_SIRENE
         - switch.turn_off: GA_SIRENE
         - switch.turn_off: XT_SIRENE
@@ -1050,13 +1065,14 @@ binary_sensor:
       mode: INPUT_PULLUP
       inverted: True
     on_release :
+        # TODO : Réparer capteur fermeture gauche
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: C1_F_FERME_G
       then:
-        - if:
-            condition:
-              - binary_sensor.is_off: C1_F_FERME_G
-            then:
-              - logger.log: "Fenêtre Chambre 1 déverrouillée Gauche"
-              - script.execute: trigger_alarm
+        - logger.log: "Fenêtre Chambre 1 déverrouillée Gauche"
+        - script.execute: trigger_alarm
   - platform: gpio #in22
     name: "VR Chambre 1 fermés"
     id: C1_VR_FERME
@@ -1225,13 +1241,14 @@ binary_sensor:
       mode: INPUT_PULLUP
       inverted: True
     on_release :
+    # TODO : Réparer capteur baie salon verrouillée droite
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: SA_B_VERR_D
       then:
-        - if:
-            condition:
-              - binary_sensor.is_off: SA_B_VERR_D
-            then:
-              - logger.log: "Baie Salon ouverte Droite"
-              - script.execute: trigger_alarm
+        - logger.log: "Baie Salon ouverte Droite"
+        - script.execute: trigger_alarm
   - platform: gpio #in32
     name: "Fenêtre SDB RDC fermée"
     id: BB_F_FERME
@@ -1385,7 +1402,7 @@ binary_sensor:
       number: 15
       mode: INPUT_PULLUP
       inverted: True
-    # TO DO : Réparer capteur SJ_F_VERR_G
+    # TODO : Réparer capteur SJ_F_VERR_G
     # on_release :
       # then:
         # - if:
@@ -1421,7 +1438,7 @@ binary_sensor:
       mode: INPUT_PULLUP
       inverted: True
     on_release :
-      #TO DO : Réparer capteur SJ_F_VERR_G
+      #TODO : Réparer capteur SJ_F_VERR_G
       # then:
         # - if:
             # condition:
@@ -1588,13 +1605,14 @@ binary_sensor:
       mode: INPUT_PULLUP
       inverted: True
     on_release :
+        # TODO : Réparer capteur verrouillage chambre 2 gauche
+      # then:
+        # - if:
+            # condition:
+              # - binary_sensor.is_off: C2_F_VERR_G
       then:
-        - if:
-            condition:
-              - binary_sensor.is_off: C2_F_VERR_G
-            then:
-              - logger.log: "Fenêtre Chambre 2 ouverte Gauche"
-              - script.execute: trigger_alarm
+        - logger.log: "Fenêtre Chambre 2 ouverte Gauche"
+        - script.execute: trigger_alarm
   - platform: gpio #in52
     name: "Fenêtre Chambre 2 verrouillée Droite"
     id: C2_F_VERR_D
