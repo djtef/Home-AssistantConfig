@@ -933,12 +933,23 @@ binary_sensor:
     # filters:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
-    on_press:
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
       then:
-        - cover.open: vr02
-    on_release:
-      then:
-        - cover.stop: vr02
+        - lambda: |-
+            if (id(vr02).current_operation == CoverOperation::COVER_OPERATION_IDLE) 
+            {
+                 auto call = id(vr02).make_call();
+                 call.set_command_open();
+                 call.perform();
+            } 
+            else 
+            {
+                 auto call = id(vr02).make_call();
+                 call.set_command_stop();
+                 call.perform();
+            }
   - platform: gpio
     name: "VR Cuisine descente"
     id: in04
@@ -950,12 +961,23 @@ binary_sensor:
     # filters:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
-    on_press:
+    on_click:
+    - min_length: 75ms
+      max_length: 300ms
       then:
-        - cover.close: vr02
-    on_release:
-      then:
-        - cover.stop: vr02
+        - lambda: |-
+            if (id(vr02).current_operation == CoverOperation::COVER_OPERATION_IDLE) 
+            {
+                 auto call = id(vr02).make_call();
+                 call.set_command_close();
+                 call.perform();
+            } 
+            else 
+            {
+                 auto call = id(vr02).make_call();
+                 call.set_command_stop();
+                 call.perform();
+            }
   - platform: gpio
     name: "VR Palier montée"
     id: in05
