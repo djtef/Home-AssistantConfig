@@ -1518,13 +1518,23 @@
         pourcentage: 11
   mode: single
 - id: '1696441833102'
-  alias: 'Lumière terrasse '
-  description: 'Allume la terrasse le soir '
+  alias: 'Terrasse '
+  description: 'Allume la terrasse et remonte le store le soir '
   trigger:
   - platform: sun
     event: sunset
     offset: 00:15:00
     id: plus15min
+  - platform: sun
+    event: sunset
+    offset: -01:00:00
+    id: moins1h
+  - platform: state
+    entity_id:
+    - cover.vr_cuisine
+    - cover.vr_salon
+    to: closed
+    id: fermeture
   condition: []
   action:
   - choose:
@@ -1546,6 +1556,26 @@
           data: {}
           target:
             entity_id: light.exterieur_appliques_terrasse
+    - conditions:
+      - condition: trigger
+        id: moins1h
+      sequence:
+      - service: cover.open_cover
+        data: {}
+        target:
+          entity_id: cover.store_banne
+    - conditions:
+      - condition: state
+        entity_id: cover.vr_cuisine
+        state: closed
+      - condition: state
+        entity_id: cover.vr_salon
+        state: closed
+      sequence:
+      - service: light.turn_off
+        data: {}
+        target:
+          entity_id: light.exterieur_appliques_terrasse
   mode: single
 - id: '1696441887415'
   description: ''
@@ -1553,3 +1583,136 @@
   condition: []
   action: []
   mode: single
+- id: '1696801508640'
+  alias: NSPanel Configuration
+  description: ''
+  use_blueprint:
+    path: Blackymas/nspanel_blueprint.yaml
+    input:
+      nspanel_name: dc9e9a042844f5973b4fd6b751a4c611
+      language: fr
+      date_format: '%A, %d/%m'
+      weather_entity: weather.maison
+      outdoortemp: sensor.lumi_lumi_weather_temperature_6
+      home_value01: sensor.puissance_apparente
+      home_value01_icon: mdi:flash
+      chip01: light.cuisine_led
+      chip01_icon: mdi:led-strip-variant
+      chip02: light.cuisine_spots_plan_de_travail
+      chip02_icon: mdi:wall-sconce-round
+      home_custom_button01_icon: mdi:lightbulb
+      home_custom_button02: cover.store_banne
+      home_custom_button02_icon: mdi:storefront-outline
+      home_custom_button03: cover.eau_potable
+      home_custom_button03_icon: mdi:pipe-valve
+      alarm: alarm_control_panel.alarme_maison
+      left_button_entity: light.cuisine_spots_plan_de_travail
+      left_button_name: Cuisine spots
+      left_button_hold_select: Default
+      right_button_entity: light.cuisine_led
+      right_button_name: Cuisine LED
+      button_page01_label: Volets roulants RDC
+      button_page02_label: Volets roulants Etage
+      button_page03_label: Page 3
+      button_page04_label: Page 4
+      entitypages_enabled: true
+      entity_page01_label: Fenêtres
+      entities_entity01: binary_sensor.baie_cuisine_fermee_droite
+      entities_entity01_name: Baie Cuisine droite
+      entities_entity01_icon: mdi:window-open-variant
+      entities_entity02: binary_sensor.baie_cuisine_fermee_gauche
+      entities_entity02_name: Baie Cuisine gauche
+      entities_entity02_icon: mdi:window-open-variant
+      chip03: binary_sensor.portail_garage_ferme
+      chip03_icon: mdi:garage-variant
+      entity02: cover.vr_porte_fenetre_salon
+      entity02_name: Porte-fenetre
+      entity02_icon: mdi:window-shutter
+      entity03: cover.vr_salon
+      entity03_name: Baie salon
+      entity03_icon: mdi:window-shutter
+      entity04: cover.vr_cuisine
+      entity04_name: Cuisine
+      entity04_icon: mdi:window-shutter
+      entity05: cover.vr_cellier
+      entity05_name: Cellier
+      entity05_icon: mdi:window-shutter
+      entity06: cover.vr_bureau
+      entity06_name: Bureau
+      entity06_icon: mdi:window-shutter
+      entity07_name: Chambre parents
+      entity07: cover.vr_chambre_1
+      entity07_icon: mdi:window-shutter
+      entity08: cover.vr_bureau
+      entity08_name: Bureau
+      entity08_icon: mdi:window-shutter
+      entity01: cover.vr_general
+      entity01_name: General
+      entity01_icon: mdi:window-shutter
+      entity01_icon_color:
+      - 35
+      - 223
+      - 26
+      entity09: cover.vr_palier
+      entity09_name: Palier
+      entity09_icon: mdi:window-shutter
+      entity10: cover.vr_escalier
+      entity10_name: Escalier
+      entity10_icon: mdi:window-shutter
+      entity11: cover.vr_chambre_2
+      entity11_name: Chambre Athenais
+      entity11_icon: mdi:window-shutter
+      entity12: cover.vr_chambre_3
+      entity12_name: Chambre 3
+      entity12_icon: mdi:window-shutter
+      home_custom_button01: light.exterieur_spot_portail_garage
+- id: '1696801521588'
+  alias: NSPanel Configuration
+  description: ''
+  use_blueprint:
+    path: Blackymas/nspanel_blueprint.yaml
+    input:
+      nspanel_name: dc9e9a042844f5973b4fd6b751a4c611
+      language: fr
+      date_format: '%A, %d/%m'
+      weather_entity: weather.maison
+      outdoortemp: sensor.lumi_lumi_weather_temperature_6
+      home_value01: sensor.puissance_apparente
+      home_value01_icon: mdi:flash
+      chip01_icon: mdi:garage-variant
+      chip02_icon: mdi:door-closed-lock
+      home_custom_button01: cover.store_banne
+      home_custom_button01_icon: mdi:awning-outline
+      home_custom_button02_icon: mdi:window-shutter
+      home_custom_button03: cover.eau_potable
+      home_custom_button03_icon: mdi:pipe-valve
+      alarm: alarm_control_panel.alarme_maison
+      left_button_entity: light.cuisine_spots_plan_de_travail
+      left_button_name: Cuisine spots
+      left_button_hold_select: Default
+      right_button_entity: light.cuisine_led
+      right_button_name: Cuisine LED
+      button_page01_label: Volets roulants
+      entity01: cover.vr_porte_fenetre_salon
+      entity01_name: VR Porte-fenêtre
+      entity01_icon: mdi:window-shutter
+      button_page02_label: Page 2
+      button_page03_label: Page 3
+      button_page04_label: Page 4
+      entitypages_enabled: true
+      entity_page01_label: Fenêtres
+      entities_entity01: binary_sensor.baie_cuisine_fermee_droite
+      entities_entity01_name: Baie Cuisine droite
+      entities_entity01_icon: mdi:window-open-variant
+      entities_entity02: binary_sensor.baie_cuisine_fermee_gauche
+      entities_entity02_name: Baie Cuisine gauche
+      entities_entity02_icon: mdi:window-open-variant
+      home_value02: sensor.compteur_eau
+      home_value02_icon: mdi:water
+      home_custom_button02: cover.vr_cuisine
+      chip01: binary_sensor.portail_garage_ferme
+      chip01_icon_color:
+      - 1
+      - 52
+      - 254
+      chip02: binary_sensor.porte_entree_verrouillee

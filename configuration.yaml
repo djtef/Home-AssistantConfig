@@ -212,11 +212,138 @@ template:
 
 
   - sensor:
+      - name: Sun Angle
+        unit_of_measurement: "°"
+        state: "{{ '%+.1f'|format(state_attr('sun.sun', 'elevation')) }}"
+    
       - name: Changement capteurs
         state: >
           {% set x = expand(integration_entities("alarme"))|selectattr('domain', 'eq', 'binary_sensor') | sort(attribute='last_changed', reverse=true) | list %}
           {{ (x[0].entity_id if now() - x[0].last_changed < timedelta(seconds=3) else '') if x | count > 0 else '' }}
 
+      - name: vr_baie_fermeture_soleil
+        unit_of_measurement: '%'
+        state: >
+            {% set deg2rad = pi/180 %}
+
+            {%- macro norm(x, min, max) %}
+                {{ (x - min) / (max - min) }}
+            {%- endmacro %}
+
+            {%- macro h2perc(x) %}
+                {{ 100 * float(norm(x, h_min, h_max)) }}
+            {%- endmacro %}
+
+            {%- macro clipv(x, x_min, x_max) %}
+                {{ max(min(x, x_max), x_min) }}
+            {%- endmacro %}
+
+            {% set win_azi = 234 %}
+            {% set d = 0.5 %}
+            {% set h_max = 2.15 %}
+            {% set h_min = 0 %}
+
+            {% set fov = deg2rad * 90 %}
+
+            {% set sun_azi = state_attr('sun.sun', 'azimuth') %}
+            {% set sun_ele = state_attr('sun.sun', 'elevation') %}
+
+            {% set def_h = h_max %}
+            
+            {% set alpha = deg2rad * sun_ele %}
+            {% set gamma = deg2rad * (win_azi - sun_azi) %}    
+
+            {% set h = (d / cos(gamma)) * tan(alpha) %}
+
+            {% if (alpha > 0) and (gamma | abs < fov) %}
+                {{ clipv(h2perc(h) | round(0) | int , 0, 100) }}
+            {% else %}  
+                {{ clipv(h2perc(def_h) | round(0) | int , 0, 100) }}
+            {% endif %}
+            
+      - name: vr_fenetre_arriere_fermeture_soleil
+        unit_of_measurement: '%'
+        state: >
+            {% set deg2rad = pi/180 %}
+
+            {%- macro norm(x, min, max) %}
+                {{ (x - min) / (max - min) }}
+            {%- endmacro %}
+
+            {%- macro h2perc(x) %}
+                {{ 100 * float(norm(x, h_min, h_max)) }}
+            {%- endmacro %}
+
+            {%- macro clipv(x, x_min, x_max) %}
+                {{ max(min(x, x_max), x_min) }}
+            {%- endmacro %}
+
+            {% set win_azi = 54 %}
+            {% set d = 0.5 %}
+            {% set h_max = 2.15 %}
+            {% set h_min = 0 %}
+
+            {% set fov = deg2rad * 90 %}
+
+            {% set sun_azi = state_attr('sun.sun', 'azimuth') %}
+            {% set sun_ele = state_attr('sun.sun', 'elevation') %}
+
+            {% set def_h = h_max %}
+            
+            {% set alpha = deg2rad * sun_ele %}
+            {% set gamma = deg2rad * (win_azi - sun_azi) %}    
+
+            {% set h = (d / cos(gamma)) * tan(alpha) %}
+
+            {% if (alpha > 0) and (gamma | abs < fov) %}
+                {{ clipv(h2perc(h) | round(0) | int , 0, 100) }}
+            {% else %}  
+                {{ clipv(h2perc(def_h) | round(0) | int , 0, 100) }}
+            {% endif %}
+        
+
+      - name: vr_cote_JM_fermeture_soleil
+        unit_of_measurement: '%'
+        state: >
+            {% set deg2rad = pi/180 %}
+
+            {%- macro norm(x, min, max) %}
+                {{ (x - min) / (max - min) }}
+            {%- endmacro %}
+
+            {%- macro h2perc(x) %}
+                {{ 100 * float(norm(x, h_min, h_max)) }}
+            {%- endmacro %}
+
+            {%- macro clipv(x, x_min, x_max) %}
+                {{ max(min(x, x_max), x_min) }}
+            {%- endmacro %}
+
+            {% set win_azi = 144 %}
+            {% set d = 0.5 %}
+            {% set h_max = 2.15 %}
+            {% set h_min = 0 %}
+
+            {% set fov = deg2rad * 90 %}
+
+            {% set sun_azi = state_attr('sun.sun', 'azimuth') %}
+            {% set sun_ele = state_attr('sun.sun', 'elevation') %}
+
+            {% set def_h = h_max %}
+            
+            {% set alpha = deg2rad * sun_ele %}
+            {% set gamma = deg2rad * (win_azi - sun_azi) %}    
+
+            {% set h = (d / cos(gamma)) * tan(alpha) %}
+
+            {% if (alpha > 0) and (gamma | abs < fov) %}
+                {{ clipv(h2perc(h) | round(0) | int , 0, 100) }}
+            {% else %}  
+                {{ clipv(h2perc(def_h) | round(0) | int , 0, 100) }}
+            {% endif %}
+        
+        
+       
 binary_sensor:
   - platform: group
     name: "Capteurs ouvertures"
