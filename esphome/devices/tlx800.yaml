@@ -65,8 +65,33 @@ mcp23017:
     i2c_id: bus_b
     address: 0x23
 
+
+script:
+  - id: cuisine_led
+    mode: restart 
+    then:
+      - if:
+          condition:
+            switch.is_on: out2_01 #Relai Cuisine LED
+          then:
+            - light.turn_off: CU_LED
+            - delay: 20 ms
+            - switch.turn_off: out2_01 #Relai Cuisine LED
+          else:
+            - switch.turn_on: out2_01 #Relai Cuisine LED
+            - delay: 20 ms
+            - light.turn_on: CU_LED
 # Individual outputs
 switch:
+  - platform: gpio
+    name: "Switch Cuisine LED"
+    id: out2_01 #LED CUISINE => SWITCH
+    restore_mode: RESTORE_DEFAULT_OFF 
+    pin:
+      mcp23xxx: mcp23017_hub_a5
+      number: 15
+      mode: OUTPUT
+      inverted: False
   - platform: gpio
     name: "VR 01 montée"
     id: out01
@@ -330,6 +355,9 @@ switch:
       inverted: False
 
 output:
+  - platform: ledc
+    pin: GPIO12
+    id: pwm_12
   - platform: gpio
     id: out1_07H #Portail garage 7e pin haut
     pin:
@@ -337,13 +365,13 @@ output:
       number: 1
       mode: OUTPUT
       inverted: False
-  - platform: gpio
-    id: out2_01
-    pin:
-      mcp23xxx: mcp23017_hub_a5
-      number: 15
-      mode: OUTPUT
-      inverted: False
+  # - platform: gpio
+    # id: out2_01 #LED CUISINE => SWITCH
+    # pin:
+      # mcp23xxx: mcp23017_hub_a5
+      # number: 15
+      # mode: OUTPUT
+      # inverted: False
   - platform: gpio
     id: out2_02
     pin:
@@ -673,14 +701,21 @@ output:
       number: 7
       mode: OUTPUT
       inverted: False
-
-
-
 light:
-  - platform: binary
+  - platform: monochromatic
+    output: pwm_12
     id: CU_LED
     name: Cuisine LED
-    output: out2_01
+    default_transition_length: 500ms
+    on_turn_on :
+        - switch.turn_on: out2_01 #Relai Cuisine LED
+    on_turn_off :
+        - delay: 20 ms
+        - switch.turn_off: out2_01 #Relai Cuisine LED
+  # - platform: binary
+    # id: CU_LED
+    # name: Cuisine LED
+    # output: out2_01
   - platform: binary
     id: SA_APP_HAUTE
     name: Salon Applique haute
@@ -875,14 +910,15 @@ button:
     name: "Portail Garage"
     output: out1_07H
     duration: 200ms
-# Individual inputs
+    
 binary_sensor:
+# Individual inputs
   - platform: gpio
     name: "Impulsion compteur eau"
     id: COMPTEUR_EAU_PULSE
     pin:
-      number: GPIO12
-      mode: INPUT_PULLUP
+      number: GPIO35
+      mode: INPUT
     on_state:
       then:
         - globals.set:
@@ -1629,7 +1665,7 @@ binary_sensor:
     - min_length: 75ms
       max_length: 300ms
       then:
-        - light.toggle: CU_LED
+        - script.execute: cuisine_led
   - platform: gpio #in2 02
     name: "BP Salon Porte-fenêtre 2-Bas Gauche"
     id: BP_SA_PF_2_3
@@ -2071,7 +2107,19 @@ binary_sensor:
     - min_length: 75ms
       max_length: 300ms
       then:
-        - light.toggle: CU_LED
+        - script.execute: cuisine_led
+    on_press:
+      - delay: 300ms
+      - while:
+          condition:
+            - binary_sensor.is_on: BP_CU_VERRIERE_1
+            - binary_sensor.is_off: BP_CU_VERRIERE_2
+          then:
+            - light.dim_relative:
+                id: CU_LED
+                relative_brightness: 5%
+                transition_length: 0.1s
+            - delay: 0.1s
   - platform: gpio #in2 30
     name: "BP Cuisine Verrière-Droite"
     id: BP_CU_VERRIERE_2
@@ -2087,7 +2135,19 @@ binary_sensor:
     - min_length: 75ms
       max_length: 300ms
       then:
-        - light.toggle: CU_SPT_TOUR        
+        - light.toggle: CU_SPT_TOUR  
+    on_press:
+      - delay: 300ms
+      - while:
+          condition:
+            - binary_sensor.is_on: BP_CU_VERRIERE_2
+            - binary_sensor.is_off: BP_CU_VERRIERE_1
+          then:
+            - light.dim_relative:
+                id: CU_LED
+                relative_brightness: -5%
+                transition_length: 0.1s
+            - delay: 0.1s
   - platform: gpio #in2 31
     name: "BP Salle à manger Colonne-Haut"
     id: BP_SM_COLONNE_1
@@ -2119,7 +2179,7 @@ binary_sensor:
     - min_length: 75ms
       max_length: 300ms
       then:
-        - light.toggle: CU_LED
+        - script.execute: cuisine_led
   - platform: gpio #in2 33
     name: "BP Salle à manger Colonne-Bas Droite"
     id: BP_SM_COLONNE_4
@@ -2580,7 +2640,7 @@ binary_sensor:
     - min_length: 75ms
       max_length: 300ms
       then:
-        - light.toggle: CU_LED
+        - script.execute: cuisine_led
   - platform: gpio #in3 24
     name: "BP Cuisine angle-Droite"
     id: CU_BP_ANGLE_D
@@ -2826,7 +2886,7 @@ binary_sensor:
     - min_length: 75ms
       max_length: 300ms
       then:
-        - light.toggle: CU_LED
+        - script.execute: cuisine_led
   - platform: gpio #in3 37
     name: "BP Cuisine côté cellier-Droite"
     id: CU_BP_CELLIER_D
@@ -2903,8 +2963,8 @@ sensor:
     id: COMPTEUR_EAU_DEBIT
     icon: mdi:water
     pin:
-      number: GPIO12
-      mode: INPUT_PULLUP
+      number: GPIO35
+      mode: INPUT
     unit_of_measurement: "L/min"
     timeout: 1min
     internal_filter: 100ms
@@ -2968,10 +3028,10 @@ sensor:
     teleinfo_id: myteleinfo
 
 text_sensor:
-  - platform: teleinfo
-    tag_name: "ADCO"
-    name: "Identifiant du compteur"
-    teleinfo_id: myteleinfo
+  # - platform: teleinfo
+    # tag_name: "ADCO"
+    # name: "Identifiant du compteur"
+    # teleinfo_id: myteleinfo
   - platform: teleinfo
     tag_name: "OPTARIF"
     name: "Option tarifaire"
