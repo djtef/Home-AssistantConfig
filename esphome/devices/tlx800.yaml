@@ -19,6 +19,10 @@ globals:
      type: int
      restore_value: yes
      initial_value: '0'
+   - id: CU_LED_brightness
+     type: float
+     restore_value: yes
+     initial_value: '50'
      
 uart:
   id: uart_bus
@@ -74,13 +78,25 @@ script:
           condition:
             switch.is_on: out2_01 #Relai Cuisine LED
           then:
-            - light.turn_off: CU_LED
-            - delay: 20 ms
+            - lambda: |-
+                id(CU_LED_brightness) = id(CU_LED).remote_values.get_brightness();
+            - light.turn_on:
+                id: CU_LED
+                brightness: 0%
+                transition_length: 50ms
+            - delay: 50 ms
+            - light.turn_off:
+                id: CU_LED
             - switch.turn_off: out2_01 #Relai Cuisine LED
           else:
             - switch.turn_on: out2_01 #Relai Cuisine LED
             - delay: 20 ms
-            - light.turn_on: CU_LED
+            - lambda: |-
+                auto call = id(CU_LED).turn_on();
+                call.set_transition_length(100); // in ms
+                call.set_brightness(id(CU_LED_brightness)); 
+                call.perform();
+            # - light.turn_on: CU_LED
 # Individual outputs
 switch:
   - platform: gpio
@@ -805,16 +821,16 @@ light:
     name: Salon Eclairage central 2
     output: out2_23
   - platform: binary
-    id: C1_APP_G
-    name: Chambre 1 Applique gauche
+    id: BH_LED
+    name: SDB étage LED
     output: out2_24
   - platform: binary
     id: C1_APP_D
     name: Chambre 1 Applique droite
     output: out3_01
   - platform: binary
-    id: BH_LED
-    name: SDB étage LED
+    id: C1_APP_G
+    name: Chambre 1 Applique gauche
     output: out3_02
   - platform: binary
     id: C2_DCL
