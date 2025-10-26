@@ -1,0 +1,31 @@
+esphome:
+  name: c3supermini
+  friendly_name: c3supermini
+
+esp32:
+  board: esp32-c3-devkitm-1
+  framework:
+    type: arduino
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "VLxeRMn53aJVXYW74ca7cc6JpLfHY1GZ4sPn+I+lcBE="
+
+ota:
+  password: "b46e7702aa5dde121730f9a1d922002e"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "C3Supermini Fallback Hotspot"
+    password: "QPhtkufqkfQi"
+
+captive_portal:
+    

@@ -1,0 +1,904 @@
+sensor.energie_routeur:
+    state_class: total_increasing
+sensor.sim800l_rssi_2:
+  friendly_name: "Sim800L RSSI"
+sensor.alarme_uptime_2:
+  friendly_name: "Alarme Uptime"
+sensor.sms_sender_2:
+  friendly_name: "Sms Sender"
+sensor.sms_message_2:
+  friendly_name: "Sms Message"
+sensor.caller_id_2:
+  friendly_name: "Caller ID"
+sensor.ussd_code_2:
+  friendly_name: "Ussd Code"
+sensor.state_alarm_panel:
+  friendly_name: "State Alarm Panel"
+binary_sensor.sim800l_registered_2:
+  friendly_name: "Sim800L Registered"
+binary_sensor.alarme_status:
+  friendly_name: "Alarme Status"
+binary_sensor.alarme_silencieuse:
+  friendly_name: "Alarme silencieuse"
+binary_sensor.porte_entree_verrouillee:
+  friendly_name: "Porte Entrée verrouillée"
+binary_sensor.porte_entree_fermee:
+  friendly_name: "Porte Entrée fermée"
+binary_sensor.porte_garage_verrouillee_droite:
+  friendly_name: "Porte Garage verrouillée Droite"
+binary_sensor.porte_garage_verrouillee_gauche:
+  friendly_name: "Porte Garage verrouillée Gauche"
+binary_sensor.porte_garage_fermee_gauche:
+  friendly_name: "Porte Garage fermée Gauche"
+binary_sensor.fenetre_garage_fermee:
+  friendly_name: "Fenêtre Garage fermée"
+binary_sensor.portail_garage_ferme:
+  friendly_name: "Portail Garage fermé"
+binary_sensor.fenetre_palier_verrouillee_gauche:
+  friendly_name: "Fenêtre Palier verrouillée Gauche"
+binary_sensor.vr_palier_fermes:
+  friendly_name: "VR Palier fermés"
+binary_sensor.fenetre_palier_verrouillee_droite:
+  friendly_name: "Fenêtre Palier verrouillée Droite"
+binary_sensor.fenetre_palier_fermee_droite:
+  friendly_name: "Fenêtre Palier fermée Droite"
+binary_sensor.fenetre_palier_fermee_gauche:
+  friendly_name: "Fenêtre Palier fermée Gauche"
+binary_sensor.fenetre_bureau_verrouillee_gauche:
+  friendly_name: "Fenêtre Bureau verrouillée Gauche"
+binary_sensor.vr_bureau_fermes:
+  friendly_name: "VR Bureau fermés"
+binary_sensor.fenetre_bureau_fermee_gauche:
+  friendly_name: "Fenêtre Bureau fermée Gauche"
+binary_sensor.fenetre_bureau_verrouillee_droite:
+  friendly_name: "Fenêtre Bureau verrouillée Droite"
+binary_sensor.fenetre_bureau_fermee_droite:
+  friendly_name: "Fenêtre Bureau fermée Droite"
+binary_sensor.vr_porte_fenetre_salon_fermes:
+  friendly_name: "VR Porte-fenêtre Salon fermés"
+binary_sensor.porte_fenetre_salon_verrouillee:
+  friendly_name: "Porte-fenêtre Salon verrouillée"
+binary_sensor.porte_fenetre_salon_fermee:
+  friendly_name: "Porte-fenêtre Salon fermée"
+binary_sensor.fenetre_chambre_1_verrouillee_gauche:
+  friendly_name: "Fenêtre Chambre 1 verrouillée Gauche"
+binary_sensor.vr_chambre_1_fermes:
+  friendly_name: "VR Chambre 1 fermés"
+binary_sensor.fenetre_chambre_1_fermee_gauche:
+  friendly_name: "Fenêtre Chambre 1 fermée Gauche"
+binary_sensor.fenetre_chambre_1_verrouillee_droite:
+  friendly_name: "Fenêtre Chambre 1 verrouillée Droite"
+binary_sensor.fenetre_chambre_1_fermee_droite:
+  friendly_name: "Fenêtre Chambre 1 fermée Droite"
+binary_sensor.baie_salon_verrouillee_gauche:
+  friendly_name: "Baie Salon verrouillée Gauche"
+binary_sensor.vr_baie_salon_fermes_gauche:
+  friendly_name: "VR Baie Salon fermés Gauche"
+binary_sensor.baie_salon_fermee_gauche:
+  friendly_name: "Baie Salon Fermée Gauche"
+binary_sensor.baie_salon_verrouillee_droite:
+  friendly_name: "Baie Salon verrouillée Droite"
+binary_sensor.vr_baie_salon_fermes_droite:
+  friendly_name: "VR Baie Salon fermés Droite"
+binary_sensor.baie_salon_fermee_droite:
+  friendly_name: "Baie Salon fermée Droite"
+binary_sensor.fenetre_sdb_rdc_fermee:
+  friendly_name: "Fenêtre SDB RDC fermée"
+binary_sensor.fenetre_sdb_rdc_verrouillee:
+  friendly_name: "Fenêtre SDB RDC verrouillée"
+binary_sensor.baie_cuisine_verrouillee_gauche:
+  friendly_name: "Baie Cuisine verrouillée Gauche"
+binary_sensor.vr_cuisine_fermes_gauche:
+  friendly_name: "VR Cuisine fermés Gauche"
+binary_sensor.baie_cuisine_fermee_gauche:
+  friendly_name: "Baie Cuisine fermée Gauche"
+binary_sensor.baie_cuisine_verrouillee_droite:
+  friendly_name: "Baie Cuisine verrouillée Droite"
+binary_sensor.vr_cuisine_fermes_droite:
+  friendly_name: "VR Cuisine fermés Droite"
+binary_sensor.baie_cuisine_fermee_droite:
+  friendly_name: "Baie Cuisine fermée Droite"
+binary_sensor.fenetre_sdj_verrouillee_gauche:
+  friendly_name: "Fenêtre SDJ verrouillée Gauche"
+binary_sensor.vr_sdj_fermes:
+  friendly_name: "VR SDJ fermés"
+binary_sensor.fenetre_sdj_fermee_gauche:
+  friendly_name: "Fenêtre SDJ fermée Gauche"
+binary_sensor.fenetre_sdj_verrouillee_droite:
+  friendly_name: "Fenêtre SDJ verrouillée Droite"
+binary_sensor.fenetre_sdj_fermee_droite:
+  friendly_name: "Fenêtre SDJ fermée Droite"
+binary_sensor.fenetre_chambre_3_verrouillee_gauche:
+  friendly_name: "Fenêtre Chambre 3 verrouillée Gauche"
+binary_sensor.fenetre_chambre_3_fermee_gauche:
+  friendly_name: "Fenêtre Chambre 3 fermée Gauche"
+binary_sensor.fenetre_chambre_3_verrouillee_droite:
+  friendly_name: "Fenêtre Chambre 3 verrouillée Droite"
+binary_sensor.vr_chambre_3_fermes:
+  friendly_name: "VR Chambre 3 fermés"
+binary_sensor.fenetre_chambre_3_fermee_droite:
+  friendly_name: "Fenêtre Chambre 3 fermée Droite"
+binary_sensor.fenetre_chambre_2_verrouillee_gauche:
+  friendly_name: "Fenêtre Chambre 2 verrouillée Gauche"
+binary_sensor.fenetre_chambre_2_fermee_gauche:
+  friendly_name: "Fenêtre Chambre 2 fermée Gauche"
+binary_sensor.fenetre_chambre_2_verrouillee_droite:
+  friendly_name: "Fenêtre Chambre 2 verrouillée Droite"
+binary_sensor.vr_chambre_2_fermes:
+  friendly_name: "VR Chambre 2 fermés"
+binary_sensor.fenetre_chambre_2_fermee_droite:
+  friendly_name: "Fenêtre Chambre 2 fermée Droite"
+binary_sensor.fenetre_wc_etage_fermee:
+  friendly_name: "Fenêtre WC Etage fermée"
+binary_sensor.fenetre_wc_etage_verrouillee:
+  friendly_name: "Fenêtre WC Etage verrouillée"
+binary_sensor.vr_escalier_fermes:
+  friendly_name: "VR Escalier fermés"
+binary_sensor.fenetre_escalier_fermee:
+  friendly_name: "Fenêtre Escalier fermée"
+binary_sensor.fenetre_escalier_verrouillee:
+  friendly_name: "Fenêtre Escalier verrouillée"
+binary_sensor.fenetre_wc_rdc_fermee:
+  friendly_name: "Fenêtre WC RDC fermée"
+binary_sensor.fenetre_wc_rdc_verrouillee:
+  friendly_name: "Fenêtre WC RDC verrouillée"
+binary_sensor.fenetre_sdb_etage_fermee:
+  friendly_name: "Fenêtre SDB Etage fermée"
+binary_sensor.fenetre_sdb_etage_verrouillee:
+  friendly_name: "Fenêtre SDB Etage verrouillée"
+binary_sensor.vr_cellier_fermes:
+  friendly_name: "VR Cellier fermés"
+binary_sensor.fenetre_cellier_verrouillee:
+  friendly_name: "Fenêtre Cellier verrouillée"
+binary_sensor.fenetre_cellier_fermee:
+  friendly_name: "Fenêtre Cellier fermée"
+binary_sensor.autoprotection_sirene_interieure:
+  friendly_name: "Autoprotection sirène intérieure"
+binary_sensor.activation_clavier_entree:
+  friendly_name: "Activation clavier entrée"
+binary_sensor.capteur_presence_bureau:
+  friendly_name: "Capteur présence bureau"
+binary_sensor.autoprotection_sirene_exterieure:
+  friendly_name: "Autoprotection sirène extérieure"
+binary_sensor.in71:
+  friendly_name: "in71"
+binary_sensor.in72:
+  friendly_name: "in72"
+button.alarme_restart:
+  friendly_name: "Alarme Restart"
+button.alarme_factory_reset:
+  friendly_name: "Alarme factory reset"
+number.code:
+  friendly_name: "Code"
+number.sim800l_heartbit:
+  friendly_name: "SIM800L Heartbit"
+switch.alarme_shutdown:
+  friendly_name: "Alarme Shutdown"
+switch.out73:
+  friendly_name: "out73"
+switch.out74:
+  friendly_name: "out74"
+switch.switch_cameras:
+  friendly_name: "Switch cameras"
+switch.sirene_exterieure:
+  friendly_name: "Sirène Extérieure"
+switch.signal_optique_exterieur:
+  friendly_name: "Signal Optique Extérieur"
+switch.led_sirene_exterieure:
+  friendly_name: "LED Sirène extérieure"
+switch.sirene_garage:
+  friendly_name: "Sirène Garage"
+switch.sirene_salon:
+  friendly_name: "Sirène salon"
+sensor.sejour:
+  friendly_name: "Séjour"
+sensor.sdj:
+  friendly_name: "SDJ"
+sensor.chambre_parents:
+  friendly_name: "Chambre parents"
+sensor.bureau:
+  friendly_name: "Bureau"
+sensor.version_logiciel_regulateur:
+  friendly_name: "Version logiciel régulateur"
+sensor.identifiant_ihm:
+  friendly_name: "Identifiant IHM"
+sensor.date_et_heure:
+  friendly_name: "Date et heure"
+sensor.temperature_piece_principale:
+  friendly_name: "Température pièce principale"
+sensor.volume_restant_ecs:
+  friendly_name: "Volume restant ECS"
+sensor.temperature_ecs:
+  friendly_name: "Température ECS"
+sensor.temperature_bas:
+  friendly_name: "Temperature bas"
+sensor.resistance_bas:
+  friendly_name: "Resistance bas"
+sensor.temperature_haut:
+  friendly_name: "Temperature haut"
+sensor.resistance_haut:
+  friendly_name: "Resistance Haut"
+sensor.aiguillage_vanne:
+  friendly_name: "Aiguillage vanne"
+select.mode_air:
+  friendly_name: "Mode Air"
+select.mode_ecs:
+  friendly_name: "Mode ECS"
+binary_sensor.bouche_k1a:
+  friendly_name: "Bouche K1a"
+binary_sensor.bouche_k2:
+  friendly_name: "Bouche K2"
+binary_sensor.bouche_k3:
+  friendly_name: "Bouche K3"
+binary_sensor.bouche_k4:
+  friendly_name: "Bouche K4"
+binary_sensor.resistance_appoint:
+  friendly_name: "Résistance appoint"
+binary_sensor.filtre:
+  friendly_name: "Filtre"
+button.restart:
+  friendly_name: "Restart"
+button.template_button:
+  friendly_name: "Template Button"
+number.consigne_ecs:
+  friendly_name: "Consigne ECS"
+number.thermostat_1:
+  friendly_name: "Thermostat 1"
+number.thermostat_2:
+  friendly_name: "Thermostat 2"
+number.thermostat_3:
+  friendly_name: "Thermostat 3"
+number.thermostat_4:
+  friendly_name: "Thermostat 4"
+number.thermostat_5:
+  friendly_name: "Thermostat 5"
+number.tarif_hp:
+  friendly_name: "Tarif HP"
+number.tarif_hc:
+  friendly_name: "Tarif HC"
+switch.forcage_60deg:
+  friendly_name: "Forçage 60°"
+switch.test_clim:
+  friendly_name: "Test Clim"
+sensor.nspanel_api_uptime:
+  friendly_name: "nspanel API uptime"
+sensor.nspanel_device_uptime:
+  friendly_name: "nspanel Device uptime"
+sensor.nspanel_rssi:
+  friendly_name: "nspanel RSSI"
+sensor.nspanel_temperature:
+  friendly_name: "nspanel Temperature"
+sensor.nspanel_current_page:
+  friendly_name: "nspanel Current page"
+sensor.nspanel_notification_label:
+  friendly_name: "nspanel Notification Label"
+sensor.nspanel_notification_text:
+  friendly_name: "nspanel Notification Text"
+select.nspanel_wake_up_page:
+  friendly_name: "nspanel Wake-up page"
+binary_sensor.nspanel_left_button:
+  friendly_name: "nspanel Left Button"
+binary_sensor.nspanel_right_button:
+  friendly_name: "nspanel Right Button"
+binary_sensor.nspanel_nextion_display:
+  friendly_name: "nspanel Nextion display"
+binary_sensor.nspanel_status:
+  friendly_name: "nspanel Status"
+button.nspanel_restart:
+  friendly_name: "nspanel Restart"
+button.nspanel_update_tft_display:
+  friendly_name: "nspanel Update TFT display"
+button.nspanel_exit_reparse:
+  friendly_name: "nspanel Exit reparse"
+number.nspanel_display_brightness:
+  friendly_name: "nspanel Display Brightness"
+number.nspanel_display_brightness_dimdown:
+  friendly_name: "nspanel Display Brightness Dimdown"
+number.nspanel_temperature_correction:
+  friendly_name: "nspanel Temperature Correction"
+number.nspanel_timeout_page:
+  friendly_name: "nspanel Timeout Page"
+number.nspanel_timeout_dimming:
+  friendly_name: "nspanel Timeout Dimming"
+number.nspanel_timeout_sleep:
+  friendly_name: "nspanel Timeout Sleep"
+switch.nspanel_notification_unread:
+  friendly_name: "nspanel Notification unread"
+switch.nspanel_notification_sound:
+  friendly_name: "nspanel Notification sound"
+switch.nspanel_relay_1:
+  friendly_name: "nspanel Relay 1"
+switch.nspanel_relay_2:
+  friendly_name: "nspanel Relay 2"
+binary_sensor.sonoff_basic_button:
+  friendly_name: "Sonoff Basic Button"
+switch.sonoff_basic_relay:
+  friendly_name: "Sonoff Basic Relay"
+sensor.debit_compteur_eau:
+  friendly_name: "Debit compteur eau"
+sensor.compteur_eau:
+  friendly_name: "Compteur eau"
+sensor.compteur_eau_m3:
+  friendly_name: "Compteur eau m3"
+sensor.intensite_souscrite:
+  friendly_name: "Intensité souscrite"
+sensor.index_compteur:
+  friendly_name: "Index compteur"
+sensor.puissance_apparente:
+  friendly_name: "Puissance apparente"
+sensor.intensite_instantanee:
+  friendly_name: "Intensité instantanée"
+sensor.avertissement_intensite:
+  friendly_name: "Avertissement intensité"
+sensor.intensite_maximale:
+  friendly_name: "Intensité maximale"
+sensor.tlx800_uptime_2:
+  friendly_name: "TLX800 Uptime"
+sensor.option_tarifaire:
+  friendly_name: "Option tarifaire"
+cover.vr_chambre_2:
+  friendly_name: "VR Chambre 2"
+cover.vr_cuisine:
+  friendly_name: "VR Cuisine"
+cover.vr_palier:
+  friendly_name: "VR Palier"
+cover.vr_escalier:
+  friendly_name: "VR Escalier"
+cover.vr_porte_fenetre_salon:
+  friendly_name: "VR Porte-fenêtre salon"
+cover.vr_chambre_3:
+  friendly_name: "VR Chambre 3"
+cover.vr_bureau:
+  friendly_name: "VR Bureau"
+cover.vr_chambre_1:
+  friendly_name: "VR Chambre 1"
+cover.vr_cellier:
+  friendly_name: "VR Cellier"
+cover.vr_salle_de_jeu:
+  friendly_name: "VR Salle de jeu"
+cover.vr_salon:
+  friendly_name: "VR Salon"
+cover.vr_general:
+  friendly_name: "VR  GENERAL"
+cover.eau_potable:
+  friendly_name: "Eau potable"
+binary_sensor.vr_chambre_2_montee:
+  friendly_name: "VR Chambre 2 montée"
+binary_sensor.vr_chambre_2_descente:
+  friendly_name: "VR Chambre 2 descente"
+binary_sensor.vr_cuisine_montee:
+  friendly_name: "VR Cuisine montée"
+binary_sensor.vr_cuisine_descente:
+  friendly_name: "VR Cuisine descente"
+binary_sensor.vr_palier_montee:
+  friendly_name: "VR Palier montée"
+binary_sensor.vr_palier_descente:
+  friendly_name: "VR Palier descente"
+binary_sensor.vr_porte_fenetre_salon_montee:
+  friendly_name: "VR Porte-fenêtre salon montée"
+binary_sensor.vr_porte_fenetre_salon_descente:
+  friendly_name: "VR Porte-fenêtre salon descente"
+binary_sensor.vr_chambre_3_montee:
+  friendly_name: "VR Chambre 3 montée"
+binary_sensor.vr_chambre_3_descente:
+  friendly_name: "VR Chambre 3 descente"
+binary_sensor.vr_bureau_montee:
+  friendly_name: "VR Bureau montée"
+binary_sensor.vr_bureau_descente:
+  friendly_name: "VR Bureau descente"
+binary_sensor.vr_chambre_1_montee:
+  friendly_name: "VR Chambre 1 montée"
+binary_sensor.vr_chambre_1_descente:
+  friendly_name: "VR Chambre 1 descente"
+binary_sensor.vr_cellier_montee:
+  friendly_name: "VR Cellier montée"
+binary_sensor.vr_cellier_descente:
+  friendly_name: "VR Cellier descente"
+binary_sensor.vr_salle_de_jeu_montee:
+  friendly_name: "VR Salle de jeu montée"
+binary_sensor.vr_salle_de_jeu_descente:
+  friendly_name: "VR Salle de jeu descente"
+binary_sensor.vr_salon_montee:
+  friendly_name: "VR Salon montée"
+binary_sensor.vr_salon_descente:
+  friendly_name: "VR Salon descente"
+binary_sensor.bp_salon_angle_sm_haut:
+  friendly_name: "BP Salon Angle SM-Haut"
+binary_sensor.bp_salon_angle_sm_bas_gauche:
+  friendly_name: "BP Salon Angle SM-Bas Gauche"
+binary_sensor.bp_salon_angle_sm_bas_droite:
+  friendly_name: "BP Salon Angle SM-Bas Droite"
+binary_sensor.bp_salle_a_manger_baie_haut_gauche:
+  friendly_name: "BP Salle à manger Baie-Haut Gauche"
+binary_sensor.bp_salle_a_manger_baie_haut_droite:
+  friendly_name: "BP Salle à manger Baie-Haut Droite"
+binary_sensor.bp_sdj:
+  friendly_name: "BP SDJ"
+binary_sensor.bp_chambre_1_lit_gauche_gauche:
+  friendly_name: "BP Chambre 1 Lit gauche-Gauche"
+binary_sensor.bp_chambre_1_lit_gauche_droit:
+  friendly_name: "BP Chambre 1 Lit gauche-Droit"
+binary_sensor.bp_chambre_1_lit_droite_gauche:
+  friendly_name: "BP Chambre 1 Lit droite-Gauche"
+binary_sensor.bp_chambre_1_lit_droite_droite:
+  friendly_name: "BP Chambre 1 Lit droite-Droite"
+binary_sensor.bp_entree_angle_salon:
+  friendly_name: "BP Entrée Angle salon"
+binary_sensor.bp_salon_angle_entree_haut:
+  friendly_name: "BP Salon Angle entrée-Haut"
+binary_sensor.bp_salon_angle_entree_bas_gauche:
+  friendly_name: "BP Salon Angle entrée-Bas Gauche"
+binary_sensor.bp_salon_angle_entree_bas_droite:
+  friendly_name: "BP Salon Angle entrée-Bas Droite"
+binary_sensor.bp_salon_baie_haut_gauche:
+  friendly_name: "BP Salon Baie-Haut Gauche"
+binary_sensor.bp_salon_baie_haut_droite:
+  friendly_name: "BP Salon Baie-Haut Droite"
+binary_sensor.bp_salon_porte_fenetre_1_haut_gauche:
+  friendly_name: "BP Salon Porte-fenêtre 1-Haut Gauche"
+binary_sensor.bp_salon_porte_fenetre_1_haut_droite:
+  friendly_name: "BP Salon Porte-fenêtre 1-Haut Droite"
+binary_sensor.bp_salle_a_manger_angle_salon_bas_gauche:
+  friendly_name: "BP Salle à manger Angle salon - Bas gauche"
+binary_sensor.bp_salon_porte_fenetre_2_bas_gauche:
+  friendly_name: "BP Salon Porte-fenêtre 2-Bas Gauche"
+binary_sensor.bp_salon_porte_fenetre_2_bas_droite:
+  friendly_name: "BP Salon Porte-fenêtre 2-Bas Droite"
+binary_sensor.in_2_04:
+  friendly_name: "in#2 04"
+binary_sensor.bp_sdb_rdc_gauche:
+  friendly_name: "BP SDB RDC-Gauche"
+binary_sensor.bp_sdb_rdc_droite:
+  friendly_name: "BP SDB RDC-Droite"
+binary_sensor.bp_garage_cellier_droite:
+  friendly_name: "BP Garage Cellier-Droite"
+binary_sensor.in_2_08:
+  friendly_name: "in#2 08"
+binary_sensor.bp_placard_escalier_rdc:
+  friendly_name: "BP Placard Escalier RDC"
+binary_sensor.bp_salle_a_manger_angle_salon_bas_droite:
+  friendly_name: "BP Salle à manger Angle salon - Bas Droite"
+binary_sensor.in_2_11:
+  friendly_name: "in#2 11"
+binary_sensor.bp_palier_chambre_2_gauche:
+  friendly_name: "BP Palier Chambre 2-Gauche"
+binary_sensor.bp_garage_cellier_gauche:
+  friendly_name: "BP Garage Cellier-Gauche"
+binary_sensor.bp_entree_sas:
+  friendly_name: "BP Entrée SAS"
+binary_sensor.bp_sas:
+  friendly_name: "BP SAS"
+binary_sensor.bp_salle_a_manger_angle_salon_haut:
+  friendly_name: "BP Salle à manger Angle salon-Haut"
+binary_sensor.bp_wc_rdc:
+  friendly_name: "BP WC RDC"
+binary_sensor.bp_bureau:
+  friendly_name: "BP Bureau"
+binary_sensor.in_2_19:
+  friendly_name: "in#2 19"
+binary_sensor.bp_sdb_etage_gauche:
+  friendly_name: "BP SDB étage-Gauche"
+binary_sensor.bp_salon_porte_fenetre_2_haut:
+  friendly_name: "BP Salon Porte-fenêtre 2-Haut"
+binary_sensor.bp_couloir_wc:
+  friendly_name: "BP Couloir WC"
+binary_sensor.in_2_23:
+  friendly_name: "in#2 23"
+binary_sensor.in_2_24:
+  friendly_name: "in#2 24"
+binary_sensor.bp_palier_chambre_2_droite:
+  friendly_name: "BP Palier Chambre 2-Droite"
+binary_sensor.bp_chambre_1_gauche:
+  friendly_name: "BP Chambre 1-Gauche"
+binary_sensor.bp_chambre_1_droite:
+  friendly_name: "BP Chambre 1-Droite"
+binary_sensor.bp_chambre_2:
+  friendly_name: "BP Chambre 2"
+binary_sensor.bp_cuisine_verriere_gauche:
+  friendly_name: "BP Cuisine Verrière-Gauche"
+binary_sensor.bp_cuisine_verriere_droite:
+  friendly_name: "BP Cuisine Verrière-Droite"
+binary_sensor.bp_salle_a_manger_colonne_haut:
+  friendly_name: "BP Salle à manger Colonne-Haut"
+binary_sensor.bp_salle_a_manger_colonne_bas_gauche:
+  friendly_name: "BP Salle à manger Colonne-Bas Gauche"
+binary_sensor.bp_salle_a_manger_colonne_bas_droite:
+  friendly_name: "BP Salle à manger Colonne-Bas Droite"
+binary_sensor.in_2_34:
+  friendly_name: "in#2 34"
+binary_sensor.bp_entree_porte_haut_droite:
+  friendly_name: "BP Entrée Porte-Haut Droite"
+binary_sensor.bp_entree_porte_bas:
+  friendly_name: "BP Entrée Porte-Bas"
+binary_sensor.bp_sdb_etage_droite:
+  friendly_name: "BP SDB étage-Droite"
+binary_sensor.in_2_38:
+  friendly_name: "in#2 38"
+binary_sensor.presence_220v:
+  friendly_name: "Présence 220V"
+binary_sensor.batterie_12v_faible:
+  friendly_name: "Batterie 12V faible"
+binary_sensor.electrovanne_eau_potable_fermee:
+  friendly_name: "Electrovanne eau potable fermée"
+binary_sensor.electrovanne_eau_potable_ouverte:
+  friendly_name: "Electrovanne eau potable ouverte"
+binary_sensor.bp_chambre_2_lit_gauche:
+  friendly_name: "BP Chambre 2 lit gauche"
+binary_sensor.bp_wc_etage:
+  friendly_name: "BP WC étage"
+binary_sensor.capteur_presence_entree:
+  friendly_name: "Capteur présence entrée"
+binary_sensor.bp_cellier_cote_cuisine_droite:
+  friendly_name: "BP Cellier côté cuisine-Droite"
+binary_sensor.bp_escalier_bas_gauche:
+  friendly_name: "BP Escalier bas-Gauche"
+binary_sensor.bp_chambre_3_entree:
+  friendly_name: "BP Chambre 3 Entrée"
+binary_sensor.in_3_11:
+  friendly_name: "in#3 11"
+binary_sensor.bp_garage_portail:
+  friendly_name: "BP Garage portail"
+binary_sensor.bp_garage_porte:
+  friendly_name: "BP Garage porte"
+binary_sensor.in_3_14:
+  friendly_name: "in#3 14"
+binary_sensor.in_3_15:
+  friendly_name: "in#3 15"
+binary_sensor.bp_escalier_bas_droite:
+  friendly_name: "BP Escalier bas-Droite"
+binary_sensor.in_3_17:
+  friendly_name: "in#3 17"
+binary_sensor.in_3_18:
+  friendly_name: "in#3 18"
+binary_sensor.in_3_19:
+  friendly_name: "in#3 19"
+binary_sensor.in_3_20:
+  friendly_name: "in#3 20"
+binary_sensor.in_3_21:
+  friendly_name: "in#3 21"
+binary_sensor.in_3_22:
+  friendly_name: "in#3 22"
+binary_sensor.bp_cuisine_angle_gauche:
+  friendly_name: "BP Cuisine angle-Gauche"
+binary_sensor.bp_cuisine_angle_droite:
+  friendly_name: "BP Cuisine angle-Droite"
+binary_sensor.bp_chambre_2_lit_droite:
+  friendly_name: "BP Chambre 2 lit droite"
+binary_sensor.bp_palier_chambre_3_gauche:
+  friendly_name: "BP Palier Chambre 3-Gauche"
+binary_sensor.bp_palier_chambre_3_droite:
+  friendly_name: "BP Palier Chambre 3-Droite"
+binary_sensor.bp_chambre_3_lit_droite:
+  friendly_name: "BP Chambre 3 lit droite"
+binary_sensor.bp_chambre_3_lit_gauche:
+  friendly_name: "BP Chambre 3 lit gauche"
+binary_sensor.bp_entree_angle_couloir_gauche:
+  friendly_name: "BP Entrée angle couloir-Gauche"
+binary_sensor.bp_entree_angle_couloir_droite:
+  friendly_name: "BP Entrée angle couloir-Droite"
+binary_sensor.vr_entree_haut_montee:
+  friendly_name: "VR Entrée Haut montée"
+binary_sensor.vr_entree_haut_descente:
+  friendly_name: "VR Entrée Haut descente"
+binary_sensor.vr_entree_bas_descente:
+  friendly_name: "VR Entrée Bas descente"
+binary_sensor.vr_entree_bas_montee:
+  friendly_name: "VR Entrée Bas montée"
+binary_sensor.bp_cuisine_cote_cellier_gauche:
+  friendly_name: "BP Cuisine côté cellier-Gauche"
+binary_sensor.bp_cuisine_cote_cellier_droite:
+  friendly_name: "BP Cuisine côté cellier-Droite"
+binary_sensor.bp_escalier_haut_gauche:
+  friendly_name: "BP Escalier haut-Gauche"
+binary_sensor.bp_escalier_haut_droite:
+  friendly_name: "BP Escalier haut-Droite"
+binary_sensor.bp_cellier_cote_cuisine_gauche_2:
+  friendly_name: "BP Cellier Côté Cuisine-Gauche"
+switch.switch_cuisine_led:
+  friendly_name: "Switch Cuisine LED"
+switch.vr_01_montee:
+  friendly_name: "VR 01 montée"
+switch.vr_01_descente:
+  friendly_name: "VR 01 descente"
+switch.vr_cuisine_montee:
+  friendly_name: "VR Cuisine montée"
+switch.vr_cuisine_descente:
+  friendly_name: "VR Cuisine descente"
+switch.vr_palier_montee:
+  friendly_name: "VR Palier montée"
+switch.vr_palier_descente:
+  friendly_name: "VR Palier descente"
+switch.vr_escalier_montee:
+  friendly_name: "VR Escalier montée"
+switch.vr_escalier_descente:
+  friendly_name: "VR Escalier descente"
+switch.vr_porte_fenetre_salon_montee:
+  friendly_name: "VR Porte-fenêtre salon montée"
+switch.vr_porte_fenetre_salon_descente:
+  friendly_name: "VR Porte-fenêtre salon descente"
+switch.vr_chambre_3_montee:
+  friendly_name: "VR Chambre 3 montée"
+switch.vr_chambre_3_descente:
+  friendly_name: "VR Chambre 3 descente"
+switch.vr_bureau_montee:
+  friendly_name: "VR Bureau montée"
+switch.vr_bureau_descente:
+  friendly_name: "VR Bureau descente"
+switch.vr_chambre_1_montee:
+  friendly_name: "VR Chambre 1 montée"
+switch.vr_chambre_1_descente:
+  friendly_name: "VR Chambre 1 descente"
+switch.vr_cellier_montee:
+  friendly_name: "VR Cellier montée"
+switch.vr_cellier_descente:
+  friendly_name: "VR Cellier descente"
+switch.vr_salle_de_jeu_montee:
+  friendly_name: "VR Salle de jeu montée"
+switch.vr_salle_de_jeu_descente:
+  friendly_name: "VR Salle de jeu descente"
+switch.vr_salon_montee:
+  friendly_name: "VR Salon montée"
+switch.vr_salon_descente:
+  friendly_name: "VR Salon descente"
+switch.vr_chambre_2_montee:
+  friendly_name: "VR Chambre 2 montée"
+switch.vr_chambre_2_descente:
+  friendly_name: "VR Chambre 2 descente"
+switch.electrovanne_eau_potable_ouverture:
+  friendly_name: "Electrovanne eau potable ouverture"
+switch.electrovanne_eau_potable_fermeture:
+  friendly_name: "Electrovanne eau potable fermeture"
+button.portail_garage:
+  friendly_name: "Portail Garage"
+button.tlx800_restart:
+  friendly_name: "TLX800 Restart"
+button.tlx800_factory_reset:
+  friendly_name: "TLX800 factory reset"
+light.cuisine_led:
+  friendly_name: "Cuisine LED"
+light.salon_applique_haute:
+  friendly_name: "Salon Applique haute"
+light.salon_appliques_peripheriques:
+  friendly_name: "Salon Appliques périphériques"
+light.sdb_rdc_led:
+  friendly_name: "SDB RDC LED"
+light.cuisine_spots_ilot:
+  friendly_name: "Cuisine Spots ilot"
+light.sdb_rdc_spot_central:
+  friendly_name: "SDB RDC Spot central"
+light.cellier_spots:
+  friendly_name: "Cellier Spots"
+light.escalier_placard_1:
+  friendly_name: "Escalier placard 1"
+light.escalier_placard_2:
+  friendly_name: "Escalier placard 2"
+light.cuisine_spots_plan_de_travail:
+  friendly_name: "Cuisine Spots plan de travail"
+light.sdb_etage_spots:
+  friendly_name: "SDB étage Spots"
+light.palier_eclairage_central:
+  friendly_name: "Palier Eclairage central"
+light.garage_eclairage:
+  friendly_name: "Garage Eclairage"
+light.entree_spots:
+  friendly_name: "Entrée Spots"
+light.sas_spot:
+  friendly_name: "SAS Spot"
+light.salle_a_manger_eclairage:
+  friendly_name: "Salle à manger Eclairage"
+light.wc_rdc_eclairage:
+  friendly_name: "WC RDC Eclairage"
+light.bureau_eclairage:
+  friendly_name: "Bureau Eclairage"
+light.palier_spots:
+  friendly_name: "Palier Spots"
+light.sdb_etage_spot_central:
+  friendly_name: "SDB étage Spot central"
+light.salon_eclairage_central:
+  friendly_name: "Salon Eclairage central"
+light.couloir_spots:
+  friendly_name: "Couloir Spots"
+light.salon_eclairage_central_2:
+  friendly_name: "Salon Eclairage central 2"
+light.sdb_etage_led:
+  friendly_name: "SDB étage LED"
+light.chambre_1_applique_droite:
+  friendly_name: "Chambre 1 Applique droite"
+light.chambre_1_applique_gauche:
+  friendly_name: "Chambre 1 Applique gauche"
+light.chambre_2_eclairage:
+  friendly_name: "Chambre 2 Eclairage"
+light.wc_etage_eclairage:
+  friendly_name: "WC étage Eclairage"
+light.chambre_1_eclairage_central:
+  friendly_name: "Chambre 1 Eclairage central"
+light.sdb_rdc_spots:
+  friendly_name: "SDB RDC Spots"
+light.sdj_eclairage:
+  friendly_name: "SDJ Eclairage"
+light.cellier_applique:
+  friendly_name: "Cellier Applique"
+light.pallier_spot_escalier:
+  friendly_name: "Pallier Spot escalier"
+light.chambre_3_eclairage:
+  friendly_name: "Chambre 3 Eclairage"
+light.exterieur_appliques_cote_jm:
+  friendly_name: "Extérieur Appliques côté JM"
+light.exterieur_spot_portail_garage:
+  friendly_name: "Extérieur Spot portail garage"
+light.exterieur_applique_porte_garage:
+  friendly_name: "Extérieur Applique porte garage"
+light.exterieur_appliques_terrasse:
+  friendly_name: "Extérieur Appliques terrasse"
+light.exterieur_applique_porche_entree:
+  friendly_name: "Extérieur Applique porche entrée"
+light.escalier_appliques:
+  friendly_name: "Escalier Appliques"
+light.out_3_17:
+  friendly_name: "out#3 17"
+light.out_3_18:
+  friendly_name: "out#3 18"
+light.out_3_19:
+  friendly_name: "out#3 19"
+light.out_3_20:
+  friendly_name: "out#3 20"
+light.out_3_21:
+  friendly_name: "out#3 21"
+light.out_3_22:
+  friendly_name: "out#3 22"
+light.out_3_23:
+  friendly_name: "out#3 23"
+light.out_3_24:
+  friendly_name: "out#3 24"
+sensor.t_one_version_logiciel_r_gulateur:
+  friendly_name: "Version logiciel régulateur"
+sensor.t_one_identifiant_ihm:
+  friendly_name: "Identifiant IHM"
+sensor.t_one_date_et_heure:
+  friendly_name: "Date et heure"
+sensor.t_one_temp_rature_pi_ce_principale:
+  friendly_name: "Température pièce principale"
+sensor.t_one_t_one_uptime:
+  friendly_name: "T.One Uptime"
+sensor.t_one_aiguillage_vanne:
+  friendly_name: "Aiguillage vanne"
+select.t_one_mode_air:
+  friendly_name: "Mode Air"
+binary_sensor.t_one_filtre:
+  friendly_name: "Filtre"
+button.t_one_t_one_restart:
+  friendly_name: "T.One Restart"
+button.t_one_t_one_factory_reset:
+  friendly_name: "T.One factory reset"
+number.t_one_thermostat_1:
+  friendly_name: "Thermostat 1"
+number.t_one_thermostat_2:
+  friendly_name: "Thermostat 2"
+number.t_one_thermostat_3:
+  friendly_name: "Thermostat 3"
+number.t_one_thermostat_4:
+  friendly_name: "Thermostat 4"
+number.t_one_thermostat_5:
+  friendly_name: "Thermostat 5"
+number.t_one_thermostat_6:
+  friendly_name: "Thermostat 6"
+number.t_one_thermostat_7:
+  friendly_name: "Thermostat 7"
+number.t_one_thermostat_8:
+  friendly_name: "Thermostat 8"
+number.t_one_thermostat_9:
+  friendly_name: "Thermostat 9"
+number.t_one_thermostat_10:
+  friendly_name: "Thermostat 10"
+number.t_one_tarif_hp:
+  friendly_name: "Tarif HP"
+number.t_one_tarif_hc:
+  friendly_name: "Tarif HC"
+sensor.regulator_software_version:
+  friendly_name: "Regulator software version"
+sensor.hci_identifier:
+  friendly_name: "HCI identifier"
+sensor.current_action:
+  friendly_name: "Current action"
+sensor.main_room_temperature:
+  friendly_name: "Main room temperature"
+sensor.remaining_volume_of_hot_water:
+  friendly_name: "Remaining volume of hot water"
+sensor.current_hot_water_temperature:
+  friendly_name: "Current hot water temperature"
+sensor.ld2420_firmware:
+  friendly_name: "LD2420 Firmware"
+select.operating_mode:
+  friendly_name: "Operating Mode"
+binary_sensor.presence:
+  friendly_name: "Presence"
+binary_sensor.rcwl015:
+  friendly_name: "rcwl015"
+button.apply_config:
+  friendly_name: "Apply Config"
+button.undo_edits:
+  friendly_name: "Undo Edits"
+button.restart_module:
+  friendly_name: "Restart Module"
+button.factory_reset:
+  friendly_name: "Factory Reset"
+number.detection_presence_timeout:
+  friendly_name: "Detection Presence Timeout"
+number.detection_gate_minimum:
+  friendly_name: "Detection Gate Minimum"
+number.detection_gate_maximum:
+  friendly_name: "Detection Gate Maximum"
+number.select_gate_to_set:
+  friendly_name: "Select Gate to Set"
+number.set_still_threshold_value:
+  friendly_name: "Set Still Threshold Value"
+number.set_move_threshold_value:
+  friendly_name: "Set Move Threshold Value"
+sensor.anneau_04:
+  friendly_name: "Anneau 04"
+sensor.anneau_03:
+  friendly_name: "Anneau 03"
+sensor.anneau_02:
+  friendly_name: "Anneau 02"
+sensor.anneau_01:
+  friendly_name: "Anneau 01"
+sensor.anneau_08:
+  friendly_name: "Anneau 08"
+sensor.anneau_07:
+  friendly_name: "Anneau 07"
+sensor.anneau_06:
+  friendly_name: "Anneau 06"
+sensor.anneau_05:
+  friendly_name: "Anneau 05"
+sensor.anneau_12:
+  friendly_name: "Anneau 12"
+sensor.anneau_11:
+  friendly_name: "Anneau 11"
+sensor.anneau_10:
+  friendly_name: "Anneau 10"
+sensor.anneau_09:
+  friendly_name: "Anneau 09"
+sensor.anneau_16:
+  friendly_name: "Anneau 16"
+sensor.anneau_15:
+  friendly_name: "Anneau 15"
+sensor.anneau_14:
+  friendly_name: "Anneau 14"
+sensor.anneau_13:
+  friendly_name: "Anneau 13"
+sensor.anneau_20:
+  friendly_name: "Anneau 20"
+sensor.anneau_19:
+  friendly_name: "Anneau 19"
+sensor.anneau_18:
+  friendly_name: "Anneau 18"
+sensor.anneau_17:
+  friendly_name: "Anneau 17"
+sensor.anneau_24:
+  friendly_name: "Anneau 24"
+sensor.anneau_23:
+  friendly_name: "Anneau 23"
+sensor.anneau_22:
+  friendly_name: "Anneau 22"
+sensor.anneau_21:
+  friendly_name: "Anneau 21"
+sensor.anneau_28:
+  friendly_name: "Anneau 28"
+sensor.anneau_27:
+  friendly_name: "Anneau 27"
+sensor.anneau_26:
+  friendly_name: "Anneau 26"
+sensor.anneau_25:
+  friendly_name: "Anneau 25"
+sensor.anneau_32:
+  friendly_name: "Anneau 32"
+sensor.anneau_31:
+  friendly_name: "Anneau 31"
+sensor.anneau_30:
+  friendly_name: "Anneau 30"
+sensor.anneau_29:
+  friendly_name: "Anneau 29"
+button.restart_2:
+  friendly_name: "Restart"
+update.alarme_firmware:
+  friendly_name: "Micrologiciel"

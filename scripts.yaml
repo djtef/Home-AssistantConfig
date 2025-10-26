@@ -8,6 +8,10 @@ tts_google_home:
       name: Texte
       description: Texte à lire
       example: Ceci est un test
+      required: true
+      selector:
+        text:
+      default: Bonjour
     volume:
       name: Volume
       description: Volume du Media player
@@ -19,39 +23,67 @@ tts_google_home:
           step: 5
           unit_of_measurement: '%'
           mode: slider
+      required: true
+      default: 50
     media_player_entity:
       name: Entité Media player
       description: Entité du Media player qui va lire le texte
       example: media_player.sejour
+      required: true
+      selector:
+        entity:
+          domain: media_player
+      default: media_player.sejour
   sequence:
-  - service: media_player.media_stop
-    data:
+  - data:
       entity_id: '{{ media_player_entity }}'
-  - service: media_player.turn_on
-    data:
+    enabled: false
+    action: media_player.media_stop
+  - metadata: {}
+    data: {}
+    target:
       entity_id: '{{ media_player_entity }}'
+    action: media_player.turn_on
+  - if:
+    - condition: state
+      entity_id: media_player.sejour
+      state: playing
+    then:
+    - metadata: {}
+      data: {}
+      target:
+        entity_id: '{{ media_player_entity }}'
+      action: media_player.media_stop
+  - data:
+      entity_id: '{{ media_player_entity }}'
+    action: media_player.turn_on
   - alias: Wait for idle
     wait_template: '{{ is_state(media_player_entity, ''idle'') }}'
-  - service: scene.create
-    data:
+  - data:
       scene_id: google_home
       snapshot_entities: '{{ media_player_entity }}'
+    action: scene.create
   - alias: Définit le volume
-    service: media_player.volume_set
     data:
       entity_id: '{{ media_player_entity }}'
       volume_level: '{{ volume/100 }}'
+    action: media_player.volume_set
   - alias: TTS Google Home
-    service: tts.google_translate_say
     data:
       entity_id: '{{ media_player_entity }}'
       message: '{{ texte }}'
+    action: tts.google_translate_say
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 2
+      milliseconds: 0
   - alias: Wait for idle
     wait_template: '{{ is_state(media_player_entity, ''idle'') }}'
-  - service: scene.turn_on
-    target:
+  - target:
       entity_id: scene.google_home
     data: {}
+    action: scene.turn_on
 test_sirene_interieure:
   alias: Test sirène intérieure
   sequence:
@@ -125,23 +157,23 @@ tts_ouvertures:
   description: Notifie par Telegram les portes et fenêtres restées ouvertes
   sequence:
   - condition: template
-    value_template: '{{expand(state_attr(''binary_sensor.capteurs_ouvertures'', ''entity_id''))|
-      selectattr(''state'',''eq'',''off'')|map(attribute=''entity_id'')|list|count
-      > 0}}'
-  - service: script.tts_google_home
-    data:
+    value_template: '{{expand(state_attr(''binary_sensor.capteurs_ouvertures'', ''entity_id''))|selectattr(''state'',''eq'',''off'')|rejectattr(''entity_id'',
+      ''search'', ''porte_entree'')|map(attribute=''entity_id'')|list|count > 0}}'
+  - data:
       texte: "Attention ! {% for s in expand(integration_entities(\"alarme\"))|selectattr('domain',
-        'eq', 'binary_sensor')| selectattr('state', 'eq', 'off')|map(attribute='attributes.friendly_name')|
-        list %}\n  {%- if (\"Baie\" in s or \"Fenêtre\" in s or \"Porte\" in s) and
-        not \"VR\" in s -%}\n    {{s.lower() \n      | replace(\"fermée\", \"ouverte\")\n
+        'eq', 'binary_sensor')| selectattr('state', 'eq', 'off')|rejectattr('entity_id',
+        'search', 'porte_entree')|map(attribute='attributes.friendly_name')| list
+        %}\n  {%- if (\"Baie\" in s or \"Fenêtre\" in s or \"Porte\" in s) and not
+        \"VR\" in s -%}\n    {{s.lower() \n      | replace(\"fermée\", \"ouverte\")\n
         \     | replace(\"verrouillée\", \"déverrouillée\")\n      | replace(\"droite\",
         \"à droite\")\n      | replace(\"gauche\", \"à gauche\")\n      | replace(\"sdb\",
         \"salle de bain\")\n      | replace(\"sdj\", \"salle de jeu\")\n      | replace(\"rdc\",
         \"rez de chaussée\")\n      | replace(\"wc\", \"WC\")\n      | replace(\"1\",
-        \"parentale\")\n      | replace(\"2\", \"Athénaïs\")}}\n    {{- '\\n' -}}\n
-        \ {%- endif -%}\n{% endfor %}\n"
+        \"parentale\")\n      | replace(\"3\", \"Aloïs\") \n      | replace(\"2\",
+        \"Athénaïs\")}}\n    {{- '\\n' -}}\n  {%- endif -%}\n{% endfor %}\n"
       volume: '{{ volume }}'
       media_player_entity: media_player.sejour
+    action: script.tts_google_home
 flash_rouge_xiaomi:
   alias: 'Flash rouge Xiaomi '
   sequence:
@@ -180,8 +212,7 @@ deverrouille_relais_vr:
       - service: switch.toggle
         data: {}
         target:
-          entity_id:
-          - switch.vr_cuisine_montee
+          entity_id: switch.vr_salle_de_jeu_montee
       - delay:
           hours: 0
           minutes: 0
@@ -200,8 +231,8 @@ notifie_ouvertures:
     value_template: '{{ expand(state_attr(''binary_sensor.capteurs_ouvertures'', ''entity_id''))|
       selectattr(''state'',''eq'',''off'')|map(attribute=''entity_id'')|list|count
       != 1 or is_state(''binary_sensor.porte_entree_verrouillee'', ''on'') }}'
-  - service: notify.maison
-    data:
+    enabled: false
+  - data:
       title: 'Attention ! Alarme activée avec :'
       message: "{% for s in expand(integration_entities(\"alarme\"))|selectattr('domain',
         'eq', 'binary_sensor')| selectattr('state', 'eq', 'off')|map(attribute='attributes.friendly_name')|
@@ -211,8 +242,9 @@ notifie_ouvertures:
         \"à droite\")\n      | replace(\"gauche\", \"à gauche\")\n      | replace(\"sdb\",
         \"salle de bain\")\n      | replace(\"sdj\", \"salle de jeu\")\n      | replace(\"rdc\",
         \"rez de chaussée\")\n      | replace(\"wc\", \"WC\")\n      | replace(\"1\",
-        \"parentale\")\n      | replace(\"2\", \"Athénaïs\")}}\n    {{- '\\n' -}}\n
-        \ {%- endif -%}\n{% endfor %}\n"
+        \"parentale\")\n      | replace(\"2\", \"Athénaïs\")\n      | replace(\"3\",
+        \"Aloïs\")}}\n    {{- '\\n' -}}\n  {%- endif -%}\n{% endfor %}\n"
+    action: notify.maison
   icon: mdi:message-alert
   mode: restart
   fields:
@@ -256,3 +288,193 @@ persienne:
   mode: parallel
   icon: mdi:blinds-horizontal-closed
   max: 15
+minuteur_lumiere_escalier:
+  alias: Minuteur lumière escalier
+  sequence:
+  - service: light.turn_on
+    metadata: {}
+    data: {}
+    target:
+      entity_id: light.escalier_appliques
+  - service: timer.start
+    entity_id: timer.applique_escalier
+    data_template:
+      duration: '{{ states(''input_number.duree_applique_escalier'') | int * 60 }}'
+  - delay:
+      minutes: '{{ states(''input_number.duree_applique_escalier'') }}'
+  - service: light.turn_off
+    metadata: {}
+    data: {}
+    target:
+      entity_id: light.escalier_appliques
+  mode: restart
+  icon: mdi:timer-sand
+groupes_dynamiques:
+  alias: Groupes dynamiques
+  sequence:
+  - action: group.set
+    metadata: {}
+    data:
+      object_id: lights_tlx800
+      entities: '{{ expand(integration_entities("tlx800"))|selectattr(''domain'',
+        ''eq'', ''light'') | rejectattr(''entity_id'', ''search'', ''^light.out_3_'')
+        |  map(attribute=''entity_id'')| list }}
+
+        '
+    alias: Groupe Lumières
+  description: Crée les groupes dynamiquement
+  icon: mdi:home-group-plus
+maintient_detecteur_fumee:
+  alias: Maintient détecteur fumée
+  sequence:
+  - action: switch.turn_off
+    metadata: {}
+    data: {}
+    target:
+      entity_id: switch.lumi_lumi_sensor_smoke_acn03_indicateur_de_rythme_cardiaque
+  - wait_for_trigger:
+    - trigger: state
+      entity_id:
+      - switch.lumi_lumi_sensor_smoke_acn03_indicateur_de_rythme_cardiaque
+      to: 'off'
+      for:
+        hours: 0
+        minutes: 0
+        seconds: 1
+    timeout:
+      hours: 0
+      minutes: 1
+      seconds: 0
+      milliseconds: 0
+  - action: switch.turn_on
+    metadata: {}
+    data: {}
+    target:
+      entity_id: switch.lumi_lumi_sensor_smoke_acn03_indicateur_de_rythme_cardiaque
+  - wait_for_trigger:
+    - trigger: state
+      entity_id:
+      - switch.lumi_lumi_sensor_smoke_acn03_indicateur_de_rythme_cardiaque
+      for:
+        hours: 0
+        minutes: 0
+        seconds: 1
+      to: 'on'
+    timeout:
+      hours: 0
+      minutes: 1
+      seconds: 0
+      milliseconds: 0
+  description: Maintient en vie le détecteur de fumée du RDC
+  icon: mdi:smoke-detector-variant
+snapshot_rtsp_generique:
+  alias: Snapshot RTSP générique
+  mode: queued
+  fields:
+    camera_entity:
+      name: Caméra RTSP
+      required: true
+    filename:
+      name: Fichier de destination
+      required: true
+  sequence:
+  - data:
+      entity_id: '{{ camera_entity }}'
+      filename: '{{ filename }}'
+    action: ffmpeg.save
+  description: ''
+tts_google_home_testito:
+  sequence:
+  - target:
+      entity_id: '{{ media_player_entity }}'
+    action: media_player.turn_on
+    data: {}
+  - if:
+    - condition: state
+      entity_id: media_player.sejour
+      state: playing
+    then:
+    - metadata: {}
+      data: {}
+      target:
+        entity_id: '{{ media_player_entity }}'
+      action: media_player.media_stop
+    enabled: true
+  - data:
+      entity_id: '{{ media_player_entity }}'
+    action: media_player.turn_on
+    enabled: true
+  - alias: Wait for idle
+    wait_template: '{{ is_state(media_player_entity, ''idle'') }}'
+    enabled: true
+  - data:
+      scene_id: google_home
+      snapshot_entities: '{{ media_player_entity }}'
+    action: scene.create
+    enabled: true
+  - alias: Définit le volume
+    data:
+      entity_id: '{{ media_player_entity }}'
+      volume_level: '{{ volume/100 }}'
+    action: media_player.volume_set
+    enabled: true
+  - alias: TTS Google Home
+    data:
+      entity_id: '{{ media_player_entity }}'
+      message: '{{ texte }}'
+    action: tts.google_translate_say
+    enabled: true
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 2
+      milliseconds: 0
+  - alias: Wait for idle
+    wait_template: '{{ is_state(media_player_entity, ''idle'') }}'
+    enabled: true
+  - alias: TTS Google Home
+    data:
+      entity_id: '{{ media_player_entity }}'
+      message: '{{ texte }}'
+    action: tts.google_translate_say
+    enabled: true
+  - target:
+      entity_id: scene.google_home
+    data: {}
+    action: scene.turn_on
+    enabled: false
+  alias: TTS Google Home (testito)
+  icon: mdi:microphone-message
+  description: Fait parler Google Home
+  mode: restart
+  fields:
+    texte:
+      name: Texte
+      description: Texte à lire
+      example: Ceci est un test
+      required: true
+      selector:
+        text:
+      default: Bonjour
+    volume:
+      name: Volume
+      description: Volume du Media player
+      example: 50
+      selector:
+        number:
+          min: 0
+          max: 100
+          step: 5
+          unit_of_measurement: '%'
+          mode: slider
+      required: true
+      default: 50
+    media_player_entity:
+      name: Entité Media player
+      description: Entité du Media player qui va lire le texte
+      example: media_player.sejour
+      required: true
+      selector:
+        entity:
+          domain: media_player
+      default: media_player.sejour

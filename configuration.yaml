@@ -7,6 +7,8 @@ homeassistant:
   internal_url: !secret internal_url
   allowlist_external_dirs:
     - "/config/camera"
+  customize: !include customize.yaml
+
 
 logger:
   default: error
@@ -14,6 +16,26 @@ logger:
     rflink: debug
     homeassistant.components.rflink: debug
     
+
+ffmpeg:
+
+camera:
+  - platform: ffmpeg
+    name: reolink_entree
+    input: !secret rtsp_entree
+
+  - platform: ffmpeg
+    name: reolink_jardin
+    input: !secret rtsp_jardin
+
+  - platform: ffmpeg
+    name: reolink_garage
+    input: !secret rtsp_garage
+
+  - platform: ffmpeg
+    name: reolink_salon
+    input: !secret rtsp_salon
+
 
 http:
   use_x_forwarded_for: true
@@ -38,6 +60,32 @@ light:
 sensor:
   - platform: rflink
     automatic_add: true
+
+  - platform: rest
+    resource_template: >-
+      {{
+        'https://www.doctolib.fr/availabilities.json?'
+        ~ 'start_date=' ~ now().strftime("%Y-%m-%d")
+        ~ '&visit_motive_ids=4183667'
+        ~ '&agenda_ids=643149-643154-643166-643167-643168-643170-643175-643184-643189-643196-643200-643201-675554'
+        ~ '&practice_ids=244516'
+        ~ '&insurance_sector=public'
+        ~ '&destroy_temporary=true'
+        ~ '&limit=7'
+      }}
+    method: GET
+    name: IRM Genou St Cyprien
+    value_template: "{{ value_json.total }}"
+    scan_interval: 60
+    timeout: 10
+    headers:
+      User-Agent: "Mozilla/5.0 Gecko/20100101 Firefox/88.0"
+    unit_of_measurement: appointments
+    json_attributes:
+      - next_slot
+      - availabilities
+      - reason
+      - message
     
 cover:
   - platform: rflink
@@ -53,13 +101,6 @@ device_tracker:
     new_device_defaults:
       track_new_devices: true
 
-# Example configuration.yaml entry for the Telegram Bot
-telegram_bot:
-  - platform: polling
-    api_key: !secret telegram_bot_api_key
-    allowed_chat_ids:
-      - !secret telegram_moi_chat_id
-      - !secret telegram_maison_chat_id
 
 # Example configuration.yaml entry for the notifier
 notify:
@@ -83,17 +124,6 @@ utility_meter:
   util_water_usage_yearly:
     source: sensor.compteur_eau
     cycle: yearly
-    
-proximity:
-  home:
-    # ignored_zones:
-      # - work
-      # - school
-    devices:
-      - device_tracker.galaxy_s20_fe
-      - device_tracker.m2103k19pg
-    tolerance: 50
-    unit_of_measurement: km
          
 # secrets inside templates not allowed
 # must use hard coded 'code' on home assistant panel
@@ -127,37 +157,59 @@ alarm_control_panel:
               code: "{{ code }}"
 
 template:                                                                                                                                                                        
-  - trigger:                                                                                                                                                                     
+  - trigger:     
+      - platform: time_pattern
+        hours: /1
+      - platform: homeassistant
+        event: start
+    action:
+      - service: weather.get_forecasts
+        data:
+          type: daily
+        target:
+          entity_id: weather.gagnac_sur_garonne
+        response_variable: daily
+    sensor:
+      - name: Weather Forecast Jour Gagnac
+        unique_id: weather_forecast_jour_gagnac
+        state: "{{ daily['weather.gagnac_sur_garonne'].forecast[0].condition }}"
+        attributes:
+          forecast: "{{ daily['weather.gagnac_sur_garonne'].forecast }}"
+          temp_max: "{{ daily['weather.gagnac_sur_garonne'].forecast[0].temperature }}"
+          temp_min: "{{ daily['weather.gagnac_sur_garonne'].forecast[0].templow }}"
+          precipitation: "{{ daily['weather.gagnac_sur_garonne'].forecast[0].precipitation }}"
+                                                                                                                                                                    
+  - trigger:     
       - platform: numeric_state
-        entity_id: sensor.prise_lave_vaisselle_active_power
+        entity_id: sensor.prise_lave_vaisselle_puissance
         for:
           hours: 0
           minutes: 0
           seconds: 30
         above: 8  
       - platform: numeric_state
-        entity_id: sensor.prise_lave_vaisselle_active_power
+        entity_id: sensor.prise_lave_vaisselle_puissance
         for:
           hours: 0
           minutes: 0
           seconds: 30
         above: 1500
       - platform: numeric_state
-        entity_id: sensor.prise_lave_vaisselle_active_power
+        entity_id: sensor.prise_lave_vaisselle_puissance
         for:
           hours: 0
           minutes: 0
           seconds: 30
         below: 1500
       - platform: numeric_state
-        entity_id: sensor.prise_lave_vaisselle_active_power
+        entity_id: sensor.prise_lave_vaisselle_puissance
         for:
           hours: 1
           minutes: 0
           seconds: 30
         below: 1500          
       - platform: numeric_state
-        entity_id: sensor.prise_lave_vaisselle_active_power
+        entity_id: sensor.prise_lave_vaisselle_puissance
         for:
           hours: 0
           minutes: 30
@@ -341,9 +393,8 @@ template:
             {% else %}  
                 {{ clipv(h2perc(def_h) | round(0) | int , 0, 100) }}
             {% endif %}
-        
-        
        
+        
 binary_sensor:
   - platform: group
     name: "Capteurs ouvertures"
@@ -414,6 +465,126 @@ binary_sensor:
 # 26	8948843	Salle de bain RDC
 # 27	8948828	Bureau
 
+
+climate:
+  - platform: climate_template
+    name: Séjour
+    unique_id: sejour_k1a_climate_template
+    icon_template: mdi:home-thermometer
+    availability_template: >- 
+        {{ is_state('sensor.aiguillage_vanne', 'Air') 
+        or  is_state('sensor.aiguillage_vanne', 'Standby')
+        or  is_state('sensor.aiguillage_vanne', 'ECS') }}
+    modes:
+      - "heat"
+      - "cool"  # Si la climatisation est activée
+      - "off"
+    preset_modes:
+      - comfort
+      - eco
+      - away
+      - home
+      - boost
+      - none
+    hvac_mode_template: >-
+      {% if 'Chauffage' in states('select.mode_air') %} 
+          heat
+      {% elif 'Clim' in states('select.mode_air') %} 
+          cool
+      {% else %} 
+          off      
+      {% endif %}
+    preset_mode_template: >-
+      {% if is_state('select.mode_air', 'Off') %}
+        none
+      {% elif 'Confort' in states('select.mode_air') %}
+        comfort
+      {% elif 'Prog A' in states('select.mode_air') or 'Prog C' in states('select.mode_air') %}
+        away
+      {% elif 'Prog B' in states('select.mode_air') or 'Prog D' in states('select.mode_air') %}
+        home
+      {% elif 'Eco' in states('select.mode_air') %}
+        eco
+      {% elif 'Boost' in states('select.mode_air') %}
+        boost
+      {% else %}
+        none
+      {% endif %}
+    set_preset_mode:
+      - action: select.select_option
+        data:
+          entity_id: select.mode_air
+          option: >-
+            {% if 'Chauffage' in states('select.mode_air') %} 
+                {% if preset_mode == 'none' %}
+                    Off
+                {% elif preset_mode == 'comfort' or preset_mode == 'boost' %}
+                    Confort Chauffage
+                {% elif preset_mode == 'away' %}
+                   Prog A Chauffage
+                {% elif preset_mode == 'home' %}
+                   Prog B Chauffage
+                {% elif preset_mode == 'eco' %}
+                   Eco Chauffage
+                {% endif %}
+            {% elif 'Clim' in states('select.mode_air') %} 
+              {% if preset_mode == 'none' %}
+                    Off
+                {% elif preset_mode == 'comfort' or preset_mode == 'eco' %}
+                    Confort Clim
+                {% elif preset_mode == 'away' %}
+                   Prog C Clim
+                {% elif preset_mode == 'home' %}
+                   Prog D Clim
+                {% elif preset_mode == 'boost' %}
+                   Boost Clim
+                {% endif %}
+            {% else %}
+              Off
+            {% endif %}
+    set_hvac_mode:
+      - action: select.select_option
+        data:
+          entity_id: select.mode_air
+          option: >-
+            {% if hvac_mode == 'heat' %}
+              Confort Chauffage
+            {% elif hvac_mode == 'cool' %}
+              Confort Clim
+            {% elif hvac_mode == 'off' %}
+              Off
+            {% else %}
+              Off
+            {% endif %}
+    hvac_action_template: >-
+      {% if is_state('binary_sensor.bouche_k1a', 'off') %}
+        off
+      {% elif 'Chauffage' in states('select.mode_air') %}
+        heating
+      {% elif 'Clim' in states('select.mode_air') %}
+        cooling
+      {% else %}
+        idle
+      {% endif %}
+
+    #current_humidity_template: "{{ states('sensor.aqara_temperature_et_humidite_thermostat_k1a_humidity') }}" # Avec capteur additionnel
+    temp_step: 1
+    current_temperature_template: "{{ states('sensor.temperature_piece_principale') }}"     
+    min_temp: 0
+    max_temp_template: >-
+      {% if 'Chauffage' in states('select.mode_air') %} 
+          24
+      {% elif 'Clim' in states('select.mode_air') %} 
+           31
+      {% else %} 
+          24        {##  pas vraiment besoin  ##} 
+      {% endif %}
+    target_temperature_template: "{{ states('number.thermostat_1') }}" 
+    set_temperature:
+      - action: number.set_value
+        data:
+          entity_id: number.thermostat_1  
+          value: "{{ temperature }}"
  
 automation: !include automations.yaml
 script: !include scripts.yaml

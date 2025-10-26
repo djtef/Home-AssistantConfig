@@ -1,0 +1,23 @@
+- id: '1712770009681'
+  name: Nouvelle scène
+  entities:
+    light.cuisine_led:
+      supported_color_modes:
+      - brightness
+      color_mode: brightness
+      brightness: 255
+      friendly_name: Cuisine LED
+      supported_features: 40
+      state: 'on'
+    light.salle_a_manger_eclairage:
+      supported_color_modes:
+      - onoff
+      color_mode: onoff
+      friendly_name: Salle à manger Eclairage
+      supported_features: 8
+      state: 'on'
+  metadata:
+    light.cuisine_led:
+      entity_only: true
+    light.salle_a_manger_eclairage:
+      entity_only: true

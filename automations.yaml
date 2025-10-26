@@ -21,19 +21,24 @@
         id: pile
       sequence:
       - if:
-        - condition: state
-          entity_id: binary_sensor.porte_fenetre_salon_verrouillee
-          state: 'on'
+        - condition: or
+          conditions:
+          - condition: state
+            entity_id: binary_sensor.porte_fenetre_salon_verrouillee
+            state: 'on'
+          - condition: state
+            entity_id: alarm_control_panel.alarme_maison
+            state: armed_away
         then:
-        - service: cover.close_cover
-          target:
+        - target:
             entity_id: cover.vr_porte_fenetre_salon
+          action: cover.close_cover
+          data: {}
     - conditions:
       - condition: trigger
         id: plus15min
       sequence:
-      - service: cover.close_cover
-        target:
+      - target:
           entity_id:
           - cover.vr_bureau
           - cover.vr_cellier
@@ -43,124 +48,101 @@
           - cover.vr_escalier
           - cover.vr_palier
           - cover.vr_salle_de_jeu
+        action: cover.close_cover
+        data: {}
     - conditions:
       - condition: trigger
         id: plus45min
       sequence:
       - if:
-        - condition: and
+        - condition: or
           conditions:
+          - condition: and
+            conditions:
+            - condition: state
+              entity_id: binary_sensor.baie_cuisine_verrouillee_droite
+              state: 'on'
+            - condition: state
+              entity_id: binary_sensor.baie_cuisine_verrouillee_gauche
+              state: 'on'
           - condition: state
-            entity_id: binary_sensor.baie_cuisine_verrouillee_droite
-            state: 'on'
-          - condition: state
-            entity_id: binary_sensor.baie_cuisine_verrouillee_gauche
-            state: 'on'
+            entity_id: alarm_control_panel.alarme_maison
+            state: armed_away
         then:
-        - service: cover.close_cover
-          data: {}
+        - data: {}
           target:
             entity_id: cover.vr_cuisine
+          action: cover.close_cover
       - if:
-        - condition: and
+        - condition: or
           conditions:
+          - condition: and
+            conditions:
+            - condition: state
+              entity_id: binary_sensor.baie_salon_verrouillee_droite
+              state: 'on'
+            - condition: state
+              entity_id: binary_sensor.baie_salon_verrouillee_gauche
+              state: 'on'
           - condition: state
-            entity_id: binary_sensor.baie_salon_verrouillee_droite
-            state: 'on'
-          - condition: state
-            entity_id: binary_sensor.baie_salon_verrouillee_gauche
-            state: 'on'
+            entity_id: alarm_control_panel.alarme_maison
+            state: armed_away
         then:
-        - service: cover.close_cover
-          data: {}
+        - data: {}
           target:
             entity_id: cover.vr_salon
+          action: cover.close_cover
   mode: single
-- id: '1667940962264'
-  alias: Zone Notification
-  description: ''
-  use_blueprint:
-    path: homeassistant/notify_leaving_zone.yaml
-    input:
-      person_entity: person.thomas
-      zone_entity: zone.maison
-      notify_device: 6b2bbffd51050ec702281f101ce90bec
 - id: '1669586212407'
   alias: Éclairage placard escalier
   description: ''
-  trigger:
-  - platform: state
-    entity_id:
-    - binary_sensor.lumi_lumi_sensor_magnet_aq2_opening
+  triggers:
+  - entity_id:
+    - binary_sensor.porte_placard_ouverture
     from: 'off'
     to: 'on'
-  condition: []
-  action:
-  - service: light.turn_on
-    data: {}
+    trigger: state
+  conditions: []
+  actions:
+  - data: {}
     target:
       entity_id: light.escalier_placard_2
+    action: light.turn_on
   mode: single
 - id: '1669586289331'
   alias: Extinction éclairage placard escalier
   description: ''
-  trigger:
-  - platform: state
-    entity_id:
-    - binary_sensor.lumi_lumi_sensor_magnet_aq2_opening
+  triggers:
+  - entity_id:
+    - binary_sensor.porte_placard_ouverture
     from: 'on'
     to: 'off'
-  condition: []
-  action:
-  - service: light.turn_off
-    data: {}
+    trigger: state
+  conditions: []
+  actions:
+  - data: {}
     target:
       entity_id: light.escalier_placard_2
+    action: light.turn_off
   mode: single
 - id: '1669586500452'
   alias: Éclairage cellier
   description: ''
-  trigger:
-  - platform: state
-    entity_id:
-    - binary_sensor.lumi_lumi_sensor_magnet_aq2_opening_2
+  triggers:
+  - entity_id:
+    - binary_sensor.porte_cellier_ouverture_2
     from: 'off'
     to: 'on'
-  condition:
+    trigger: state
+  conditions:
   - condition: state
     entity_id: cover.vr_cellier
     state: closed
-  action:
-  - service: light.turn_on
-    data: {}
+  actions:
+  - data: {}
     target:
       entity_id: light.cellier_spots
-  mode: single
-- id: '1669586965200'
-  alias: Éclairage entrée cuisine
-  description: ''
-  trigger:
-  - device_id: 94f10a3d79b25b9d82a903e70bd953ab
-    domain: zha
-    platform: device
-    type: remote_button_short_press
-    subtype: remote_button_short_press
-  condition: []
-  action:
-  - if:
-    - condition: state
-      entity_id: light.cuisine_spots_plan_de_travail
-      state: 'on'
-    then:
-    - service: light.turn_off
-      data: {}
-      target:
-        entity_id: light.cuisine_spots_plan_de_travail
-    else:
-    - service: light.turn_on
-      data: {}
-      target:
-        entity_id: light.cuisine_spots_plan_de_travail
+    action: light.turn_on
   mode: single
 - id: '1672266440012'
   alias: Lampe bureau
@@ -380,7 +362,7 @@
       entity_id: switch.sirene_interieure
   mode: single
 - id: '1676238242545'
-  alias: Extinction lumière placard escalier
+  alias: Expiration lumière placard escalier
   description: Extinction lumière placard escalier au bout d'1 min
   trigger:
   - platform: state
@@ -393,20 +375,20 @@
       seconds: 0
   condition: []
   action:
-  - service: light.turn_off
-    data: {}
+  - data: {}
     target:
       entity_id: light.escalier_placard_2
+    action: light.turn_off
   mode: single
 - id: '1677092658855'
   alias: Alarme
   description: Gère les état de l'alarme
-  trigger:
-  - platform: state
-    entity_id:
+  triggers:
+  - entity_id:
     - alarm_control_panel.alarme_maison
-  condition: []
-  action:
+    trigger: state
+  conditions: []
+  actions:
   - choose:
     - conditions:
       - condition: state
@@ -418,35 +400,35 @@
           entity_id: input_boolean.alarme_silencieuse
           state: 'off'
         then:
-        - service: script.tts_ouvertures
-          data:
+        - data:
             volume: 80
-        - service: script.tts_google_home
-          data:
+          action: script.tts_ouvertures
+        - data:
             texte: L'alarme sera activée dès que la porte sera fermée
             volume: 80
             media_player_entity: media_player.sejour
+          action: script.tts_google_home
     - conditions:
       - condition: state
         entity_id: alarm_control_panel.alarme_maison
         state: armed_away
       sequence:
-      - service: script.notifie_ouvertures
-        data: {}
+      - data: {}
+        action: script.notifie_ouvertures
       - if:
         - condition: state
           entity_id: input_boolean.alarme_silencieuse
           state: 'off'
         then:
-        - service: script.tts_google_home
-          data:
+        - data:
             texte: Alarme activée !
             volume: 80
             media_player_entity: media_player.sejour
-      - service: automation.turn_on
-        data: {}
+          action: script.tts_google_home
+      - data: {}
         target:
           entity_id: automation.telegram_changement_capteur
+        action: automation.turn_on
     - conditions:
       - condition: state
         entity_id: alarm_control_panel.alarme_maison
@@ -460,54 +442,57 @@
           entity_id: input_boolean.alarme_silencieuse
           state: 'off'
         then:
-        - service: script.turn_on
-          data:
+        - data:
             variables:
               texte: Alarme désactivée
               volume: 80
               media_player_entity: media_player.sejour
           target:
             entity_id: script.tts_google_home
-      - service: siren.turn_off
-        target:
+          action: script.turn_on
+      - target:
           entity_id:
           - siren.pse03_v1_1_0_siren_2
           - siren.pse03_v1_1_0_siren
         data: {}
         enabled: false
+        action: siren.turn_off
+        continue_on_error: true
       - parallel:
         - if:
           - condition: state
             entity_id: input_boolean.alarme_silencieuse
             state: 'off'
           then:
-          - service: siren.turn_on
-            data:
+          - data:
               tone: '5'
               duration: '5'
             target:
               entity_id:
               - siren.pse03_v1_1_0_siren_2
               - siren.pse03_v1_1_0_siren
-        - service: automation.turn_off
-          data:
+            action: siren.turn_on
+            continue_on_error: true
+        - data:
             stop_actions: true
           target:
             entity_id: automation.telegram_changement_capteur
+          action: automation.turn_off
         - if:
           - condition: template
             value_template: '{{trigger.from_state.state == ''triggered''}}'
           then:
-          - service: scene.turn_on
-            target:
+          - target:
               entity_id: scene.lumieres_vr
             data: {}
-      - service: siren.turn_off
-        data: {}
+            action: scene.turn_on
+      - data: {}
         target:
           entity_id:
           - siren.pse03_v1_1_0_siren_2
           - siren.pse03_v1_1_0_siren
+        action: siren.turn_off
+        continue_on_error: true
     - conditions:
       - condition: state
         entity_id: alarm_control_panel.alarme_maison
@@ -516,8 +501,7 @@
         entity_id: input_boolean.alarme_silencieuse
         state: 'off'
       sequence:
-      - service: script.turn_on
-        data:
+      - data:
           variables:
             texte: Il reste 20 secondes pour désactiver l'alarme, 17, 16, 15, 14,
               13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
@@ -525,22 +509,25 @@
             media_player_entity: media_player.sejour
         target:
           entity_id: script.tts_google_home
-      - service: siren.turn_on
-        data:
+        action: script.turn_on
+      - data:
           tone: '6'
         target:
           entity_id:
           - siren.pse03_v1_1_0_siren_2
           - siren.pse03_v1_1_0_siren
+        action: siren.turn_on
+        continue_on_error: true
       - delay:
           seconds: 4
-      - service: siren.turn_on
-        data:
+      - data:
           tone: '6'
         target:
           entity_id:
           - siren.pse03_v1_1_0_siren_2
           - siren.pse03_v1_1_0_siren
+        action: siren.turn_on
+        continue_on_error: true
       - delay:
           seconds: 3
       - repeat:
@@ -549,13 +536,14 @@
             entity_id: alarm_control_panel.alarme_maison
             state: pending
           sequence:
-          - service: siren.turn_on
-            data:
+          - data:
               tone: '6'
             target:
               entity_id:
               - siren.pse03_v1_1_0_siren_2
               - siren.pse03_v1_1_0_siren
+            action: siren.turn_on
+            continue_on_error: true
           - delay:
               seconds: 1
     - conditions:
@@ -569,66 +557,68 @@
             entity_id: input_boolean.alarme_silencieuse
             state: 'off'
           then:
-          - service: siren.turn_on
-            data:
+          - data:
               tone: '1'
               duration: '600'
+              volume_level: 1
             target:
               entity_id:
               - siren.pse03_v1_1_0_siren_2
               - siren.pse03_v1_1_0_siren
-        - service: scene.create
-          data:
+            action: siren.turn_on
+            continue_on_error: true
+        - data:
             scene_id: lumieres_vr
             snapshot_entities: '{{ expand(states)|selectattr(''domain'', ''in'', (''light'',
               ''cover''))|selectattr(''state'', ''ne'', ''unavailable'')| map(attribute=''entity_id'')|
               list }}
 
               '
-        - service: notify.maison
-          data:
+          action: scene.create
+        - data:
             message: Alarme maison déclenchée !
             title: ALARME !
-        - service: notify.mobile_app_galaxy_s20_fe
-          data:
+          action: notify.maison
+        - data:
             message: Alarme maison déclenchée !
             title: ALARME !
-        - service: notify.mobile_app_m2103k19pg
-          data:
+          action: notify.mobile_app_galaxy_s20_fe
+        - data:
             message: Alarme maison déclenchée !
             title: ALARME !
+          action: notify.mobile_app_m2103k19pg
         - if:
           - condition: template
             value_template: '{{trigger.from_state.state == ''pending''}}'
           then:
-          - service: notify.maison
-            data:
+          - data:
               message: Délai désactivation alarme dépassé !
+            action: notify.maison
       - repeat:
           while:
           - condition: state
             entity_id: alarm_control_panel.alarme_maison
             state: triggered
           sequence:
-          - service: cover.open_cover
-            data: {}
+          - data: {}
             target:
               entity_id: cover.vr_general
+            action: cover.open_cover
           - if:
             - condition: state
               entity_id: input_boolean.alarme_silencieuse
               state: 'off'
             then:
-            - service: script.turn_on
-              data:
+            - data:
                 variables:
                   texte: Alarme déclenchée, appel police en cours !
                   volume: 100
                   media_player_entity: media_player.sejour
               target:
                 entity_id: script.tts_google_home
-          - service: script.allume_lumieres
-            data: {}
+              action: script.turn_on
+          - data: {}
+            action: script.allume_lumieres
         enabled: true
   mode: restart
 - id: '1677626292376'
@@ -711,31 +701,132 @@
 - id: '1679160880850'
   alias: Alerte lumineuse ouverture
   description: Alerte lumineuse passerelle Xiaomi si une fenêtre ou porte est ouverte
-  trigger:
-  - platform: state
-    entity_id:
+  triggers:
+  - entity_id:
     - binary_sensor.portail_garage_ferme
-  condition: []
-  action:
-  - choose:
-    - conditions:
-      - '{{trigger.from_state.state == ''off''}}'
-      - '{{trigger.to_state.state == ''on''}}'
-      sequence:
-      - service: light.turn_off
-        data: {}
-        target:
-          entity_id: light.gateway_light_34ce008bede9
-    - conditions:
-      - '{{trigger.from_state.state == ''on''}}'
-      - '{{trigger.to_state.state == ''off''}}'
-      sequence:
-      - service: light.turn_on
-        data:
-          color_name: blue
+    trigger: state
+  - trigger: numeric_state
+    entity_id:
+    - sensor.nombre_capteurs_ouverts
+    above: 0
+  - trigger: numeric_state
+    entity_id:
+    - sensor.nombre_capteurs_ouverts
+    below: 1
+  - trigger: state
+    entity_id:
+    - light.gateway_light_34ce008bede9
+  - trigger: state
+    entity_id:
+    - sun.sun
+    from:
+    to:
+  - trigger: numeric_state
+    entity_id:
+    - sensor.nombre_capteurs_ouverts
+    for:
+      hours: 0
+      minutes: 15
+      seconds: 0
+    above: 0
+    id: 15min
+  - trigger: state
+    entity_id:
+    - binary_sensor.bp_salle_a_manger_colonne_haut
+    from: 'off'
+    to: 'on'
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 1
+    id: 'off'
+  conditions: []
+  actions:
+  - if:
+    - condition: state
+      entity_id: binary_sensor.portail_garage_ferme
+      state: 'off'
+      for:
+        hours: 0
+        minutes: 0
+        seconds: 1
+    then:
+    - data:
+        color_name: blue
+        brightness_pct: 100
+      target:
+        entity_id: light.gateway_light_34ce008bede9
+      action: light.turn_on
+    else:
+    - if:
+      - condition: numeric_state
+        entity_id: sensor.nombre_capteurs_ouverts
+        above: 0
+      - condition: state
+        entity_id: sun.sun
+        state: below_horizon
+      - condition: state
+        entity_id: input_boolean.aeration_auto
+        state: 'off'
+      - condition: numeric_state
+        entity_id: weather.gagnac_sur_garonne
+        attribute: temperature
+        below: 20
+      then:
+      - data:
+          color_name: darkorange
           brightness_pct: 100
         target:
           entity_id: light.gateway_light_34ce008bede9
+        action: light.turn_on
+      else:
+      - action: light.turn_off
+        target:
+          entity_id:
+          - light.gateway_light_34ce008bede9
+        data: {}
+  - if:
+    - condition: trigger
+      id:
+      - 15min
+    - condition: numeric_state
+      entity_id: weather.gagnac_sur_garonne
+      attribute: temperature
+      below: 20
+    then:
+    - data:
+        color_name: darkorange
+        brightness_pct: 100
+      target:
+        entity_id: light.gateway_light_34ce008bede9
+      action: light.turn_on
+    - data:
+        title: ' Température extérieure {{ state_attr(''weather.gagnac_sur_garonne'',
+          ''temperature'') }}° et depuis 15 min :'
+        message: "{% for s in expand(integration_entities(\"alarme\"))|selectattr('domain',
+          'eq', 'binary_sensor')| selectattr('state', 'eq', 'off')|map(attribute='attributes.friendly_name')|
+          list %}\n  {%- if (\"Baie\" in s or \"Fenêtre\" in s or \"Port\" in s) and
+          not \"VR\" in s -%}\n    {{s.lower() \n      | replace(\"fermée\", \"ouverte\")\n
+          \     | replace(\"verrouillée\", \"déverrouillée\")\n      | replace(\"droite\",
+          \"à droite\")\n      | replace(\"gauche\", \"à gauche\")\n      | replace(\"sdb\",
+          \"salle de bain\")\n      | replace(\"sdj\", \"salle de jeu\")\n      |
+          replace(\"rdc\", \"rez de chaussée\")\n      | replace(\"wc\", \"WC\")\n
+          \     | replace(\"1\", \"parentale\")\n      | replace(\"2\", \"Athénaïs\")\n
+          \     | replace(\"3\", \"Aloïs\")}}\n    {{- '\\n' -}}\n  {%- endif -%}\n{%
+          endfor %}\n"
+      action: notify.maison
+    alias: Si ouverture 15min et température extérieur sous 20°
+  - if:
+    - condition: trigger
+      id:
+      - 'off'
+    then:
+    - action: light.turn_off
+      metadata: {}
+      data: {}
+      target:
+        entity_id: light.gateway_light_34ce008bede9
+    alias: Si BP cuisine maintenu 1s
   mode: single
 - id: '1679261150516'
   alias: Alarme absence
@@ -1077,7 +1168,8 @@
       - service: switch.turn_off
         data: {}
         target:
-          entity_id: switch.nvr_push_notifications
+          entity_id:
+          - switch.rln8_410_notifications_push
     - conditions:
       - condition: trigger
         id: activation
@@ -1085,82 +1177,86 @@
       - service: switch.turn_on
         data: {}
         target:
-          entity_id: switch.nvr_push_notifications
+          entity_id:
+          - switch.rln8_410_notifications_push
   mode: single
 - id: '1682548945845'
   alias: Lumière entrée jardin
   description: Allume la lumière extérieure devant la maison quand la caméra détecte
     une personne ou un véhicule
-  trigger:
-  - platform: state
-    entity_id:
-    - binary_sensor.entree_vehicle
+  triggers:
+  - entity_id:
+    - binary_sensor.entree_vehicule
     to: 'on'
     id: vehicule
-  - platform: state
-    entity_id:
-    - binary_sensor.entree_person
+    trigger: state
+  - entity_id:
+    - binary_sensor.entree_humain
     to: 'on'
     id: personne
-  condition:
+    trigger: state
+  conditions:
   - condition: sun
     before: sunrise
     after: sunset
-    after_offset: 00:30:00
-    before_offset: 00:30:00
-  action:
-  - service: light.turn_on
-    data: {}
+    after_offset: 00:45:00
+    before_offset: 00:15:00
+  actions:
+  - data: {}
     target:
       entity_id: light.exterieur_spot_portail_garage
+    action: light.turn_on
   - if:
     - condition: trigger
       id: personne
     then:
-    - service: light.turn_on
-      data: {}
+    - data: {}
       target:
         entity_id: light.exterieur_applique_porche_entree
+      action: light.turn_on
   - delay:
       hours: 0
       minutes: 2
       seconds: 0
       milliseconds: 0
-  - service: light.turn_off
-    data: {}
+  - data: {}
     target:
       entity_id:
       - light.exterieur_spot_portail_garage
       - light.exterieur_applique_porche_entree
+    action: light.turn_off
   mode: restart
 - id: '1683928118795'
   alias: Détection caméra
   description: Notification Telegram lors d'une détection personne ou véhicule des
     caméras
-  trigger:
-  - platform: state
-    entity_id:
-    - binary_sensor.jardin_person
-    - binary_sensor.jardin_vehicle
-    - binary_sensor.entree_person
-    - binary_sensor.entree_vehicle
-    - binary_sensor.garage_person
-    - binary_sensor.garage_vehicle
-    - binary_sensor.salon_person
-    - binary_sensor.salon_vehicle
+  triggers:
+  - entity_id:
+    - binary_sensor.jardin_humain
+    - binary_sensor.jardin_vehicule
+    - binary_sensor.jardin_animal
+    - binary_sensor.entree_humain
+    - binary_sensor.entree_vehicule
+    - binary_sensor.entree_animal
+    - binary_sensor.entree_humain_2
+    - binary_sensor.entree_vehicule_2
+    - binary_sensor.entree_animal_2
+    - binary_sensor.garage_humain
+    - binary_sensor.garage_vehicule
+    - binary_sensor.salon_humain
+    - binary_sensor.salon_vehicule
     to: 'on'
-  condition:
+    trigger: state
+  conditions:
   - condition: or
     conditions:
-    - condition: and
-      conditions:
-      - condition: state
-        entity_id: alarm_control_panel.alarme_maison
-        state: armed_away
-        for:
-          hours: 0
-          minutes: 3
-          seconds: 0
+    - condition: state
+      entity_id: alarm_control_panel.alarme_maison
+      state: armed_away
+      for:
+        hours: 0
+        minutes: 3
+        seconds: 0
     - condition: and
       conditions:
       - condition: template
@@ -1218,37 +1314,64 @@
           - condition: state
             entity_id: person.jacinta
             state: not_home
-  action:
-  - service: notify.maison
-    data:
+  actions:
+  - data:
       title: Détection caméra
       message: '{{ state_attr(trigger.entity_id, ''friendly_name'') }}'
     enabled: false
-  - service: camera.snapshot
-    data:
-      filename: /config/camera/{{ trigger.entity_id }}.jpg
-    target:
-      entity_id: "{% if 'salon' in trigger.entity_id  %}\n  camera.salon_sub\n{% elif
-        'entree' in trigger.entity_id %}\n  camera.entree_sub\n{% elif 'garage' in
-        trigger.entity_id %}\n  camera.garage_sub\n{% elif 'jardin' in trigger.entity_id
-        %}\n  camera.jardin_sub\n{% endif %}\n"
-  - service: notify.maison
-    data:
-      title: Detection caméra
-      message: 'Un mouvement a été détecté par la caméra :'
+    action: notify.maison
+  - if:
+    - condition: or
+      conditions:
+      - condition: state
+        entity_id: timer.notification_cameras
+        state: idle
+        enabled: true
+      - condition: template
+        value_template: '{{ trigger.to_state.last_changed|as_timestamp - trigger.from_state.last_changed|as_timestamp
+          > 300}}'
+        alias: Dernière détection > 3min
+      - condition: template
+        value_template: '{{ trigger.entity_id != states(''input_text.derniere_detection_camera'')
+          }} '
+    then:
+    - data:
+        filename: /config/camera/{{ trigger.entity_id }}.jpg
+      target:
+        entity_id: "{% if 'salon' in trigger.entity_id  %}\n  camera.reolink_salon\n{%
+          elif 'entree' in trigger.entity_id %}\n  camera.reolink_entree\n{% elif
+          'garage' in trigger.entity_id %}\n  camera.reolink_garage\n{% elif 'jardin'
+          in trigger.entity_id %}\n  camera.reolink_jardin\n{% endif %}\n"
+      action: camera.snapshot
+    - data:
+        title: Detection caméra
+        message: 'Un mouvement a été détecté par la caméra :'
+        data:
+          photo:
+          - file: /config/camera/{{ trigger.entity_id }}.jpg
+            caption: 'Détection caméra : {{ state_attr(trigger.entity_id, ''friendly_name'')
+              }}'
+      action: notify.maison
+    - action: input_text.set_value
+      metadata: {}
       data:
-        photo:
-        - file: /config/camera/{{ trigger.entity_id }}.jpg
-          caption: 'Détection caméra : {{ state_attr(trigger.entity_id, ''friendly_name'')
-            }}'
+        value: '{{ trigger.entity_id }}'
+      target:
+        entity_id: input_text.derniere_detection_camera
+  - action: timer.start
+    metadata: {}
+    data: {}
+    target:
+      entity_id: timer.notification_cameras
+    enabled: true
   mode: single
 - id: '1686436079869'
-  alias: Ouverture volets
+  alias: Ouverture volets 6h
   description: Ouverture volets été matin
-  trigger:
-  - platform: time
-    at: 06:00:00
-  condition:
+  triggers:
+  - at: 05:30:00
+    trigger: time
+  conditions:
   - condition: state
     entity_id: alarm_control_panel.alarme_maison
     state: disarmed
@@ -1259,7 +1382,10 @@
     - cloudy
     - partlycloudy
     - sunny
-  action:
+  - condition: state
+    entity_id: input_boolean.aeration_auto
+    state: 'on'
+  actions:
   - if:
     - condition: or
       conditions:
@@ -1269,11 +1395,14 @@
       - condition: state
         entity_id: binary_sensor.baie_cuisine_fermee_gauche
         state: 'off'
+    - condition: state
+      entity_id: input_boolean.aeration_auto_baie_cuisine
+      state: 'on'
     then:
-    - service: cover.open_cover
-      data: {}
+    - data: {}
       target:
         entity_id: cover.vr_cuisine
+      action: cover.open_cover
   - if:
     - condition: or
       conditions:
@@ -1283,11 +1412,14 @@
       - condition: state
         entity_id: binary_sensor.baie_salon_fermee_gauche
         state: 'off'
+    - condition: state
+      entity_id: input_boolean.aeration_auto_baie_salon
+      state: 'on'
     then:
-    - service: cover.open_cover
-      data: {}
+    - data: {}
       target:
         entity_id: cover.vr_salon
+      action: cover.open_cover
   - if:
     - condition: or
       conditions:
@@ -1297,11 +1429,14 @@
       - condition: state
         entity_id: binary_sensor.fenetre_sdj_fermee_gauche
         state: 'off'
+    - condition: state
+      entity_id: input_boolean.aeration_auto_salle_de_jeux
+      state: 'on'
     then:
-    - service: cover.open_cover
-      data: {}
+    - data: {}
       target:
         entity_id: cover.vr_salle_de_jeu
+      action: cover.open_cover
   - if:
     - condition: or
       conditions:
@@ -1311,11 +1446,14 @@
       - condition: state
         entity_id: binary_sensor.fenetre_palier_fermee_gauche
         state: 'off'
+    - condition: state
+      entity_id: input_boolean.aeration_auto_palier
+      state: 'on'
     then:
-    - service: cover.open_cover
-      data: {}
+    - data: {}
       target:
         entity_id: cover.vr_palier
+      action: cover.open_cover
   - if:
     - condition: or
       conditions:
@@ -1325,11 +1463,14 @@
       - condition: state
         entity_id: binary_sensor.fenetre_chambre_3_fermee_gauche
         state: 'off'
+    - condition: state
+      entity_id: input_boolean.aeration_auto_chambre_3
+      state: 'on'
     then:
-    - service: cover.open_cover
-      data: {}
+    - data: {}
       target:
         entity_id: cover.vr_chambre_3
+      action: cover.open_cover
   - if:
     - condition: or
       conditions:
@@ -1339,43 +1480,87 @@
       - condition: state
         entity_id: binary_sensor.fenetre_chambre_2_fermee_gauche
         state: 'off'
+    - condition: state
+      entity_id: input_boolean.aeration_auto_chambre_athenais
+      state: 'on'
     then:
-    - service: cover.open_cover
-      target:
+    - target:
         entity_id: cover.vr_chambre_2
       data: {}
+      action: cover.open_cover
     enabled: true
   - if:
     - condition: state
       entity_id: binary_sensor.fenetre_cellier_fermee
       state: 'off'
+    - condition: state
+      entity_id: input_boolean.aeration_auto_cellier
+      state: 'on'
     then:
-    - service: cover.open_cover
-      target:
+    - target:
         entity_id: cover.vr_cellier
       data: {}
-    - service: cover.open_cover
-      data: {}
-      target:
-        entity_id: cover.vr_cellier
+      action: cover.open_cover
   - if:
     - condition: state
       entity_id: binary_sensor.porte_fenetre_salon_fermee
       state: 'off'
+    - condition: state
+      entity_id: input_boolean.aeration_auto_porte_fenetre
+      state: 'on'
     then:
-    - service: cover.open_cover
-      target:
+    - target:
         entity_id: cover.vr_porte_fenetre_salon
       data: {}
+      action: cover.open_cover
   - if:
     - condition: state
       entity_id: binary_sensor.fenetre_escalier_fermee
       state: 'off'
+    - condition: state
+      entity_id: input_boolean.aeration_auto_palier
+      state: 'on'
     then:
-    - service: cover.open_cover
-      target:
+    - target:
         entity_id: cover.vr_escalier
       data: {}
+      action: cover.open_cover
+  - if:
+    - condition: or
+      conditions:
+      - condition: state
+        entity_id: binary_sensor.fenetre_chambre_1_fermee_gauche
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.fenetre_chambre_1_fermee_droite
+        state: 'off'
+    - condition: state
+      entity_id: input_boolean.aeration_auto_chambre_parents
+      state: 'on'
+    then:
+    - metadata: {}
+      data: {}
+      target:
+        entity_id: cover.vr_chambre_1
+      action: cover.open_cover
+  - if:
+    - condition: or
+      conditions:
+      - condition: state
+        entity_id: binary_sensor.fenetre_bureau_fermee_gauche
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.fenetre_bureau_fermee_droite
+        state: 'off'
+    - condition: state
+      entity_id: input_boolean.aeration_auto_bureau
+      state: 'on'
+    then:
+    - metadata: {}
+      data: {}
+      target:
+        entity_id: cover.vr_bureau
+      action: cover.open_cover
   mode: single
 - id: '1686512140329'
   alias: Fin Lave-vaisselle
@@ -1385,6 +1570,7 @@
     entity_id:
     - sensor.test_template
     to: Fin
+    from: Séchage
   condition: []
   action:
   - service: notify.maison
@@ -1520,50 +1706,65 @@
 - id: '1696441833102'
   alias: 'Terrasse '
   description: 'Allume la terrasse et remonte le store le soir '
-  trigger:
-  - platform: sun
-    event: sunset
+  triggers:
+  - event: sunset
     offset: 00:15:00
     id: plus15min
-  - platform: sun
-    event: sunset
-    offset: -01:00:00
+    trigger: sun
+  - event: sunset
+    offset: -01:15:00
     id: moins1h
-  - platform: state
-    entity_id:
+    trigger: sun
+  - entity_id:
     - cover.vr_cuisine
     - cover.vr_salon
     to: closed
     id: fermeture
-  condition: []
-  action:
+    trigger: state
+  - trigger: numeric_state
+    entity_id:
+    - sensor.vr_baie_fermeture_soleil
+    below: 11
+    id: couche
+  conditions: []
+  actions:
   - choose:
     - conditions:
       - condition: trigger
         id: plus15min
       sequence:
       - if:
-        - condition: or
+        - condition: and
           conditions:
           - condition: state
-            entity_id: binary_sensor.baie_cuisine_verrouillee_droite
-            state: 'off'
-          - condition: state
-            entity_id: binary_sensor.baie_cuisine_verrouillee_gauche
-            state: 'off'
+            entity_id: alarm_control_panel.alarme_maison
+            state: disarmed
+          - condition: or
+            conditions:
+            - condition: state
+              entity_id: binary_sensor.baie_cuisine_verrouillee_droite
+              state: 'off'
+            - condition: state
+              entity_id: binary_sensor.baie_cuisine_verrouillee_gauche
+              state: 'off'
         then:
-        - service: light.turn_on
-          data: {}
+        - data: {}
           target:
             entity_id: light.exterieur_appliques_terrasse
+          action: light.turn_on
     - conditions:
       - condition: trigger
-        id: moins1h
+        id:
+        - couche
       sequence:
-      - service: cover.open_cover
-        data: {}
+      - data: {}
         target:
-          entity_id: cover.store_banne
+          entity_id:
+          - cover.store_banne
+          - cover.vr_salle_de_jeu
+          - cover.vr_cellier
+          - cover.vr_salon
+        action: cover.open_cover
     - conditions:
       - condition: state
         entity_id: cover.vr_cuisine
@@ -1572,16 +1773,24 @@
         entity_id: cover.vr_salon
         state: closed
       sequence:
-      - service: light.turn_off
-        data: {}
+      - data: {}
         target:
           entity_id: light.exterieur_appliques_terrasse
-  mode: single
-- id: '1696441887415'
-  description: ''
-  trigger: []
-  condition: []
-  action: []
+        action: light.turn_off
+    - conditions:
+      - condition: trigger
+        id:
+        - moins1h
+      sequence:
+      - data: {}
+        target:
+          entity_id:
+          - cover.store_banne
+          - cover.vr_salle_de_jeu
+          - cover.vr_cellier
+          - cover.vr_salon
+          - cover.vr_chambre_2
+        action: cover.open_cover
   mode: single
 - id: '1696801508640'
   alias: NSPanel Configuration
@@ -1716,3 +1925,1325 @@
       - 52
       - 254
       chip02: binary_sensor.porte_entree_verrouillee
+- id: '1702075326749'
+  alias: Réveil LED cuisine
+  description: Faire varier lentement la luminosité des LED de la cuisine de 10% à
+    90% pendant 5min quand les 2 boutons de la salle à manger sont appuyés 1s
+  triggers:
+  - entity_id:
+    - binary_sensor.bp_salle_a_manger_colonne_bas_droite
+    - binary_sensor.bp_salle_a_manger_colonne_bas_gauche
+    from: 'off'
+    to: 'on'
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 0.5
+    trigger: state
+  conditions:
+  - condition: state
+    entity_id:
+    - binary_sensor.bp_salle_a_manger_colonne_bas_droite
+    - binary_sensor.bp_salle_a_manger_colonne_bas_gauche
+    state: 'on'
+  actions:
+  - data:
+      brightness: 52
+    target:
+      entity_id: light.cuisine_led
+    action: light.turn_on
+  - wait_for_trigger:
+    - entity_id:
+      - light.cuisine_led
+      above: 50
+      below: 54
+      trigger: numeric_state
+    timeout:
+      hours: 0
+      minutes: 0
+      seconds: 5
+      milliseconds: 0
+  - data:
+      brightness_pct: 70
+      transition: 300
+    target:
+      entity_id: light.cuisine_led
+    action: light.turn_on
+  - condition: time
+    before: 08:30:00
+  - action: cover.open_cover
+    metadata: {}
+    data: {}
+    target:
+      entity_id:
+      - cover.vr_salon
+      - cover.vr_cuisine
+  mode: single
+- id: '1709481301341'
+  alias: Ouverture garage soir boulot
+  description: Ouvre le garage les soirs de semaine lorsque Thomas arrive
+  trigger:
+  - platform: zone
+    entity_id: person.thomas
+    zone: zone.home
+    event: enter
+  condition:
+  - condition: state
+    entity_id: alarm_control_panel.alarme_maison
+    state: disarmed
+  - condition: time
+    after: '18:00:00'
+    before: '20:15:00'
+    weekday:
+    - mon
+    - tue
+    - wed
+    - thu
+    - fri
+  - condition: state
+    entity_id: binary_sensor.portail_garage_ferme
+    state: 'on'
+    for:
+      hours: 0
+      minutes: 5
+      seconds: 0
+  - condition: template
+    value_template: '{{ trigger.to_state.last_changed|as_timestamp - trigger.from_state.last_changed|as_timestamp
+      > 36000}}'
+  action:
+  - service: button.press
+    target:
+      entity_id: button.portail_garage
+    data: {}
+  - if:
+    - condition: sun
+      after: sunset
+      after_offset: 00:45:00
+    then:
+    - service: light.turn_on
+      metadata: {}
+      data: {}
+      target:
+        entity_id: light.exterieur_spot_portail_garage
+  - wait_for_trigger:
+    - platform: state
+      entity_id:
+      - binary_sensor.portail_garage_ferme
+      from: 'off'
+      to: 'on'
+    timeout:
+      hours: 0
+      minutes: 2
+      seconds: 0
+      milliseconds: 0
+    continue_on_timeout: true
+  - service: light.turn_off
+    metadata: {}
+    data: {}
+    target:
+      entity_id: light.exterieur_spot_portail_garage
+  - if:
+    - condition: state
+      entity_id: binary_sensor.portail_garage_ferme
+      state: 'off'
+    - condition: template
+      value_template: ' now()|as_timestamp - states.button.portail_garage.last_changed|as_timestamp
+        > 30'
+    then:
+    - service: button.press
+      metadata: {}
+      data: {}
+      target:
+        entity_id: button.portail_garage
+  mode: single
+- id: '1715894664516'
+  alias: Rechargement camera intérieures
+  description: Recharge les cameras intérieures qui étaient éteintes
+  trigger:
+  - platform: state
+    entity_id:
+    - switch.switch_cameras
+    to: 'on'
+    for:
+      hours: 0
+      minutes: 1
+      seconds: 0
+  condition: []
+  action:
+  - target:
+      device_id: d91c36baadb55e0a2672821a45d48b9e
+    data: {}
+    action: homeassistant.reload_config_entry
+  mode: single
+- id: '1717788686989'
+  alias: Commande store banne
+  description: Commande store banne depuis BP VR baie cuisine
+  trigger:
+  - platform: state
+    entity_id:
+    - binary_sensor.vr_cuisine_descente
+    from: 'off'
+    to: 'on'
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 1
+    id: descente
+  - platform: state
+    entity_id:
+    - binary_sensor.vr_cuisine_montee
+    from: 'off'
+    to: 'on'
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 1
+    id: montee
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - descente
+      sequence:
+      - if:
+        - condition: state
+          entity_id: binary_sensor.vr_cuisine_montee
+          state: 'on'
+        then:
+        - service: cover.stop_cover
+          metadata: {}
+          data: {}
+          target:
+            entity_id: cover.store_banne
+        else:
+        - service: cover.close_cover
+          target:
+            entity_id:
+            - cover.store_banne
+          data: {}
+    - conditions:
+      - condition: trigger
+        id:
+        - montee
+      sequence:
+      - if:
+        - condition: state
+          entity_id: binary_sensor.vr_cuisine_descente
+          state: 'on'
+        then:
+        - service: cover.stop_cover
+          metadata: {}
+          data: {}
+          target:
+            entity_id: cover.store_banne
+        else:
+        - service: cover.open_cover
+          target:
+            entity_id:
+            - cover.store_banne
+          data: {}
+  mode: restart
+- id: '1722373596346'
+  alias: Fermeture VR sud soleil
+  description: Ferme le VR de la baie du salon avant que le soleil tape
+  triggers:
+  - entity_id:
+    - sensor.vr_baie_fermeture_soleil
+    for:
+      hours: 0
+      minutes: 1
+      seconds: 0
+    below: 100
+    trigger: numeric_state
+  conditions:
+  - condition: template
+    value_template: '{% set n = now() %} {{ n.month == 7 or  n.month == 8 or( n.month
+      == 6 and ( 15 <= n.day <= 30 )) or( n.month == 9 and ( 1 <= n.day <= 15 ))}}
+
+      '
+  - condition: state
+    entity_id: weather.gagnac_sur_garonne
+    state:
+    - sunny
+    - partlycloudy
+  - condition: numeric_state
+    entity_id: sensor.weather_forecast_jour_gagnac
+    attribute: temp_max
+    above: 25
+  actions:
+  - action: cover.open_cover
+    metadata: {}
+    data: {}
+    target:
+      entity_id:
+      - cover.vr_salle_de_jeu
+  - metadata: {}
+    data: {}
+    target:
+      entity_id:
+      - cover.vr_salon
+      - cover.vr_chambre_2
+      - cover.vr_chambre_3
+    action: cover.close_cover
+  - if:
+    - condition: numeric_state
+      entity_id: weather.gagnac_sur_garonne
+      attribute: wind_speed
+      below: 15
+    then:
+    - action: cover.close_cover
+      metadata: {}
+      data: {}
+      target:
+        entity_id: cover.store_banne
+  - action: cover.set_cover_position
+    metadata: {}
+    data:
+      position: 20
+    target:
+      entity_id: cover.vr_cellier
+  mode: single
+- id: '1722374400046'
+  alias: Monter store si vent
+  description: Monte le store en cas de vent supérieur à 20km/h
+  trigger:
+  - platform: numeric_state
+    entity_id:
+    - weather.gagnac_sur_garonne
+    attribute: wind_speed
+    above: 20
+  condition: []
+  action:
+  - service: cover.open_cover
+    metadata: {}
+    data: {}
+    target:
+      entity_id: cover.store_banne
+  mode: single
+- id: '1723158078487'
+  alias: Persienne VR bas
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - binary_sensor.bp_salon_angle_entree_bas_droite
+    - binary_sensor.bp_salon_angle_entree_bas_gauche
+    - binary_sensor.bp_salon_angle_entree_haut
+    to: 'on'
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 1
+  condition: []
+  action:
+  - parallel:
+    - data:
+        cover: cover.vr_salon
+        pourcentage: 7
+      action: script.persienne
+    - data:
+        cover: cover.vr_cuisine
+        pourcentage: 7
+      action: script.persienne
+    - data:
+        cover: cover.vr_porte_fenetre_salon
+        pourcentage: 11
+      action: script.persienne
+    - data:
+        cover: cover.vr_cellier
+        pourcentage: 11
+      action: script.persienne
+    - data:
+        cover: cover.vr_bureau
+        pourcentage: 11
+      action: script.persienne
+    - data:
+        cover: cover.vr_salle_de_jeu
+        pourcentage: 11
+      action: script.persienne
+    - data:
+        cover: cover.vr_chambre_1
+        pourcentage: 11
+      action: script.persienne
+  mode: single
+- id: '1723239970473'
+  alias: Notifications courant
+  description: Envoie un message Telegram quand on perd le courant ou que la batterie
+    est faible
+  triggers:
+  - entity_id:
+    - binary_sensor.presence_220v
+    trigger: state
+    id: '220'
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 1
+  - trigger: state
+    entity_id:
+    - binary_sensor.batterie_12v_faible
+    to: 'on'
+    id: 12V
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - '220'
+      sequence:
+      - if:
+        - condition: template
+          value_template: '{{ trigger.to_state.state == ''off'' and trigger.from_state.state
+            == ''on'' }}'
+        then:
+        - action: notify.maison
+          data:
+            message: ⚠️ Coupure de courant générale ⚡
+        else:
+        - if:
+          - condition: template
+            value_template: '{{ trigger.to_state.state == ''on'' and trigger.from_state.state
+              == ''off'' }}'
+          then:
+          - action: notify.maison
+            data:
+              message: ✅ Retour du courant général ⚡
+    - conditions:
+      - condition: trigger
+        id:
+        - 12V
+      sequence:
+      - action: notify.maison
+        data:
+          message: "⚠️  Batterie 12V faible \U0001FAAB"
+  mode: single
+- id: '1723378450607'
+  alias: Ouverture volets Nord
+  description: 'Ouvre les fenêtres palier, escalier et chambre 1 à 100% puis bureau
+    à 20% quand il n''y a plus de soleil '
+  triggers:
+  - entity_id:
+    - sensor.vr_fenetre_arriere_fermeture_soleil
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 1
+    above: 80
+    trigger: numeric_state
+  conditions: []
+  actions:
+  - action: cover.open_cover
+    metadata: {}
+    data: {}
+    target:
+      entity_id:
+      - cover.vr_palier
+      - cover.vr_escalier
+  - if:
+    - condition: state
+      entity_id: cover.vr_chambre_1
+      state: open
+    then:
+    - action: cover.open_cover
+      metadata: {}
+      data: {}
+      target:
+        entity_id:
+        - cover.vr_chambre_1
+  - condition: numeric_state
+    entity_id: cover.vr_bureau
+    attribute: current_position
+    above: 0
+    below: 31
+  - action: cover.set_cover_position
+    metadata: {}
+    data:
+      position: 30
+    target:
+      entity_id: cover.vr_bureau
+  mode: single
+- id: '1723490996958'
+  alias: Lumières/VR minuit
+  description: Extinction des lumières et fermeture des volets à minuit si alarme
+    activée
+  trigger:
+  - platform: time
+    at: 00:00:00
+  condition:
+  - condition: state
+    entity_id: alarm_control_panel.alarme_maison
+    state: armed_away
+  action:
+  - action: light.turn_off
+    metadata: {}
+    data: {}
+    target:
+      entity_id: all
+  - action: cover.close_cover
+    metadata: {}
+    data: {}
+    target:
+      entity_id: cover.vr_general
+  mode: single
+- id: '1723492871421'
+  alias: Groupes dyamiques
+  description: Crée les groupes dynamique au démarrage de Home Assistant et à minuit
+  trigger:
+  - platform: homeassistant
+    event: start
+  - platform: time
+    at: 00:00:00
+  - platform: event
+    event_type: call_service
+    event_data:
+      domain: template
+      service: reload
+  condition: []
+  action:
+  - action: script.turn_on
+    metadata: {}
+    data: {}
+    target:
+      entity_id: script.groupes_dynamiques
+  mode: single
+- id: '1723494881090'
+  alias: Lumière avec alarme activée
+  description: Notifie qu'une lumière s'allume quand l'alarme est activée
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.nombre_lumieres_allumees
+  condition:
+  - condition: state
+    entity_id: alarm_control_panel.alarme_maison
+    state: armed_away
+  - condition: template
+    value_template: '{{ trigger.to_state.state | int > trigger.from_state.state |
+      int }}'
+  action:
+  - action: notify.maison
+    metadata: {}
+    data:
+      message: "{% for s in\n  expand(state_attr('group.lights_tlx800', 'entity_id'))
+        |\nselectattr('state','eq','on')|map(attribute='attributes.friendly_name')
+        | list %}\n      {{s}} allumé\n  {% endfor %}\n"
+    enabled: false
+  - action: notify.maison
+    metadata: {}
+    data:
+      message: '{{expand(state_attr(''group.lights_tlx800'', ''entity_id'')) | selectattr(''state'',''eq'',''on'')|
+        sort(attribute= ''last_changed'', reverse=true)|map(attribute=''attributes.friendly_name'')
+        | first}} allumé'
+  mode: single
+- id: '1726267079611'
+  alias: Thermostat routeur
+  description: Gère le thermostat du routeur en fonction de la température du chauffe-eau
+  triggers:
+  - entity_id:
+    - sensor.temperature_ecs
+    - sensor.temperature_bas
+    - sensor.temperature_haut
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 30
+    above: 80
+    id: up
+    trigger: numeric_state
+  - entity_id:
+    - sensor.temperature_ecs
+    - sensor.temperature_bas
+    - sensor.temperature_haut
+    below: 79
+    id: down
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 30
+    trigger: numeric_state
+  conditions: []
+  actions:
+  - if:
+    - condition: trigger
+      id:
+      - up
+    - condition: state
+      entity_id: binary_sensor.routeur_rms_routeur_rms_actif_triac
+      state: 'on'
+    then:
+    - action: mqtt.publish
+      metadata: {}
+      data:
+        qos: 0
+        retain: false
+        topic: triac
+        payload: '{"tOnOff":-180}'
+      alias: Arrêt routeur 3h
+    - action: notify.maison
+      metadata: {}
+      data:
+        message: 'Le chauffe-eau a atteint 80°. C''est le moment de se doucher ! '
+    else:
+    - if:
+      - condition: state
+        entity_id: binary_sensor.routeur_rms_routeur_rms_actif_triac
+        state: 'off'
+      - condition: numeric_state
+        entity_id: sensor.temperature_haut
+        below: 79
+      - condition: numeric_state
+        entity_id: sensor.temperature_bas
+        below: 79
+      - condition: numeric_state
+        entity_id: sensor.temperature_ecs
+        below: 79
+      then:
+      - action: mqtt.publish
+        metadata: {}
+        data:
+          qos: 0
+          retain: false
+          topic: triac
+          payload: '{"tOnOff":0}'
+        alias: Activation routeur
+  mode: single
+- id: '1733689209147'
+  alias: Eclairage sapin VR
+  description: Éclaire la sapin en fonction des volets du salon
+  triggers:
+  - trigger: state
+    entity_id:
+    - cover.vr_salon
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: cover.vr_salon
+        state: closed
+      - condition: state
+        entity_id: alarm_control_panel.alarme_maison
+        state: disarmed
+      sequence:
+      - action: switch.turn_on
+        metadata: {}
+        data: {}
+        target:
+          entity_id: switch.sonoff_basic_relay
+    - conditions:
+      - condition: state
+        entity_id: cover.vr_salon
+        state: opening
+      sequence:
+      - action: switch.turn_off
+        metadata: {}
+        data: {}
+        target:
+          entity_id: switch.sonoff_basic_relay
+  mode: single
+- id: '1733690026638'
+  alias: Eclairage sapin BP
+  description: Allume ou éteint le sapin par le BP couloir
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.bp_entree_angle_salon
+    to: 'on'
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 0.5
+  conditions: []
+  actions:
+  - action: switch.toggle
+    metadata: {}
+    data: {}
+    target:
+      entity_id: switch.sonoff_basic_relay
+  mode: single
+- id: '1733691041041'
+  alias: Eclairage sapin nuit
+  description: Allume ou éteint le sapin après minuit en fonction des lumières allumées
+  triggers:
+  - trigger: time
+    at: 00:00:05
+  - trigger: numeric_state
+    entity_id:
+    - sensor.nombre_lumieres_allumees
+    for:
+      hours: 0
+      minutes: 15
+      seconds: 0
+    below: 1
+  - trigger: numeric_state
+    entity_id:
+    - sensor.nombre_lumieres_allumees
+    above: 1
+  conditions:
+  - condition: time
+    after: 00:00:00
+    before: 08:00:00
+  actions:
+  - if:
+    - condition: numeric_state
+      entity_id: sensor.nombre_lumieres_allumees
+      below: 1
+    then:
+    - action: switch.turn_off
+      metadata: {}
+      data: {}
+      target:
+        entity_id: switch.sonoff_basic_relay
+    else:
+    - condition: state
+      entity_id: alarm_control_panel.alarme_maison
+      state: disarmed
+    - condition: state
+      entity_id: cover.vr_salon
+      state: closed
+    - action: switch.turn_on
+      metadata: {}
+      data: {}
+      target:
+        entity_id: switch.sonoff_basic_relay
+  mode: single
+- id: '1733695170869'
+  alias: Eclairage sapin alarme
+  description: Allume ou éteint le sapin en fonction de l'alarme
+  triggers:
+  - trigger: state
+    entity_id:
+    - alarm_control_panel.alarme_maison
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 5
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: alarm_control_panel.alarme_maison
+        state: armed_away
+        for:
+          hours: 0
+          minutes: 0
+          seconds: 5
+      sequence:
+      - action: switch.turn_off
+        metadata: {}
+        data: {}
+        target:
+          entity_id: switch.sonoff_basic_relay
+    - conditions:
+      - condition: and
+        conditions:
+        - condition: state
+          entity_id: alarm_control_panel.alarme_maison
+          for:
+            hours: 0
+            minutes: 0
+            seconds: 5
+          state: disarmed
+        - condition: state
+          entity_id: cover.vr_salon
+          state: closed
+        - condition: state
+          entity_id: sun.sun
+          state: above_horizon
+      sequence:
+      - action: switch.turn_on
+        metadata: {}
+        data: {}
+        target:
+          entity_id: switch.sonoff_basic_relay
+  mode: single
+- id: '1735465705656'
+  alias: Résistance appoint
+  description: ''
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.resistance_appoint
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 0
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: state
+        state: 'on'
+        entity_id: binary_sensor.resistance_appoint
+      sequence:
+      - action: mqtt.publish
+        metadata: {}
+        data:
+          qos: '0'
+          retain: false
+          topic: triac
+          payload: '{"tOnOff":180}'
+    - conditions:
+      - condition: state
+        state: 'off'
+        entity_id: binary_sensor.resistance_appoint
+      sequence:
+      - action: mqtt.publish
+        metadata: {}
+        data:
+          qos: '0'
+          retain: false
+          topic: triac
+          payload: '{"tOnOff":0}'
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 30
+          milliseconds: 0
+      - if:
+        - condition: numeric_state
+          entity_id: sensor.puissance_routeur
+          above: 1300
+        then:
+        - action: notify.maison
+          metadata: {}
+          data:
+            message: ⚠️Echec de l'arrêt du routage forcé. Deuxième tentative en cours...
+        - action: mqtt.publish
+          metadata: {}
+          data:
+            qos: '0'
+            retain: false
+            topic: triac
+            payload: '{"tOnOff":0}'
+        - delay:
+            hours: 0
+            minutes: 0
+            seconds: 30
+            milliseconds: 0
+        - if:
+          - condition: numeric_state
+            entity_id: sensor.puissance_routeur
+            above: 1300
+          then:
+          - action: notify.maison
+            metadata: {}
+            data:
+              message: ' ❌ Deuxième échec de l''arrêt du routage forcé ! Arrêtez le
+                routage manuellement !'
+          - action: mqtt.publish
+            metadata: {}
+            data:
+              qos: '0'
+              retain: false
+              topic: triac
+              payload: '{"tOnOff":0}'
+          else:
+          - action: notify.maison
+            metadata: {}
+            data:
+              message: '✅ Routage auto activé '
+- id: '1735830278977'
+  alias: Notification PAC
+  description: ''
+  triggers:
+  - trigger: state
+    entity_id:
+    - sensor.aiguillage_vanne
+    to: Standby sécurité
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 30
+    id: securite
+  - trigger: numeric_state
+    entity_id:
+    - sensor.temperature_piece_principale
+    for:
+      hours: 0
+      minutes: 35
+      seconds: 0
+    below: 17.9
+    id: temp_basse
+  - trigger: numeric_state
+    entity_id:
+    - sensor.temperature_ecs
+    below: 40
+    id: ecs_sous_40
+    for:
+      hours: 0
+      minutes: 15
+      seconds: 0
+  - trigger: numeric_state
+    entity_id:
+    - sensor.temperature_ecs
+    below: 35
+    id: ecs_sous_30
+    for:
+      hours: 0
+      minutes: 15
+      seconds: 0
+  - trigger: state
+    entity_id:
+    - binary_sensor.resistance_appoint
+    to: 'off'
+    for:
+      hours: 0
+      minutes: 2
+      seconds: 0
+    id: resistance_normale
+  - trigger: numeric_state
+    entity_id:
+    - sensor.puissance_routeur
+    for:
+      hours: 0
+      minutes: 3
+      seconds: 0
+    above: 1300
+    id: routeur_force
+  - trigger: numeric_state
+    entity_id:
+    - sensor.temperature_piece_principale
+    for:
+      hours: 0
+      minutes: 1
+      seconds: 0
+    below: 17.7
+    id: temp_tres_basse
+  - trigger: state
+    entity_id:
+    - device_tracker.aldes
+    - device_tracker.esp32s2mini
+    - device_tracker.t_one
+    to: not_home
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 5
+    id: Absent
+  - trigger: state
+    entity_id:
+    - select.mode_air
+    - select.t_one_mode_air
+    to: 'Off'
+    for:
+      hours: 0
+      minutes: 15
+      seconds: 0
+    id: 'Off'
+  conditions:
+  - alias: Si l'état précédent est défini
+    condition: template
+    value_template: '{{ trigger.from_state.state not in [''unknown'', ''unavailable'']
+      }}'
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - securite
+      sequence:
+      - action: notify.maison
+        metadata: {}
+        data:
+          message: '⚠️ La pompe à chaleur RDC est passée en sécurité '
+    - conditions:
+      - condition: trigger
+        id:
+        - temp_basse
+        - temp_tres_basse
+      - condition: state
+        entity_id: sensor.aiguillage_vanne
+        state: Air
+        for:
+          hours: 0
+          minutes: 15
+          seconds: 0
+      sequence:
+      - if:
+        - condition: not
+          conditions:
+          - condition: state
+            entity_id: select.mode_air
+            state: Confort Chauffage
+          alias: Si le chauffage n'est pas à Confort
+        then:
+        - action: notify.maison
+          metadata: {}
+          data:
+            message: "⚠️ Le chauffage est arrété au RDC et la température du séjour
+              est de {{ states('sensor.temperature_piece_principale') }}° \U0001F976
+              La consigne est à {{ states('number.thermostat_1') }}°"
+        else:
+        - action: notify.maison
+          metadata: {}
+          data:
+            message: "⚠️ La température du séjour est de {{ states('sensor.temperature_piece_principale')
+              }}° \U0001F976 La consigne est à {{ states('number.thermostat_1') }}°"
+    - conditions:
+      - condition: trigger
+        id:
+        - ecs_sous_40
+        - ecs_sous_30
+      sequence:
+      - action: notify.maison
+        metadata: {}
+        data:
+          message: ⚠️ La température de l'eau chaude est passée sous {{ states('sensor.temperature_ecs')
+            }}°
+    - conditions:
+      - condition: trigger
+        id:
+        - resistance_normale
+        - routeur_force
+      - condition: numeric_state
+        entity_id: sensor.puissance_routeur
+        above: 1300
+      - condition: state
+        entity_id: binary_sensor.esp32s2mini_r_sistance_appoint
+        state: 'off'
+      sequence:
+      - action: notify.maison
+        metadata: {}
+        data:
+          message: "⚠️ La résistance d'appoint du chauffe-eau est forcée alors que
+            ce n'est pas demandé ! \U0001F321️"
+    - conditions:
+      - condition: trigger
+        id:
+        - Absent
+      sequence:
+      - action: notify.maison
+        metadata: {}
+        data:
+          message: ⚠️ Perte de communication avec la passerelle, vérifier que la pompe
+            à chaleur est toujours alimentée
+    - conditions:
+      - condition: trigger
+        id:
+        - 'Off'
+      - condition: numeric_state
+        entity_id: sensor.t_one_temp_rature_pi_ce_principale
+        below: 19
+      sequence:
+      - if:
+        - condition: template
+          value_template: trigger.entity_id == select.mode_air
+          alias: Si déclenché par RDC
+        then:
+        - action: notify.maison
+          metadata: {}
+          data:
+            message: ⚠️ Le chauffage RDC est sur off
+        else:
+        - action: notify.maison
+          metadata: {}
+          data:
+            message: ⚠️ Le chauffage de l'étage est sur off
+  mode: single
+- id: '1739731303201'
+  alias: Allumer entrée quand on entre
+  description: Allume spots entrée quand la porte s'ouvre la nuit
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.porte_entree_fermee
+    to: 'off'
+  conditions:
+  - condition: state
+    entity_id: sun.sun
+    state: below_horizon
+  actions:
+  - action: light.turn_on
+    metadata: {}
+    data: {}
+    target:
+      entity_id: light.entree_spots
+  mode: single
+- id: '1747257384977'
+  alias: Températures ECS anormales
+  description: Notifie qu'une des température ECS est anormalement haute ou indisponible
+  triggers:
+  - trigger: numeric_state
+    entity_id:
+    - sensor.temperature_bas
+    - sensor.temperature_haut
+    - sensor.temperature_ecs
+    for:
+      hours: 0
+      minutes: 1
+      seconds: 0
+    above: 81
+  - trigger: state
+    entity_id:
+    - sensor.temperature_bas
+    - sensor.temperature_haut
+    - sensor.temperature_ecs
+    to: unavailable
+    for:
+      hours: 0
+      minutes: 1
+      seconds: 0
+  conditions: []
+  actions:
+  - action: notify.maison
+    metadata: {}
+    data:
+      message: "\U0001F321️​ Température chauffe-eau anormale ! ⚠️​\nTempérature interne
+        : {{states('sensor.temperature_ecs') }}°\nTempérature Bas : {{states('sensor.temperature_bas')
+        }}°\nTempérature Haut : {{states('sensor.temperature_haut') }}°\n"
+  mode: single
+- id: '1750106040197'
+  alias: Fermeture VR nord soleil matin
+  description: Ferme le VR des fenêtres au nord avant que le soleil tape
+  triggers:
+  - entity_id:
+    - sensor.vr_fenetre_arriere_fermeture_soleil
+    for:
+      hours: 0
+      minutes: 1
+      seconds: 0
+    trigger: numeric_state
+    above: 3
+    id: soleil
+  - entity_id:
+    - sensor.vr_fenetre_arriere_fermeture_soleil
+    for:
+      hours: 0
+      minutes: 1
+      seconds: 0
+    trigger: numeric_state
+    above: 7
+    id: soleil
+  conditions:
+  - condition: template
+    value_template: '{% set n = now() %} {{ n.month == 7 or  n.month == 8 or( n.month
+      == 6 and ( 15 <= n.day <= 30 )) or( n.month == 9 and ( 1 <= n.day <= 15 ))}}
+
+      '
+    alias: Entre le 15 juin et le 15 septembre
+  - condition: state
+    entity_id: weather.gagnac_sur_garonne
+    state:
+    - sunny
+    - partlycloudy
+    - clear-night
+  - condition: numeric_state
+    entity_id: sensor.weather_forecast_jour_gagnac
+    attribute: temp_max
+    above: 25
+  - alias: Levé soleil et production solaire suffisante
+    condition: or
+    conditions:
+    - condition: and
+      conditions:
+      - condition: numeric_state
+        entity_id: sensor.panneaux_solaires_puissance
+        above: 320
+      - condition: numeric_state
+        entity_id: sensor.vr_fenetre_arriere_fermeture_soleil
+        below: 9
+      alias: 8% et >320W
+    - condition: and
+      conditions:
+      - condition: numeric_state
+        entity_id: sensor.panneaux_solaires_puissance
+        above: 100
+      - condition: numeric_state
+        entity_id: sensor.vr_fenetre_arriere_fermeture_soleil
+        below: 5
+      alias: 4% et >100W
+  actions:
+  - action: cover.set_cover_position
+    metadata: {}
+    data:
+      position: 20
+    target:
+      entity_id:
+      - cover.vr_bureau
+      - cover.vr_escalier
+      - cover.vr_palier
+  - if:
+    - condition: numeric_state
+      entity_id: cover.vr_chambre_1
+      above: 20
+    then:
+    - action: cover.set_cover_position
+      target:
+        entity_id: cover.vr_chambre_1
+      data:
+        position: 20
+  mode: single
+- id: '1750108997449'
+  alias: Fermeture VR JM soleil matin
+  description: Ferme le VR des fenêtres côté JM avant que le soleil tape
+  triggers:
+  - entity_id:
+    - sensor.vr_cote_jm_fermeture_soleil
+    for:
+      hours: 0
+      minutes: 1
+      seconds: 0
+    trigger: numeric_state
+    above: 20
+    id: soleil
+  conditions:
+  - condition: template
+    value_template: '{% set n = now() %} {{ n.month == 7 or  n.month == 8 or( n.month
+      == 6 and ( 15 <= n.day <= 30 )) or( n.month == 9 and ( 1 <= n.day <= 15 ))}}
+
+      '
+    alias: Entre le 15 juin et le 15 septembre
+  - condition: state
+    entity_id: weather.gagnac_sur_garonne
+    state:
+    - sunny
+    - partlycloudy
+    - clear-night
+  - condition: numeric_state
+    entity_id: sensor.weather_forecast_jour_gagnac
+    attribute: temp_max
+    above: 25
+  - condition: numeric_state
+    entity_id: sensor.panneaux_solaires_puissance
+    above: 320
+  actions:
+  - if:
+    - condition: state
+      entity_id: cover.vr_salle_de_jeu
+      state: open
+    then:
+    - action: cover.set_cover_position
+      metadata: {}
+      data:
+        position: 20
+      target:
+        entity_id:
+        - cover.vr_salle_de_jeu
+  - if:
+    - condition: state
+      entity_id: cover.vr_porte_fenetre_salon
+      state: open
+    then:
+    - action: cover.set_cover_position
+      metadata: {}
+      data:
+        position: 20
+      target:
+        entity_id: cover.vr_porte_fenetre_salon
+  mode: single
+- id: '1751287128721'
+  alias: 'Surveillance puissance lave vaisselle '
+  description: ''
+  triggers:
+  - trigger: numeric_state
+    entity_id:
+    - sensor.prise_lave_vaisselle_summation_delivered
+    for:
+      hours: 0
+      minutes: 1
+      seconds: 0
+    above: 150
+    below: 150
+  conditions: []
+  actions:
+  - action: notify.moi
+    metadata: {}
+    data:
+      message: 'Lave vaisselle : changement de puissance consommée : '
+  mode: single
+- id: '1754810315888'
+  alias: Ouverture porte-fenêtre
+  description: 'Ouvre la porte-fenêtre quand il n''y a plus de soleil '
+  triggers:
+  - entity_id:
+    - sensor.vr_cote_jm_fermeture_soleil
+    trigger: numeric_state
+    above: 90
+  conditions: []
+  actions:
+  - action: cover.set_cover_position
+    metadata: {}
+    data:
+      position: '100'
+    target:
+      entity_id: cover.vr_porte_fenetre_salon
+  mode: single
+- id: '1756328979209'
+  alias: Clôture électrique
+  description: Allume la clôture le sport et l'éteint le matin
+  triggers:
+  - trigger: sun
+    event: sunset
+    offset: 00:45:00
+    id: couche
+  - trigger: sun
+    event: sunrise
+    offset: 0
+    id: leve
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - couche
+      sequence:
+      - action: switch.turn_on
+        metadata: {}
+        data: {}
+        target:
+          entity_id: switch.garage_cloture
+    - conditions:
+      - condition: trigger
+        id:
+        - leve
+      sequence:
+      - action: switch.turn_off
+        metadata: {}
+        data: {}
+        target:
+          entity_id: switch.garage_cloture
+  mode: single
+- id: '1757878488069'
+  alias: BP Aqara bureau
+  description: ''
+  use_blueprint:
+    path: carlosmesquita/zha-xiaomi-aqara-wireless-mini-switch-wxkg11lm-lumi-sensor-switch-aq2.yaml
+    input:
+      mijia_square_switch: 7c32e89d37162c80fade6b96dc9f6730
+      remote_button_short_press:
+      - action: light.toggle
+        metadata: {}
+        data: {}
+        target:
+          entity_id: light.bureau_eclairage
+- id: '1758481094510'
+  alias: Capteur bloqué >7j
+  description: Alerte si un capteur d'ouverture n'a pas changé depuis 7 jours
+  triggers:
+  - value_template: "\n      {% set seuil = now() - timedelta(minutes=235) %}\n      {%
+      set ns = namespace(triggered=false) %}\n      {% for capteur in state_attr('binary_sensor.capteurs_ouvertures',
+      'entity_id') %}\n        {% if (states[capteur].last_changed | as_datetime)
+      < seuil %}\n          {% set ns.triggered = true %}\n        {% endif %}\n      {%
+      endfor %}\n      {{ ns.triggered }}  "
+    trigger: template
+  actions:
+  - action: notify.mobile_app_galaxy_s20_fe
+    metadata: {}
+    data:
+      message: '{% set seuil = now() - timedelta(minutes=235) %} {% set inactifs =           expand(''binary_sensor.capteurs_ouvertures'')
+        |           selectattr(''last_changed'',''lt'',seuil) | map(attribute=''entity_id'')
+        |           list %} Capteur(s) inactif(s) : {{ inactifs | join('', '')           }} '
+    enabled: true
+  - action: notify.moi
+    metadata: {}
+    data:
+      message: '{% set seuil = now() - timedelta(minutes=235) %} {% set inactifs =           expand(''binary_sensor.capteurs_ouvertures'')
+        |           selectattr(''last_changed'',''lt'',seuil) | map(attribute=''entity_id'')
+        |           list %} Capteur(s) inactif(s) : {{ inactifs | join('', '')           }} '
+  mode: single
