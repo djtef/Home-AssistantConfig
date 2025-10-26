@@ -14,6 +14,13 @@ api:
         - pulse_meter.set_total_pulses:
             id: COMPTEUR_EAU_DEBIT
             value: !lambda 'return total_litres;'
+            
+
+substitutions:
+  MIN_LENGTH_BP: "50ms"
+  MAX_LENGTH_BP: "300ms"
+  MAX_LENGTH_LONG_BP: "3000ms"
+  
 globals:
    - id: sauvegarde_compteur_eau
      type: int
@@ -777,8 +784,8 @@ light:
     name: Palier Eclairage central
     output: out2_12
   - platform: binary
-    id: GA_NEON
-    name: Garage Eclairage
+    id: CE_APP
+    name: Cellier Applique
     output: out2_13
   - platform: binary
     id: EN_SPT
@@ -853,8 +860,8 @@ light:
     name: SDJ Eclairage
     output: out3_07
   - platform: binary
-    id: CE_APP
-    name: Cellier Applique
+    id: GA_NEON
+    name: Garage Eclairage
     output: out3_08
   - platform: binary
     id: PA_SPT_ESCALIER
@@ -928,18 +935,18 @@ button:
     duration: 200ms
     
 binary_sensor:
-# Individual inputs
-  - platform: gpio
-    name: "Impulsion compteur eau"
-    id: COMPTEUR_EAU_PULSE
-    pin:
-      number: GPIO35
-      mode: INPUT
-    on_state:
-      then:
-        - globals.set:
-            id: sauvegarde_compteur_eau
-            value: !lambda 'return id(COMPTEUR_EAU_TOTAL).state;'
+# # Individual inputs
+  # - platform: gpio
+    # name: "Impulsion compteur eau"
+    # id: COMPTEUR_EAU_PULSE
+    # pin:
+      # number: GPIO35
+      # mode: INPUT
+    # on_state:
+      # then:
+        # - globals.set:
+            # id: sauvegarde_compteur_eau
+            # value: !lambda 'return id(COMPTEUR_EAU_TOTAL).state;'
   - platform: gpio
     name: "VR Chambre 2 montée"
     id: in01
@@ -986,8 +993,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - lambda: |-
             if (id(vr02).current_operation == CoverOperation::COVER_OPERATION_IDLE) 
@@ -1014,8 +1021,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - lambda: |-
             if (id(vr02).current_operation == CoverOperation::COVER_OPERATION_IDLE) 
@@ -1112,8 +1119,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - lambda: |-
             if (id(vr05).current_operation == CoverOperation::COVER_OPERATION_IDLE) 
@@ -1140,8 +1147,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - lambda: |-
             if (id(vr05).current_operation == CoverOperation::COVER_OPERATION_IDLE)   
@@ -1338,8 +1345,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - lambda: |-
             if (id(vr11).current_operation == CoverOperation::COVER_OPERATION_IDLE) 
@@ -1366,8 +1373,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - lambda: |-
             if (id(vr11).current_operation == CoverOperation::COVER_OPERATION_IDLE) 
@@ -1408,8 +1415,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: SA_APP_PERIPH
   - platform: gpio #in1 25
@@ -1424,8 +1431,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: SA_APP_HAUTE
   - platform: gpio #in1 26
@@ -1440,8 +1447,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 500ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: XT_APP_TERRASSE
   - platform: gpio #in1 27
@@ -1456,8 +1463,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 500ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: XT_APP_TERRASSE
   - platform: gpio #in1 28
@@ -1472,8 +1479,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: SJ_DCL
   - platform: gpio #in1 29
@@ -1488,8 +1495,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: C1_DCL
   - platform: gpio #in1 30
@@ -1504,8 +1511,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: C1_APP_G        
   - platform: gpio #in1 31
@@ -1520,8 +1527,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: C1_DCL
   - platform: gpio #in1 32
@@ -1536,8 +1543,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: C1_APP_D
   - platform: gpio #in1 33
@@ -1552,8 +1559,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: EN_SPT
   - platform: gpio #in1 34
@@ -1568,8 +1575,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: SA_DCL
   - platform: gpio #in1 35
@@ -1584,8 +1591,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: SA_APP_PERIPH
   - platform: gpio #in1 36
@@ -1600,8 +1607,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: SA_APP_HAUTE
   - platform: gpio #in1 37
@@ -1616,8 +1623,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 500ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: XT_APP_TERRASSE
   - platform: gpio #in1 38
@@ -1632,8 +1639,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 500ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: XT_APP_TERRASSE
   - platform: gpio #in1 39
@@ -1648,8 +1655,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 500ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: XT_APP_JM
   - platform: gpio #in1 40
@@ -1678,8 +1685,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - script.execute: cuisine_led
   - platform: gpio #in2 02
@@ -1694,8 +1701,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: SA_APP_PERIPH
   - platform: gpio #in2 03
@@ -1710,8 +1717,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: SA_APP_HAUTE
   - platform: gpio #in2 04
@@ -1740,8 +1747,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: BB_LED
   - platform: gpio #in2 06
@@ -1756,12 +1763,12 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 250ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: BB_DCL
-    - min_length: 250ms
-      max_length: 3000ms
+    - min_length: ${MAX_LENGTH_BP}
+      max_length: ${MAX_LENGTH_LONG_BP}
       then:
         - light.toggle: BB_SPT
   - platform: gpio #in2 07
@@ -1776,8 +1783,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: CE_SPT
   - platform: gpio #in2 08
@@ -1806,8 +1813,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: EN_DCL_2
   - platform: gpio #in2 10
@@ -1822,8 +1829,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: CU_SPT_TOUR        
   - platform: gpio #in2 11
@@ -1852,8 +1859,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: PA_SPT_ESCALIER
   - platform: gpio #in2 13
@@ -1868,8 +1875,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: GA_NEON
   - platform: gpio #in2 14
@@ -1884,8 +1891,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: RB_SPT
   - platform: gpio #in2 15
@@ -1900,8 +1907,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: RB_SPT
   - platform: gpio #in2 16
@@ -1916,8 +1923,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: SM_DCL
   - platform: gpio #in2 17
@@ -1932,8 +1939,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: WB_SPT
   - platform: gpio #in2 18
@@ -1948,8 +1955,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: BU_DCL
   - platform: gpio #in2 19
@@ -1978,8 +1985,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: BH_LED              
   - platform: gpio #in2 21
@@ -2008,8 +2015,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: EN_SPT_COULOIR
   - platform: gpio #in2 23
@@ -2052,12 +2059,12 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: PA_DCL
-    - min_length: 300ms
-      max_length: 2000ms
+    - min_length: ${MAX_LENGTH_BP}
+      max_length: ${MAX_LENGTH_LONG_BP}
       then:
         - light.toggle: PA_SPT
   - platform: gpio #in2 26
@@ -2072,8 +2079,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: C1_DCL
   - platform: gpio #in2 27
@@ -2088,8 +2095,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: C1_APP_D
   - platform: gpio #in2 28
@@ -2104,8 +2111,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: C2_DCL
   - platform: gpio #in2 29
@@ -2120,8 +2127,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - script.execute: cuisine_led
     on_press:
@@ -2148,8 +2155,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: CU_SPT_TOUR  
     on_press:
@@ -2176,8 +2183,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: SM_DCL
   - platform: gpio #in2 32
@@ -2192,8 +2199,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - script.execute: cuisine_led
   - platform: gpio #in2 33
@@ -2208,8 +2215,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: CU_SPT_TOUR
   - platform: gpio #in2 34
@@ -2238,8 +2245,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: XT_APP_ENTREE
   - platform: gpio #in2 36
@@ -2254,8 +2261,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: EN_SPT
   - platform: gpio #in2 37
@@ -2270,12 +2277,12 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 250ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: BH_DCL
-    - min_length: 250ms
-      max_length: 3000ms
+    - min_length: ${MAX_LENGTH_BP}
+      max_length: ${MAX_LENGTH_LONG_BP}
       then:
         - light.toggle: BH_SPT
   - platform: gpio #in2 38
@@ -2294,6 +2301,7 @@ binary_sensor:
         # - light.toggle: out238
   - platform: gpio #in2 39
     name: "Présence 220V"
+    device_class: power
     id: AC_OK
     pin:
       mcp23xxx: mcp23017_hub_a8
@@ -2360,8 +2368,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: C2_DCL
   - platform: gpio #in3 04
@@ -2376,8 +2384,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: WH_SPT
   #########################################
@@ -2413,13 +2421,14 @@ binary_sensor:
         # # - light.toggle: out306
  ##############################################
   - platform: gpio #in3 07
-    name: "in#3 07"
-    id: in307
+    name: "Capteur présence entrée"
+    id: EN_MOUV
+    device_class: motion
     pin:
       mcp23xxx: mcp23017_hub_b1
       number: 6
-      mode: INPUT_PULLUP
-      inverted: True
+      mode: INPUT
+      inverted: False
     # filters:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
@@ -2438,8 +2447,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: CE_APP
   - platform: gpio #in3 09
@@ -2454,8 +2463,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: PA_SPT_ESCALIER
   - platform: gpio #in3 10
@@ -2470,8 +2479,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: C3_DCL        
   - platform: gpio #in3 11
@@ -2500,8 +2509,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: XT_APP_GARAGE_PORTAIL
   - platform: gpio #in3 13
@@ -2558,8 +2567,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: EN_APP_ESCALIER
   - platform: gpio #in3 17
@@ -2627,8 +2636,8 @@ binary_sensor:
       mode: INPUT_PULLUP
       inverted: True
     # on_click:
-    # - min_length: 75ms
-      # max_length: 300ms
+    # - min_length: ${MIN_LENGTH_BP}
+      # max_length: ${MAX_LENGTH_BP}
       # then:
         # - light.toggle: CU_LED
   - platform: gpio #in3 22
@@ -2640,8 +2649,8 @@ binary_sensor:
       mode: INPUT_PULLUP
       inverted: True
     # on_click:
-    # - min_length: 75ms
-      # max_length: 300ms
+    # - min_length: ${MIN_LENGTH_BP}
+      # max_length: ${MAX_LENGTH_BP}
       # then:
         # - light.toggle: CU_SPT_TOUR
   - platform: gpio #in3 23
@@ -2653,8 +2662,8 @@ binary_sensor:
       mode: INPUT_PULLUP
       inverted: True
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - script.execute: cuisine_led
   - platform: gpio #in3 24
@@ -2666,8 +2675,8 @@ binary_sensor:
       mode: INPUT_PULLUP
       inverted: True
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: CU_SPT_TOUR
   - platform: gpio #in3 25
@@ -2682,8 +2691,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: C2_DCL
   - platform: gpio #in3 26
@@ -2698,8 +2707,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: PA_SPT_ESCALIER
   - platform: gpio #in3 27
@@ -2714,12 +2723,12 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: PA_DCL
-    - min_length: 300ms
-      max_length: 2000ms
+    - min_length: ${MAX_LENGTH_BP}
+      max_length: ${MAX_LENGTH_LONG_BP}
       then:
         - light.toggle: PA_SPT
   - platform: gpio #in3 28
@@ -2734,8 +2743,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: C3_DCL
   - platform: gpio #in3 29
@@ -2750,8 +2759,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: C3_DCL
   - platform: gpio #in3 30
@@ -2766,8 +2775,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: EN_SPT
   - platform: gpio #in3 31
@@ -2782,8 +2791,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: EN_SPT_COULOIR
   - platform: gpio #in3 32
@@ -2899,8 +2908,8 @@ binary_sensor:
       mode: INPUT_PULLUP
       inverted: True
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - script.execute: cuisine_led
   - platform: gpio #in3 37
@@ -2912,8 +2921,8 @@ binary_sensor:
       mode: INPUT_PULLUP
       inverted: True
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: CU_SPT_TOUR
   - platform: gpio #in3 38
@@ -2928,8 +2937,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - cover.open: vr01
         - cover.open: vr03
@@ -2947,8 +2956,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - cover.close: vr01
         - cover.close: vr03
@@ -2966,8 +2975,8 @@ binary_sensor:
       # - delayed_on: 3ms
       # - delayed_off: 3ms
     on_click:
-    - min_length: 75ms
-      max_length: 300ms
+    - min_length: ${MIN_LENGTH_BP}
+      max_length: ${MAX_LENGTH_BP}
       then:
         - light.toggle: CE_SPT        
 
@@ -3004,6 +3013,11 @@ sensor:
     unit_of_measurement: "m³"
     accuracy_decimals: 3 
     state_class: total_increasing
+    on_value:
+      then:
+        - globals.set:
+            id: sauvegarde_compteur_eau
+            value: !lambda 'return id(COMPTEUR_EAU_TOTAL).state;'
   - platform: teleinfo
     tag_name: "ISOUSC"
     name: "Intensité souscrite"
@@ -3018,6 +3032,8 @@ sensor:
     device_class: energy
     icon: mdi:flash
     teleinfo_id: myteleinfo
+    filters:
+        - filter_out: 0
   - platform: teleinfo
     tag_name: "PAPP"
     name: "Puissance apparente"

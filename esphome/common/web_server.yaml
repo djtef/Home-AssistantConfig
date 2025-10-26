@@ -17,3 +17,4 @@ web_server:
   auth:
     username: "${web_server_username}"
     password: "${web_server_password}"
+  version: 3

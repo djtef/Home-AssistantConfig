@@ -9,8 +9,8 @@ substitutions:
   ota_password: !secret esphome_ota_password
 
 ota:
-  id: component_ota
-  password: "${ota_password}"
-  safe_mode: true
-  reboot_timeout: 10min
-  num_attempts: 5
+  - platform: esphome  # Your existing OTA method
+    id: ota_esphome
+    password: "${ota_password}"
+  - platform: web_server  # Add this for web-based OTA uploads
+ 

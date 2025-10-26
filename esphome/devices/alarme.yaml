@@ -1908,7 +1908,7 @@ binary_sensor:
     name: "Capteur présence bureau"
     id: BU_PIR
     filters:
-      - delayed_on: 50ms
+      - delayed_on: 1s
       - delayed_off: 50ms
     pin:
       mcp23xxx: mcp23017_hub_b4
@@ -1967,7 +1967,7 @@ binary_sensor:
       mcp23xxx: mcp23017_hub_b4
       number: 0
       mode: INPUT_PULLUP
-      inverted: True   
+      inverted: False   
 
   
   - platform: homeassistant
@@ -2045,6 +2045,9 @@ sensor:
 
 # Individual outputs
 switch:
+
+  - platform: shutdown
+    name: "Alarme Shutdown"
   - platform: gpio
     id: out73
     name: "out73"
